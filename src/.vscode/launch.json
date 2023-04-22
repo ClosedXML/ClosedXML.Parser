@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ClosedXML.Parser/bin/Debug/net7.0/AntlrCSharp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/ClosedXML.Parser",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Debug ANTLR4 grammar",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "${workspaceFolder}/debug-input.txt",
+            "grammar": "${workspaceFolder}/ClosedXML.Parser/Formula.g4",
+            "startRule": "formula",
+            "printParseTree": true,
+            "visualParseTree": true
+        }
+    ]
+}
