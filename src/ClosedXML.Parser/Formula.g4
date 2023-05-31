@@ -35,7 +35,7 @@ percent_expression
         ;
 
 prefix_atom_expression
-        : prefix_operator atom_expression
+        : (PLUS | MINUS) atom_expression
         | atom_expression
         ;
 
@@ -93,8 +93,6 @@ constant_list_rows
 constant_list_row
         : (constant | REF_CONSTANT) (COMMA (constant | REF_CONSTANT))*
         ;
-
-prefix_operator : PLUS | MINUS;
 
 /* ---------------------------- Cell references ---------------------------- */
 
@@ -159,7 +157,7 @@ arg_percent_expression
         ;
 
 arg_prefix_atom_expression
-        : prefix_operator arg_atom_expression
+        : (PLUS | MINUS) arg_atom_expression
         | arg_atom_expression
         ;
 
