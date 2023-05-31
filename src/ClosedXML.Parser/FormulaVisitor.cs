@@ -146,12 +146,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPrefix_operator([NotNull] FormulaParser.Prefix_operatorContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.whitespace"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitWhitespace([NotNull] FormulaParser.WhitespaceContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.cell_reference"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

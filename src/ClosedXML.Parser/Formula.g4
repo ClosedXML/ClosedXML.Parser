@@ -15,31 +15,31 @@ formula
 /* ---------------------------- Expression ---------------------------- */
 
 expression
-        : concat_expression (whitespace* (GREATER_OR_EQUAL_THAN | LESS_OR_EQUAL_THAN | LESS_THAN | GREATER_THAN | NOT_EQUAL | EQUAL) whitespace* concat_expression)*
+        : concat_expression ((GREATER_OR_EQUAL_THAN | LESS_OR_EQUAL_THAN | LESS_THAN | GREATER_THAN | NOT_EQUAL | EQUAL) concat_expression)*
         ;
 
 concat_expression
-        : additive_expression (whitespace* CONCAT whitespace* additive_expression)*
+        : additive_expression (CONCAT additive_expression)*
         ;
 
 additive_expression
-        : multiplying_expression (whitespace* (PLUS | MINUS) whitespace* multiplying_expression)*
+        : multiplying_expression ((PLUS | MINUS) multiplying_expression)*
         ;
 
 multiplying_expression
-        : pow_expression (whitespace* (MULT | DIV) whitespace* pow_expression)*
+        : pow_expression ((MULT | DIV) pow_expression)*
         ;
 
 pow_expression
-        : percent_expression (whitespace* POW whitespace* percent_expression)*
+        : percent_expression (POW percent_expression)*
         ;
 
 percent_expression
-        : prefix_atom_expression whitespace* PERCENT?
+        : prefix_atom_expression PERCENT?
         ;
 
 prefix_atom_expression
-        : prefix_operator whitespace* atom_expression
+        : prefix_operator atom_expression
         | atom_expression
         ;
 
@@ -47,21 +47,21 @@ atom_expression
         : ref_expression
         | constant
         | function_call
-        | OPEN_BRACE whitespace* expression whitespace* CLOSE_BRACE
+        | OPEN_BRACE expression CLOSE_BRACE
         ;
 
 /* ------------------------- Reference expression -------------------------- */
 
 ref_expression
-        : ref_intersection_expression (',' ref_intersection_expression)*
+        : ref_intersection_expression (COMMA ref_intersection_expression)*
         ;
 
 ref_intersection_expression
-        : ref_range_expression (' ' ref_range_expression)*
+        : ref_range_expression (SPACE ref_range_expression)*
         ;
 
 ref_range_expression
-        : ref_atom_expression (':' ref_atom_expression)*
+        : ref_atom_expression (COLON ref_atom_expression)*
         ;
 
 ref_atom_expression
@@ -96,7 +96,6 @@ constant_list_row
 
 postfix_operator : PERCENT;
 prefix_operator : PLUS | MINUS;
-whitespace : ' ' | '\u000D' | '\u000A';
 
 /* ---------------------------- Cell references ---------------------------- */
 
@@ -113,7 +112,7 @@ external_cell_reference
 // TODO: Implement cell function calls, but even Excel refuses this ATM
 //cell-function-call = A1-cell "(" argument-list ")"
 user_defined_function_call
-        : user_defined_function_name '(' argument_list ')'
+        : user_defined_function_name OPEN_BRACE argument_list CLOSE_BRACE
         ;
 
 user_defined_function_name
@@ -127,8 +126,7 @@ argument_list
         : argument (COMMA argument)*
         ;
 argument
-        : whitespace+ arg_expression?
-        | arg_expression?
+        : arg_expression?
         ;
 
 /*
@@ -140,31 +138,31 @@ argument
  *    return number 2).
  */
 arg_expression
-        : arg_concat_expression (whitespace* (GREATER_OR_EQUAL_THAN | LESS_OR_EQUAL_THAN | LESS_THAN | GREATER_THAN | NOT_EQUAL | EQUAL) whitespace* arg_concat_expression)*
+        : arg_concat_expression ((GREATER_OR_EQUAL_THAN | LESS_OR_EQUAL_THAN | LESS_THAN | GREATER_THAN | NOT_EQUAL | EQUAL) arg_concat_expression)*
         ;
 
 arg_concat_expression
-        : arg_additive_expression (whitespace* CONCAT whitespace* arg_additive_expression)*
+        : arg_additive_expression (CONCAT arg_additive_expression)*
         ;
 
 arg_additive_expression
-        : arg_multiplying_expression (whitespace* (PLUS | MINUS) whitespace* arg_multiplying_expression)*
+        : arg_multiplying_expression ((PLUS | MINUS) arg_multiplying_expression)*
         ;
 
 arg_multiplying_expression
-        : arg_pow_expression (whitespace* (MULT | DIV) whitespace* arg_pow_expression)*
+        : arg_pow_expression ((MULT | DIV) arg_pow_expression)*
         ;
 
 arg_pow_expression
-        : arg_percent_expression (whitespace* POW whitespace* arg_percent_expression)*
+        : arg_percent_expression (POW arg_percent_expression)*
         ;
 
 arg_percent_expression
-        : arg_prefix_atom_expression whitespace* PERCENT?
+        : arg_prefix_atom_expression PERCENT?
         ;
 
 arg_prefix_atom_expression
-        : prefix_operator whitespace* arg_atom_expression
+        : prefix_operator arg_atom_expression
         | arg_atom_expression
         ;
 
@@ -172,15 +170,15 @@ arg_atom_expression
         : arg_ref_expression
         | constant
         | function_call
-        | OPEN_BRACE whitespace* expression whitespace* CLOSE_BRACE
+        | OPEN_BRACE expression CLOSE_BRACE
         ;
 
 arg_ref_expression
-        : arg_ref_range_expression (' ' arg_ref_range_expression)*
+        : arg_ref_range_expression (SPACE arg_ref_range_expression)*
         ;
 
 arg_ref_range_expression
-        : arg_ref_atom_expression (':' arg_ref_atom_expression)*
+        : arg_ref_atom_expression (COLON arg_ref_atom_expression)*
         ;
 
 arg_ref_atom_expression
@@ -220,12 +218,12 @@ table_name
         ;
 
 ref_function_call
-        : REF_FUNCTION_LIST '(' argument_list ')'
+        : REF_FUNCTION_LIST OPEN_BRACE argument_list CLOSE_BRACE
         ;
 
 function_call
         : /*ref_function_call
-        | */(FUNCTION_LIST | FUTURE_FUNCTION_LIST | LOGICAL_CONSTANT) '(' argument_list ')'
+        | */(FUNCTION_LIST | FUTURE_FUNCTION_LIST | LOGICAL_CONSTANT) OPEN_BRACE argument_list CLOSE_BRACE
         //| cell-function-call
         | user_defined_function_call
         ;
@@ -349,29 +347,31 @@ fragment CHARCATER_WITHOUT_DOUBLE_QUOTE
 
 /* ----------------------------- Operators --------------------------------- */
 
-POW: '^' ;
-MULT: '*' ;
-DIV: '/';
-PLUS: '+' ;
-MINUS: '-' ;
-CONCAT:'&' ;
-EQUAL: '=';
-NOT_EQUAL: '<>' ;
-LESS_OR_EQUAL_THAN: '<=' ;
-LESS_THAN: '<' ;
-GREATER_OR_EQUAL_THAN: '>=' ;
-GREATER_THAN: '>' ;
-PERCENT: '%' ;
-SEMICOLON: ';' ;
-COLON: ':';
-OPEN_BRACE: '(';
-CLOSE_BRACE: ')';
-OPEN_CURLY: '{';
-CLOSE_CURLY: '}';
-COMMA : ',';
-SPACE: ' ';
-OPEN_SQUARE: '[';
-CLOSE_SQUARE: ']';
+POW: WHITESPACES '^' WHITESPACES;
+MULT: WHITESPACES '*' WHITESPACES;
+DIV: WHITESPACES '/' WHITESPACES;
+PLUS: WHITESPACES '+' WHITESPACES;
+MINUS: WHITESPACES '-' WHITESPACES;
+CONCAT: WHITESPACES '&' WHITESPACES;
+EQUAL: WHITESPACES '=' WHITESPACES;
+NOT_EQUAL: WHITESPACES '<>' WHITESPACES;
+LESS_OR_EQUAL_THAN: WHITESPACES '<=' WHITESPACES;
+LESS_THAN: WHITESPACES '<' WHITESPACES;
+GREATER_OR_EQUAL_THAN: WHITESPACES '>=' WHITESPACES;
+GREATER_THAN: WHITESPACES '>' WHITESPACES;
+PERCENT: WHITESPACES '%' WHITESPACES;
+SEMICOLON: WHITESPACES ';' WHITESPACES;
+COLON: WHITESPACES ':' WHITESPACES;
+OPEN_BRACE: WHITESPACES '(' WHITESPACES;
+CLOSE_BRACE: WHITESPACES ')' WHITESPACES;
+OPEN_CURLY: WHITESPACES '{' WHITESPACES;
+CLOSE_CURLY: WHITESPACES '}' WHITESPACES;
+COMMA : WHITESPACES ',' WHITESPACES;
+SPACE: WHITESPACES ' ' WHITESPACES;
+OPEN_SQUARE: WHITESPACES '[' WHITESPACES;
+CLOSE_SQUARE: WHITESPACES ']' WHITESPACES;
+
+fragment WHITESPACES : (' ' | '\u000D' | '\u000A')*;
 
 /* -------------------------- External References -------------------------- */
 
