@@ -116,12 +116,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitConstant([NotNull] FormulaParser.ConstantContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.array_constant"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitArray_constant([NotNull] FormulaParser.Array_constantContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.constant_list_rows"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

@@ -76,12 +76,9 @@ constant
         | LOGICAL_CONSTANT
         | NUMERICAL_CONSTANT
         | STRING_CONSTANT
-        | array_constant
+        | OPEN_CURLY constant_list_rows CLOSE_CURLY
         ;
 
-array_constant
-        : OPEN_CURLY constant_list_rows CLOSE_CURLY
-        ;
 constant_list_rows
         : constant_list_row (SEMICOLON constant_list_row)*
         ;
