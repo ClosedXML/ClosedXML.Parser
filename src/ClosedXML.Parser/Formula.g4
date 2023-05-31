@@ -94,7 +94,6 @@ constant_list_row
         : (constant | REF_CONSTANT) (COMMA (constant | REF_CONSTANT))*
         ;
 
-postfix_operator : PERCENT;
 prefix_operator : PLUS | MINUS;
 
 /* ---------------------------- Cell references ---------------------------- */

@@ -128,12 +128,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitConstant_list_row([NotNull] FormulaParser.Constant_list_rowContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.postfix_operator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitPostfix_operator([NotNull] FormulaParser.Postfix_operatorContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.prefix_operator"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
