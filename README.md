@@ -37,8 +37,7 @@ Current state - ENRON dataset parsing
 
 Bad ones fail on external workbook name reference that uses apostrophe (e.g `[1]!'Some name in external wb'`), otherwise they are parsed.
 
-* Solve cell formulas
-* Convert to LL(1) parser
+* Convert to LL(1) parser. Per maintainer [SO post](https://stackoverflow.com/a/26457201/2622707), once there are no calls to `AdaptivePredict`, it's LL(1).
 * Prerequisite for recursive descent parser
   * Remove left recusion
   * Remove left factoring
