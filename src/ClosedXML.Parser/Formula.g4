@@ -71,8 +71,15 @@ ref_atom_expression
 
 /* ------------------------------- Constants ------------------------------- */
 
+/*
+ * Constant doesn't contain #REF!, because that is in the ref_expressions and
+ * by removing it from here, there isn't an ambiguity whether `constant` or
+ * `ref_atom_expression` is the correct path from atom. This is pretty edge case
+ * anyway and even Excel has bugs there (e.g. `=(A1 ,#REF!)` can't be parsed despite
+ * its validity).
+ */
 constant
-        : (REF_CONSTANT | NONREF_ERRORS)
+        : NONREF_ERRORS
         | LOGICAL_CONSTANT
         | NUMERICAL_CONSTANT
         | STRING_CONSTANT
@@ -84,7 +91,7 @@ constant_list_rows
         ;
 
 constant_list_row
-        : constant (COMMA constant)*
+        : (constant | REF_CONSTANT) (COMMA (constant | REF_CONSTANT))*
         ;
 
 postfix_operator : PERCENT;
