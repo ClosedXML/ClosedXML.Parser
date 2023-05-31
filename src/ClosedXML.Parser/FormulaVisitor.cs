@@ -134,12 +134,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitCell_reference([NotNull] FormulaParser.Cell_referenceContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.local_cell_reference"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitLocal_cell_reference([NotNull] FormulaParser.Local_cell_referenceContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.external_cell_reference"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

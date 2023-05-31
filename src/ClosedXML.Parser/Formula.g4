@@ -96,8 +96,11 @@ constant_list_row
 
 /* ---------------------------- Cell references ---------------------------- */
 
-cell_reference : external_cell_reference | local_cell_reference;
-local_cell_reference : A1_REFERENCE;
+cell_reference
+        : A1_REFERENCE                 // local_cell_reference
+        | external_cell_reference
+        ;
+
 external_cell_reference
         : BANG_REFERENCE
         | SHEET_RANGE_REFERENCE
