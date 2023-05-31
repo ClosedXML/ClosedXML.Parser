@@ -43,7 +43,7 @@ public partial class FormulaParser : Parser {
 		OPEN_CURLY=23, CLOSE_CURLY=24, COMMA=25, SPACE=26, OPEN_SQUARE=27, CLOSE_SQUARE=28, 
 		BOOK_PREFIX=29, BANG_REFERENCE=30, SHEET_RANGE_REFERENCE=31, SINGLE_SHEET_REFERENCE=32, 
 		SINGLE_SHEET_PREFIX=33, A1_REFERENCE=34, REF_FUNCTION_LIST=35, FUNCTION_LIST=36, 
-		FUTURE_FUNCTION_LIST=37, NAME=38, INTRA_TABLE_REFERENCE=39;
+		FUTURE_FUNCTION_LIST=37, CELL_FUNCTION_LIST=38, NAME=39, INTRA_TABLE_REFERENCE=40;
 	public const int
 		RULE_formula = 0, RULE_expression = 1, RULE_concat_expression = 2, RULE_additive_expression = 3, 
 		RULE_multiplying_expression = 4, RULE_pow_expression = 5, RULE_percent_expression = 6, 
@@ -84,7 +84,7 @@ public partial class FormulaParser : Parser {
 		"OPEN_CURLY", "CLOSE_CURLY", "COMMA", "SPACE", "OPEN_SQUARE", "CLOSE_SQUARE", 
 		"BOOK_PREFIX", "BANG_REFERENCE", "SHEET_RANGE_REFERENCE", "SINGLE_SHEET_REFERENCE", 
 		"SINGLE_SHEET_PREFIX", "A1_REFERENCE", "REF_FUNCTION_LIST", "FUNCTION_LIST", 
-		"FUTURE_FUNCTION_LIST", "NAME", "INTRA_TABLE_REFERENCE"
+		"FUTURE_FUNCTION_LIST", "CELL_FUNCTION_LIST", "NAME", "INTRA_TABLE_REFERENCE"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -629,6 +629,7 @@ public partial class FormulaParser : Parser {
 			case REF_FUNCTION_LIST:
 			case FUNCTION_LIST:
 			case FUTURE_FUNCTION_LIST:
+			case CELL_FUNCTION_LIST:
 			case NAME:
 			case INTRA_TABLE_REFERENCE:
 				EnterOuterAlt(_localctx, 2);
@@ -1648,7 +1649,7 @@ public partial class FormulaParser : Parser {
 			State = 229;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << REF_CONSTANT) | (1L << NONREF_ERRORS) | (1L << LOGICAL_CONSTANT) | (1L << NUMERICAL_CONSTANT) | (1L << STRING_CONSTANT) | (1L << PLUS) | (1L << MINUS) | (1L << OPEN_BRACE) | (1L << OPEN_CURLY) | (1L << BOOK_PREFIX) | (1L << BANG_REFERENCE) | (1L << SHEET_RANGE_REFERENCE) | (1L << SINGLE_SHEET_REFERENCE) | (1L << SINGLE_SHEET_PREFIX) | (1L << A1_REFERENCE) | (1L << REF_FUNCTION_LIST) | (1L << FUNCTION_LIST) | (1L << FUTURE_FUNCTION_LIST) | (1L << NAME) | (1L << INTRA_TABLE_REFERENCE))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << REF_CONSTANT) | (1L << NONREF_ERRORS) | (1L << LOGICAL_CONSTANT) | (1L << NUMERICAL_CONSTANT) | (1L << STRING_CONSTANT) | (1L << PLUS) | (1L << MINUS) | (1L << OPEN_BRACE) | (1L << OPEN_CURLY) | (1L << BOOK_PREFIX) | (1L << BANG_REFERENCE) | (1L << SHEET_RANGE_REFERENCE) | (1L << SINGLE_SHEET_REFERENCE) | (1L << SINGLE_SHEET_PREFIX) | (1L << A1_REFERENCE) | (1L << REF_FUNCTION_LIST) | (1L << FUNCTION_LIST) | (1L << FUTURE_FUNCTION_LIST) | (1L << CELL_FUNCTION_LIST) | (1L << NAME) | (1L << INTRA_TABLE_REFERENCE))) != 0)) {
 				{
 				State = 228;
 				arg_expression();
@@ -2137,6 +2138,7 @@ public partial class FormulaParser : Parser {
 			case REF_FUNCTION_LIST:
 			case FUNCTION_LIST:
 			case FUTURE_FUNCTION_LIST:
+			case CELL_FUNCTION_LIST:
 			case NAME:
 			case INTRA_TABLE_REFERENCE:
 				EnterOuterAlt(_localctx, 2);
@@ -2497,6 +2499,7 @@ public partial class FormulaParser : Parser {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CLOSE_BRACE() { return GetToken(FormulaParser.CLOSE_BRACE, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode FUNCTION_LIST() { return GetToken(FormulaParser.FUNCTION_LIST, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode FUTURE_FUNCTION_LIST() { return GetToken(FormulaParser.FUTURE_FUNCTION_LIST, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CELL_FUNCTION_LIST() { return GetToken(FormulaParser.CELL_FUNCTION_LIST, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public User_defined_function_callContext user_defined_function_call() {
 			return GetRuleContext<User_defined_function_callContext>(0);
 		}
@@ -2524,11 +2527,12 @@ public partial class FormulaParser : Parser {
 			switch (TokenStream.LA(1)) {
 			case FUNCTION_LIST:
 			case FUTURE_FUNCTION_LIST:
+			case CELL_FUNCTION_LIST:
 				EnterOuterAlt(_localctx, 1);
 				{
 				State = 311;
 				_la = TokenStream.LA(1);
-				if ( !(_la==FUNCTION_LIST || _la==FUTURE_FUNCTION_LIST) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << FUNCTION_LIST) | (1L << FUTURE_FUNCTION_LIST) | (1L << CELL_FUNCTION_LIST))) != 0)) ) {
 				ErrorHandler.RecoverInline(this);
 				}
 				else {
@@ -2567,7 +2571,7 @@ public partial class FormulaParser : Parser {
 
 	private static char[] _serializedATN = {
 		'\x3', '\x608B', '\xA72A', '\x8133', '\xB9ED', '\x417C', '\x3BE7', '\x7786', 
-		'\x5964', '\x3', ')', '\x141', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
+		'\x5964', '\x3', '*', '\x141', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
 		'\t', '\x3', '\x4', '\x4', '\t', '\x4', '\x4', '\x5', '\t', '\x5', '\x4', 
 		'\x6', '\t', '\x6', '\x4', '\a', '\t', '\a', '\x4', '\b', '\t', '\b', 
 		'\x4', '\t', '\t', '\t', '\x4', '\n', '\t', '\n', '\x4', '\v', '\t', '\v', 
@@ -2637,7 +2641,7 @@ public partial class FormulaParser : Parser {
 		'\x38', ':', '<', '>', '@', '\x42', '\x44', '\x46', 'H', 'J', 'L', 'N', 
 		'\x2', '\t', '\x3', '\x2', '\xE', '\x13', '\x3', '\x2', '\v', '\f', '\x3', 
 		'\x2', '\t', '\n', '\x3', '\x2', '\x3', '\x4', '\x3', '\x2', ' ', '\"', 
-		'\x4', '\x2', '\x1F', '\x1F', '#', '#', '\x3', '\x2', '&', '\'', '\x2', 
+		'\x4', '\x2', '\x1F', '\x1F', '#', '#', '\x3', '\x2', '&', '(', '\x2', 
 		'\x142', '\x2', 'P', '\x3', '\x2', '\x2', '\x2', '\x4', 'S', '\x3', '\x2', 
 		'\x2', '\x2', '\x6', '[', '\x3', '\x2', '\x2', '\x2', '\b', '\x63', '\x3', 
 		'\x2', '\x2', '\x2', '\n', 'k', '\x3', '\x2', '\x2', '\x2', '\f', 's', 
@@ -2807,18 +2811,18 @@ public partial class FormulaParser : Parser {
 		'\x3', '\x2', '\x2', '\x2', '\x122', '\x11C', '\x3', '\x2', '\x2', '\x2', 
 		'\x122', '\x11D', '\x3', '\x2', '\x2', '\x2', '\x122', '\x11E', '\x3', 
 		'\x2', '\x2', '\x2', '\x123', '\x43', '\x3', '\x2', '\x2', '\x2', '\x124', 
-		'\x128', '\a', '(', '\x2', '\x2', '\x125', '\x126', '\t', '\a', '\x2', 
-		'\x2', '\x126', '\x128', '\a', '(', '\x2', '\x2', '\x127', '\x124', '\x3', 
+		'\x128', '\a', ')', '\x2', '\x2', '\x125', '\x126', '\t', '\a', '\x2', 
+		'\x2', '\x126', '\x128', '\a', ')', '\x2', '\x2', '\x127', '\x124', '\x3', 
 		'\x2', '\x2', '\x2', '\x127', '\x125', '\x3', '\x2', '\x2', '\x2', '\x128', 
 		'\x45', '\x3', '\x2', '\x2', '\x2', '\x129', '\x12B', '\x5', 'H', '%', 
 		'\x2', '\x12A', '\x129', '\x3', '\x2', '\x2', '\x2', '\x12A', '\x12B', 
 		'\x3', '\x2', '\x2', '\x2', '\x12B', '\x12C', '\x3', '\x2', '\x2', '\x2', 
-		'\x12C', '\x12D', '\a', ')', '\x2', '\x2', '\x12D', 'G', '\x3', '\x2', 
+		'\x12C', '\x12D', '\a', '*', '\x2', '\x2', '\x12D', 'G', '\x3', '\x2', 
 		'\x2', '\x2', '\x12E', '\x130', '\a', '\x1F', '\x2', '\x2', '\x12F', '\x12E', 
 		'\x3', '\x2', '\x2', '\x2', '\x12F', '\x130', '\x3', '\x2', '\x2', '\x2', 
 		'\x130', '\x131', '\x3', '\x2', '\x2', '\x2', '\x131', '\x132', '\x5', 
 		'J', '&', '\x2', '\x132', 'I', '\x3', '\x2', '\x2', '\x2', '\x133', '\x134', 
-		'\a', '(', '\x2', '\x2', '\x134', 'K', '\x3', '\x2', '\x2', '\x2', '\x135', 
+		'\a', ')', '\x2', '\x2', '\x134', 'K', '\x3', '\x2', '\x2', '\x2', '\x135', 
 		'\x136', '\a', '%', '\x2', '\x2', '\x136', '\x137', '\x5', '\x30', '\x19', 
 		'\x2', '\x137', '\x138', '\a', '\x18', '\x2', '\x2', '\x138', 'M', '\x3', 
 		'\x2', '\x2', '\x2', '\x139', '\x13A', '\t', '\b', '\x2', '\x2', '\x13A', 

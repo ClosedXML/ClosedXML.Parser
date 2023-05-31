@@ -102,8 +102,6 @@ external_cell_reference
 
 /* ------------------------- User defined functions ------------------------ */
 
-// TODO: Implement cell function calls, but even Excel refuses this ATM
-//cell-function-call = A1-cell "(" argument-list ")"
 user_defined_function_call
         : user_defined_function_name OPEN_BRACE argument_list CLOSE_BRACE
         ;
@@ -206,8 +204,7 @@ ref_function_call
         ;
 
 function_call
-        : (FUNCTION_LIST | FUTURE_FUNCTION_LIST) argument_list CLOSE_BRACE
-        //| cell-function-call
+        : (FUNCTION_LIST | FUTURE_FUNCTION_LIST | CELL_FUNCTION_LIST) argument_list CLOSE_BRACE
         | user_defined_function_call
         ;
 
@@ -535,6 +532,15 @@ FUNCTION_LIST
 
 FUTURE_FUNCTION_LIST
         : ('_xlfn.' ( 'ACOT' | 'ACOTH' | 'AGGREGATE' | 'ARABIC' | 'BASE' | 'BETA.DIST' | 'BETA.INV' | 'BINOM.DIST' | 'BINOM.DIST.RANGE' | 'BINOM.INV' | 'BITAND' | 'BITLSHIFT' | 'BITOR' | 'BITRSHIFT' | 'BITXOR' | 'BYCOL' | 'BYROW' | 'CEILING.MATH' | 'CEILING.PRECISE' | 'CHISQ.DIST' | 'CHISQ.DIST.RT' | 'CHISQ.INV' | 'CHISQ.INV.RT' | 'CHISQ.TEST' | 'COMBINA' | 'CONFIDENCE.NORM' | 'CONFIDENCE.T' | 'COT' | 'COTH' | 'COVARIANCE.P' | 'COVARIANCE.S' | 'CSC' | 'CSCH' | 'DAYS' | 'DECIMAL' | 'ERF.PRECISE' | 'ERFC.PRECISE' | 'EXPON.DIST' | 'F.DIST' | 'F.DIST.RT' | 'F.INV' | 'F.INV.RT' | 'F.TEST' | 'FIELDVALUE' | 'FILTERXML' | 'FLOOR.MATH' | 'FLOOR.PRECISE' | 'FORMULATEXT' | 'GAMMA' | 'GAMMA.DIST' | 'GAMMA.INV' | 'GAMMALN.PRECISE' | 'GAUSS' | 'HYPGEOM.DIST' | 'IFNA' | 'IMCOSH' | 'IMCOT' | 'IMCSC' | 'IMCSCH' | 'IMSEC' | 'IMSECH' | 'IMSINH' | 'IMTAN' | 'ISFORMULA' | 'ISOMITTED' | 'ISOWEEKNUM' | 'LAMBDA' | 'LET' | 'LOGNORM.DIST' | 'LOGNORM.INV' | 'MAKEARRAY' | 'MAP' | 'MODE.MULT' | 'MODE.SNGL' | 'MUNIT' | 'NEGBINOM.DIST' | 'NORM.DIST' | 'NORM.INV' | 'NORM.S.DIST' | 'NORM.S.INV' | 'NUMBERVALUE' | 'PDURATION' | 'PERCENTILE.EXC' | 'PERCENTILE.INC' | 'PERCENTRANK.EXC' | 'PERCENTRANK.INC' | 'PERMUTATIONA' | 'PHI' | 'POISSON.DIST' | 'QUARTILE.EXC' | 'QUARTILE.INC' | 'QUERYSTRING' | 'RANDARRAY' | 'RANK.AVG' | 'RANK.EQ' | 'REDUCE' | 'RRI' | 'SCAN' | 'SEC' | 'SECH' | 'SEQUENCE' | 'SHEET' | 'SHEETS' | 'SKEW.P' | 'SORTBY' | 'STDEV.P' | 'STDEV.S' | 'T.DIST' | 'T.DIST.2T' | 'T.DIST.RT' | 'T.INV' | 'T.INV.2T' | 'T.TEST' | 'UNICHAR' | 'UNICODE' | 'UNIQUE' | 'VAR.P' | 'VAR.S' | 'WEBSERVICE' | 'WEIBULL.DIST' | 'XLOOKUP' | 'XOR' | 'Z.TEST' | 'ECMA.CEILING' | 'ISO.CEILING' | 'NETWORKDAYS.INTL' | 'WORKDAY.INTL' | 'FORECAST.ETS' | 'FORECAST.ETS.CONFINT' | 'FORECAST.ETS.SEASONALITY' | 'FORECAST.LINEAR' | 'FORECAST.ETS.STAT' )) '(' WHITESPACES
+        ;
+
+/*
+ * Rather than split A1_REFERENCE, detect cell function through an extra token.
+ * Since ANTLR takes the longest match, it will find this token, if it is a cell
+ * function
+ */
+CELL_FUNCTION_LIST
+        : A1_CELL '(' WHITESPACES
         ;
 
 /* --------------------------------- Name ---------------------------------- */
