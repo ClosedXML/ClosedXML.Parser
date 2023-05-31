@@ -21,6 +21,18 @@ public class DataSetTests
             });
     }
 
+    [TestMethod]
+    public void Euses_data_set_is_parseable()
+    {
+        Assert_formulas_parsed_or_not_as_expected(
+            "./data/euses/formulas.csv",
+            new[]
+            {
+                "./data/euses/invalid-external-cell-reference.csv",
+                "./data/euses/known-fails.csv"
+            });
+    }
+
     private void Assert_formulas_parsed_or_not_as_expected(string input, string[] badFormulaPaths)
     {
         var badFormulas = new HashSet<string>();
