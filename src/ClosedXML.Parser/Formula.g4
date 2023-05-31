@@ -206,8 +206,7 @@ ref_function_call
         ;
 
 function_call
-        : /*ref_function_call
-        | */(FUNCTION_LIST | FUTURE_FUNCTION_LIST) argument_list CLOSE_BRACE
+        : (FUNCTION_LIST | FUTURE_FUNCTION_LIST) argument_list CLOSE_BRACE
         //| cell-function-call
         | user_defined_function_call
         ;
