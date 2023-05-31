@@ -159,28 +159,19 @@ arg_prefix_atom_expression
         | arg_atom_expression
         ;
 
+/*
+ * Official grammar duplicates all ref expression elements, but there is no need
+ * to have duplicate rules. It's enough that an argument expression in the first
+ * level (=no braces) doesn't have ability to call ',' union operation.
+ * Union is at the very top of ref expression hierarchy, so it is enough to
+ * use `ref_intersection_expression` in the argument atom here. The nodes below
+ * are identical to arg ref nodes to the expression ref nodex.
+ */
 arg_atom_expression
-        : arg_ref_expression
+        : ref_intersection_expression
         | constant
         | function_call
         | OPEN_BRACE expression CLOSE_BRACE
-        ;
-
-arg_ref_expression
-        : arg_ref_range_expression (SPACE arg_ref_range_expression)*
-        ;
-
-arg_ref_range_expression
-        : arg_ref_atom_expression (COLON arg_ref_atom_expression)*
-        ;
-
-arg_ref_atom_expression
-        : REF_CONSTANT
-        | cell_reference
-        | ref_function_call
-        | name_reference
-        | structure_reference
-        | OPEN_BRACE ref_expression CLOSE_BRACE
         ;
 
 /*

@@ -230,24 +230,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArg_atom_expression([NotNull] FormulaParser.Arg_atom_expressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.arg_ref_expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitArg_ref_expression([NotNull] FormulaParser.Arg_ref_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.arg_ref_range_expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitArg_ref_range_expression([NotNull] FormulaParser.Arg_ref_range_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.arg_ref_atom_expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitArg_ref_atom_expression([NotNull] FormulaParser.Arg_ref_atom_expressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.name_reference"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
