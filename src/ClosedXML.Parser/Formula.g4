@@ -104,12 +104,6 @@ external_cell_reference
         | SINGLE_SHEET_REFERENCE
         ;
 
-/* ------------------------- User defined functions ------------------------ */
-
-user_defined_function_call
-        : USER_DEFINED_FUNCTION_NAME argument_list CLOSE_BRACE
-        ;
-
 /* ------------------------------- Arguments ------------------------------- */
 
 // TODO: Argument count should be 0-253, but ANTLR doesn't accept specificic number of repeats
@@ -210,8 +204,7 @@ ref_function_call
         ;
 
 function_call
-        : (FUNCTION_LIST | FUTURE_FUNCTION_LIST | CELL_FUNCTION_LIST) argument_list CLOSE_BRACE
-        | user_defined_function_call
+        : (FUNCTION_LIST | FUTURE_FUNCTION_LIST | CELL_FUNCTION_LIST | USER_DEFINED_FUNCTION_NAME) argument_list CLOSE_BRACE
         ;
 
 /* ----------------------------------------------------------------------------

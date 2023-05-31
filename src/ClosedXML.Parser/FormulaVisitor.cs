@@ -146,12 +146,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitExternal_cell_reference([NotNull] FormulaParser.External_cell_referenceContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.user_defined_function_call"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitUser_defined_function_call([NotNull] FormulaParser.User_defined_function_callContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.argument_list"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
