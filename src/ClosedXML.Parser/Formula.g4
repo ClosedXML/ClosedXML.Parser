@@ -107,11 +107,7 @@ external_cell_reference
 /* ------------------------- User defined functions ------------------------ */
 
 user_defined_function_call
-        : user_defined_function_name OPEN_BRACE argument_list CLOSE_BRACE
-        ;
-
-user_defined_function_name
-        : name_reference
+        : USER_DEFINED_FUNCTION_NAME argument_list CLOSE_BRACE
         ;
 
 /* ------------------------------- Arguments ------------------------------- */
@@ -547,10 +543,23 @@ FUTURE_FUNCTION_LIST
 /*
  * Rather than split A1_REFERENCE, detect cell function through an extra token.
  * Since ANTLR takes the longest match, it will find this token, if it is a cell
- * function
+ * function.
  */
 CELL_FUNCTION_LIST
         : A1_CELL '(' WHITESPACES
+        ;
+
+/*
+ * This is basically inlined `name_reference` along with open brace as a single
+ * token. That removes a lot of ambiguity from atom rules to make grammar
+ * LL(1).
+ * ANTLR takes the longest match, so if name_reference is used as a UDF name,
+ * this token will be matched. Must be last, so other functions have
+ * precedence.
+ */
+USER_DEFINED_FUNCTION_NAME
+        : NAME '(' WHITESPACES                                      // local
+        | (SINGLE_SHEET_PREFIX | BOOK_PREFIX) NAME '(' WHITESPACES  // external
         ;
 
 /* --------------------------------- Name ---------------------------------- */
