@@ -4,10 +4,6 @@ grammar Formula;
  *                               PARSER RULES
  * -------------------------------------------------------------------------- */
 
-/*
- * TODO: Whitespaces. Operations have whitespaces added around them (antlr
- * doesn't line rules), but more work is needed.
- */
 formula
         : expression EOF
         ;
