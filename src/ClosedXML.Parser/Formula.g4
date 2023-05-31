@@ -60,17 +60,17 @@ ref_range_expression
         : ref_atom_expression (COLON ref_atom_expression)*
         ;
 
-/* 
+/*
  * name_reference and structure_reference are not very unambiguous, e.g.
  * BOOK_PREFIX NAME are a prefix for both
  */
 ref_atom_expression
         : REF_CONSTANT
+        | OPEN_BRACE ref_expression CLOSE_BRACE
         | cell_reference
         | ref_function_call
         | name_reference
         | structure_reference
-        | OPEN_BRACE ref_expression CLOSE_BRACE
         ;
 
 /* ------------------------------- Constants ------------------------------- */
