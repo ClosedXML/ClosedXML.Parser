@@ -60,6 +60,10 @@ ref_range_expression
         : ref_atom_expression (COLON ref_atom_expression)*
         ;
 
+/* 
+ * name_reference and structure_reference are not very unambiguous, e.g.
+ * BOOK_PREFIX NAME are a prefix for both
+ */
 ref_atom_expression
         : REF_CONSTANT
         | cell_reference
@@ -197,6 +201,8 @@ table_identifier
 table_name
         : NAME
         ;
+
+/* ---------------------------- Function calls ----------------------------- */
 
 ref_function_call
         : REF_FUNCTION_LIST argument_list CLOSE_BRACE
