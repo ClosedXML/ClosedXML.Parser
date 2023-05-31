@@ -23,6 +23,8 @@ ClosedXML is currently using [XLParser](https://github.com/spreadsheetlab/XLPars
 * ~~XLParser uses `IronParser`, an unmaintained project~~ (IronParser recently released version 1.2).
 * Doesn't have support for lambdas and R1C1 style.
 
+ANTLR lexer takes up about 3.2 seconds for Enron dataset. With parsing, it takes up 11 seconds. I want that 7+ seconds in performance and no allocation.
+
 ## Debugging
 
 Use [vscode-antlr4](https://github.com/mike-lischke/vscode-antlr4/blob/master/doc/grammar-debugging.md) plugin for debugging the grammar.
@@ -35,8 +37,7 @@ Current state - ENRON dataset parsing
 
 Bad ones fail on external workbook name reference that uses apostrophe (e.g `[1]!'Some name in external wb'`), otherwise they are parsed.
 
-* Pass tests from ENRON and EUSES datasets
-* Solve whitespaces, cell formulas
+* Solve cell formulas
 * Convert to LL(1) parser
 * Prerequisite for recursive descent parser
   * Remove left recusion
