@@ -194,7 +194,13 @@ table_identifier
         : BOOK_PREFIX? table_name
         ;
 
-// table-name is the name of the table the structure reference refers to. If it is missing, the formula containing the structure reference MUST be entered into a cell which belongs to a table and that table's name is used as the table-name. table-name MUST be the value of the displayName attribute of some table element ([ISO/IEC29500-1:2016] section 18.5.1.2). It MUST NOT be any other user-defined name.
+/* table-name is the name of the table the structure reference refers to. If it
+ * is missing, the formula containing the structure reference MUST be entered
+ * into a cell which belongs to a table and that table's name is used as the
+ * table-name. table-name MUST be the value of the displayName attribute of
+ * some table element ([ISO/IEC29500-1:2016] section 18.5.1.2). It MUST NOT be
+ * any other user-defined name.
+ */
 table_name
         : NAME
         ;
