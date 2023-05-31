@@ -44,6 +44,7 @@ public class DataSetTests
             try
             {
                 AssertFormula.CstParsed(formula);
+                Assert.IsFalse(badFormulas.Contains(formula), formula);
             }
             catch (Exception)
             {
