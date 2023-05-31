@@ -40,10 +40,10 @@ prefix_atom_expression
         ;
 
 atom_expression
-        : ref_expression
-        | constant
-        | function_call
+        : constant
         | OPEN_BRACE expression CLOSE_BRACE
+        | function_call
+        | ref_expression
         ;
 
 /* ------------------------- Reference expression -------------------------- */
@@ -170,10 +170,10 @@ arg_prefix_atom_expression
  * are identical to arg ref nodes to the expression ref nodex.
  */
 arg_atom_expression
-        : ref_intersection_expression
-        | constant
-        | function_call
+        : constant
         | OPEN_BRACE expression CLOSE_BRACE
+        | function_call
+        | ref_intersection_expression
         ;
 
 /*
