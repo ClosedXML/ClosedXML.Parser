@@ -42,9 +42,8 @@ public partial class FormulaParser : Parser {
 		GREATER_THAN=17, PERCENT=18, SEMICOLON=19, COLON=20, OPEN_BRACE=21, CLOSE_BRACE=22, 
 		OPEN_CURLY=23, CLOSE_CURLY=24, COMMA=25, SPACE=26, OPEN_SQUARE=27, CLOSE_SQUARE=28, 
 		BOOK_PREFIX=29, BANG_REFERENCE=30, SHEET_RANGE_REFERENCE=31, SINGLE_SHEET_REFERENCE=32, 
-		SINGLE_SHEET_PREFIX=33, A1_REFERENCE=34, REF_FUNCTION_LIST=35, FUNCTION_LIST=36, 
-		FUTURE_FUNCTION_LIST=37, CELL_FUNCTION_LIST=38, USER_DEFINED_FUNCTION_NAME=39, 
-		NAME=40, INTRA_TABLE_REFERENCE=41;
+		SINGLE_SHEET_PREFIX=33, A1_REFERENCE=34, REF_FUNCTION_LIST=35, CELL_FUNCTION_LIST=36, 
+		USER_DEFINED_FUNCTION_NAME=37, NAME=38, INTRA_TABLE_REFERENCE=39;
 	public const int
 		RULE_formula = 0, RULE_expression = 1, RULE_concat_expression = 2, RULE_additive_expression = 3, 
 		RULE_multiplying_expression = 4, RULE_pow_expression = 5, RULE_percent_expression = 6, 
@@ -80,9 +79,8 @@ public partial class FormulaParser : Parser {
 		"GREATER_THAN", "PERCENT", "SEMICOLON", "COLON", "OPEN_BRACE", "CLOSE_BRACE", 
 		"OPEN_CURLY", "CLOSE_CURLY", "COMMA", "SPACE", "OPEN_SQUARE", "CLOSE_SQUARE", 
 		"BOOK_PREFIX", "BANG_REFERENCE", "SHEET_RANGE_REFERENCE", "SINGLE_SHEET_REFERENCE", 
-		"SINGLE_SHEET_PREFIX", "A1_REFERENCE", "REF_FUNCTION_LIST", "FUNCTION_LIST", 
-		"FUTURE_FUNCTION_LIST", "CELL_FUNCTION_LIST", "USER_DEFINED_FUNCTION_NAME", 
-		"NAME", "INTRA_TABLE_REFERENCE"
+		"SINGLE_SHEET_PREFIX", "A1_REFERENCE", "REF_FUNCTION_LIST", "CELL_FUNCTION_LIST", 
+		"USER_DEFINED_FUNCTION_NAME", "NAME", "INTRA_TABLE_REFERENCE"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -632,8 +630,6 @@ public partial class FormulaParser : Parser {
 			case SINGLE_SHEET_PREFIX:
 			case A1_REFERENCE:
 			case REF_FUNCTION_LIST:
-			case FUNCTION_LIST:
-			case FUTURE_FUNCTION_LIST:
 			case CELL_FUNCTION_LIST:
 			case USER_DEFINED_FUNCTION_NAME:
 			case NAME:
@@ -1422,7 +1418,7 @@ public partial class FormulaParser : Parser {
 			State = 205;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << REF_CONSTANT) | (1L << NONREF_ERRORS) | (1L << LOGICAL_CONSTANT) | (1L << NUMERICAL_CONSTANT) | (1L << STRING_CONSTANT) | (1L << PLUS) | (1L << MINUS) | (1L << OPEN_BRACE) | (1L << OPEN_CURLY) | (1L << BOOK_PREFIX) | (1L << BANG_REFERENCE) | (1L << SHEET_RANGE_REFERENCE) | (1L << SINGLE_SHEET_REFERENCE) | (1L << SINGLE_SHEET_PREFIX) | (1L << A1_REFERENCE) | (1L << REF_FUNCTION_LIST) | (1L << FUNCTION_LIST) | (1L << FUTURE_FUNCTION_LIST) | (1L << CELL_FUNCTION_LIST) | (1L << USER_DEFINED_FUNCTION_NAME) | (1L << NAME) | (1L << INTRA_TABLE_REFERENCE))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << REF_CONSTANT) | (1L << NONREF_ERRORS) | (1L << LOGICAL_CONSTANT) | (1L << NUMERICAL_CONSTANT) | (1L << STRING_CONSTANT) | (1L << PLUS) | (1L << MINUS) | (1L << OPEN_BRACE) | (1L << OPEN_CURLY) | (1L << BOOK_PREFIX) | (1L << BANG_REFERENCE) | (1L << SHEET_RANGE_REFERENCE) | (1L << SINGLE_SHEET_REFERENCE) | (1L << SINGLE_SHEET_PREFIX) | (1L << A1_REFERENCE) | (1L << REF_FUNCTION_LIST) | (1L << CELL_FUNCTION_LIST) | (1L << USER_DEFINED_FUNCTION_NAME) | (1L << NAME) | (1L << INTRA_TABLE_REFERENCE))) != 0)) {
 				{
 				State = 204;
 				arg_expression();
@@ -1916,8 +1912,6 @@ public partial class FormulaParser : Parser {
 			case SINGLE_SHEET_PREFIX:
 			case A1_REFERENCE:
 			case REF_FUNCTION_LIST:
-			case FUNCTION_LIST:
-			case FUTURE_FUNCTION_LIST:
 			case CELL_FUNCTION_LIST:
 			case USER_DEFINED_FUNCTION_NAME:
 			case NAME:
@@ -2278,8 +2272,6 @@ public partial class FormulaParser : Parser {
 			return GetRuleContext<Argument_listContext>(0);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CLOSE_BRACE() { return GetToken(FormulaParser.CLOSE_BRACE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode FUNCTION_LIST() { return GetToken(FormulaParser.FUNCTION_LIST, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode FUTURE_FUNCTION_LIST() { return GetToken(FormulaParser.FUTURE_FUNCTION_LIST, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CELL_FUNCTION_LIST() { return GetToken(FormulaParser.CELL_FUNCTION_LIST, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode USER_DEFINED_FUNCTION_NAME() { return GetToken(FormulaParser.USER_DEFINED_FUNCTION_NAME, 0); }
 		public Function_callContext(ParserRuleContext parent, int invokingState)
@@ -2305,7 +2297,7 @@ public partial class FormulaParser : Parser {
 			{
 			State = 286;
 			_la = TokenStream.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << FUNCTION_LIST) | (1L << FUTURE_FUNCTION_LIST) | (1L << CELL_FUNCTION_LIST) | (1L << USER_DEFINED_FUNCTION_NAME))) != 0)) ) {
+			if ( !(_la==CELL_FUNCTION_LIST || _la==USER_DEFINED_FUNCTION_NAME) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -2331,7 +2323,7 @@ public partial class FormulaParser : Parser {
 
 	private static char[] _serializedATN = {
 		'\x3', '\x608B', '\xA72A', '\x8133', '\xB9ED', '\x417C', '\x3BE7', '\x7786', 
-		'\x5964', '\x3', '+', '\x125', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
+		'\x5964', '\x3', ')', '\x125', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
 		'\t', '\x3', '\x4', '\x4', '\t', '\x4', '\x4', '\x5', '\t', '\x5', '\x4', 
 		'\x6', '\t', '\x6', '\x4', '\a', '\t', '\a', '\x4', '\b', '\t', '\b', 
 		'\x4', '\t', '\t', '\t', '\x4', '\n', '\t', '\n', '\x4', '\v', '\t', '\v', 
@@ -2397,43 +2389,43 @@ public partial class FormulaParser : Parser {
 		'\x38', ':', '<', '>', '@', '\x42', '\x2', '\b', '\x3', '\x2', '\xE', 
 		'\x13', '\x3', '\x2', '\v', '\f', '\x3', '\x2', '\t', '\n', '\x4', '\x2', 
 		' ', '\"', '$', '$', '\x4', '\x2', '\x1F', '\x1F', '#', '#', '\x3', '\x2', 
-		'&', ')', '\x2', '\x12C', '\x2', '\x44', '\x3', '\x2', '\x2', '\x2', '\x4', 
-		'G', '\x3', '\x2', '\x2', '\x2', '\x6', 'O', '\x3', '\x2', '\x2', '\x2', 
-		'\b', 'W', '\x3', '\x2', '\x2', '\x2', '\n', '_', '\x3', '\x2', '\x2', 
-		'\x2', '\f', 'g', '\x3', '\x2', '\x2', '\x2', '\xE', 'o', '\x3', '\x2', 
-		'\x2', '\x2', '\x10', 'v', '\x3', '\x2', '\x2', '\x2', '\x12', '\x7F', 
-		'\x3', '\x2', '\x2', '\x2', '\x14', '\x81', '\x3', '\x2', '\x2', '\x2', 
-		'\x16', '\x89', '\x3', '\x2', '\x2', '\x2', '\x18', '\x91', '\x3', '\x2', 
-		'\x2', '\x2', '\x1A', '\xA2', '\x3', '\x2', '\x2', '\x2', '\x1C', '\xAC', 
-		'\x3', '\x2', '\x2', '\x2', '\x1E', '\xAE', '\x3', '\x2', '\x2', '\x2', 
-		' ', '\xB8', '\x3', '\x2', '\x2', '\x2', '\"', '\xC4', '\x3', '\x2', '\x2', 
-		'\x2', '$', '\xC6', '\x3', '\x2', '\x2', '\x2', '&', '\xCF', '\x3', '\x2', 
-		'\x2', '\x2', '(', '\xD1', '\x3', '\x2', '\x2', '\x2', '*', '\xD9', '\x3', 
-		'\x2', '\x2', '\x2', ',', '\xE1', '\x3', '\x2', '\x2', '\x2', '.', '\xE9', 
-		'\x3', '\x2', '\x2', '\x2', '\x30', '\xF1', '\x3', '\x2', '\x2', '\x2', 
-		'\x32', '\xF9', '\x3', '\x2', '\x2', '\x2', '\x34', '\x100', '\x3', '\x2', 
-		'\x2', '\x2', '\x36', '\x109', '\x3', '\x2', '\x2', '\x2', '\x38', '\x10E', 
-		'\x3', '\x2', '\x2', '\x2', ':', '\x111', '\x3', '\x2', '\x2', '\x2', 
-		'<', '\x116', '\x3', '\x2', '\x2', '\x2', '>', '\x11A', '\x3', '\x2', 
-		'\x2', '\x2', '@', '\x11C', '\x3', '\x2', '\x2', '\x2', '\x42', '\x120', 
-		'\x3', '\x2', '\x2', '\x2', '\x44', '\x45', '\x5', '\x4', '\x3', '\x2', 
-		'\x45', '\x46', '\a', '\x2', '\x2', '\x3', '\x46', '\x3', '\x3', '\x2', 
-		'\x2', '\x2', 'G', 'L', '\x5', '\x6', '\x4', '\x2', 'H', 'I', '\t', '\x2', 
-		'\x2', '\x2', 'I', 'K', '\x5', '\x6', '\x4', '\x2', 'J', 'H', '\x3', '\x2', 
-		'\x2', '\x2', 'K', 'N', '\x3', '\x2', '\x2', '\x2', 'L', 'J', '\x3', '\x2', 
-		'\x2', '\x2', 'L', 'M', '\x3', '\x2', '\x2', '\x2', 'M', '\x5', '\x3', 
-		'\x2', '\x2', '\x2', 'N', 'L', '\x3', '\x2', '\x2', '\x2', 'O', 'T', '\x5', 
-		'\b', '\x5', '\x2', 'P', 'Q', '\a', '\r', '\x2', '\x2', 'Q', 'S', '\x5', 
-		'\b', '\x5', '\x2', 'R', 'P', '\x3', '\x2', '\x2', '\x2', 'S', 'V', '\x3', 
-		'\x2', '\x2', '\x2', 'T', 'R', '\x3', '\x2', '\x2', '\x2', 'T', 'U', '\x3', 
-		'\x2', '\x2', '\x2', 'U', '\a', '\x3', '\x2', '\x2', '\x2', 'V', 'T', 
-		'\x3', '\x2', '\x2', '\x2', 'W', '\\', '\x5', '\n', '\x6', '\x2', 'X', 
-		'Y', '\t', '\x3', '\x2', '\x2', 'Y', '[', '\x5', '\n', '\x6', '\x2', 'Z', 
-		'X', '\x3', '\x2', '\x2', '\x2', '[', '^', '\x3', '\x2', '\x2', '\x2', 
-		'\\', 'Z', '\x3', '\x2', '\x2', '\x2', '\\', ']', '\x3', '\x2', '\x2', 
-		'\x2', ']', '\t', '\x3', '\x2', '\x2', '\x2', '^', '\\', '\x3', '\x2', 
-		'\x2', '\x2', '_', '\x64', '\x5', '\f', '\a', '\x2', '`', '\x61', '\t', 
-		'\x4', '\x2', '\x2', '\x61', '\x63', '\x5', '\f', '\a', '\x2', '\x62', 
+		'&', '\'', '\x2', '\x12C', '\x2', '\x44', '\x3', '\x2', '\x2', '\x2', 
+		'\x4', 'G', '\x3', '\x2', '\x2', '\x2', '\x6', 'O', '\x3', '\x2', '\x2', 
+		'\x2', '\b', 'W', '\x3', '\x2', '\x2', '\x2', '\n', '_', '\x3', '\x2', 
+		'\x2', '\x2', '\f', 'g', '\x3', '\x2', '\x2', '\x2', '\xE', 'o', '\x3', 
+		'\x2', '\x2', '\x2', '\x10', 'v', '\x3', '\x2', '\x2', '\x2', '\x12', 
+		'\x7F', '\x3', '\x2', '\x2', '\x2', '\x14', '\x81', '\x3', '\x2', '\x2', 
+		'\x2', '\x16', '\x89', '\x3', '\x2', '\x2', '\x2', '\x18', '\x91', '\x3', 
+		'\x2', '\x2', '\x2', '\x1A', '\xA2', '\x3', '\x2', '\x2', '\x2', '\x1C', 
+		'\xAC', '\x3', '\x2', '\x2', '\x2', '\x1E', '\xAE', '\x3', '\x2', '\x2', 
+		'\x2', ' ', '\xB8', '\x3', '\x2', '\x2', '\x2', '\"', '\xC4', '\x3', '\x2', 
+		'\x2', '\x2', '$', '\xC6', '\x3', '\x2', '\x2', '\x2', '&', '\xCF', '\x3', 
+		'\x2', '\x2', '\x2', '(', '\xD1', '\x3', '\x2', '\x2', '\x2', '*', '\xD9', 
+		'\x3', '\x2', '\x2', '\x2', ',', '\xE1', '\x3', '\x2', '\x2', '\x2', '.', 
+		'\xE9', '\x3', '\x2', '\x2', '\x2', '\x30', '\xF1', '\x3', '\x2', '\x2', 
+		'\x2', '\x32', '\xF9', '\x3', '\x2', '\x2', '\x2', '\x34', '\x100', '\x3', 
+		'\x2', '\x2', '\x2', '\x36', '\x109', '\x3', '\x2', '\x2', '\x2', '\x38', 
+		'\x10E', '\x3', '\x2', '\x2', '\x2', ':', '\x111', '\x3', '\x2', '\x2', 
+		'\x2', '<', '\x116', '\x3', '\x2', '\x2', '\x2', '>', '\x11A', '\x3', 
+		'\x2', '\x2', '\x2', '@', '\x11C', '\x3', '\x2', '\x2', '\x2', '\x42', 
+		'\x120', '\x3', '\x2', '\x2', '\x2', '\x44', '\x45', '\x5', '\x4', '\x3', 
+		'\x2', '\x45', '\x46', '\a', '\x2', '\x2', '\x3', '\x46', '\x3', '\x3', 
+		'\x2', '\x2', '\x2', 'G', 'L', '\x5', '\x6', '\x4', '\x2', 'H', 'I', '\t', 
+		'\x2', '\x2', '\x2', 'I', 'K', '\x5', '\x6', '\x4', '\x2', 'J', 'H', '\x3', 
+		'\x2', '\x2', '\x2', 'K', 'N', '\x3', '\x2', '\x2', '\x2', 'L', 'J', '\x3', 
+		'\x2', '\x2', '\x2', 'L', 'M', '\x3', '\x2', '\x2', '\x2', 'M', '\x5', 
+		'\x3', '\x2', '\x2', '\x2', 'N', 'L', '\x3', '\x2', '\x2', '\x2', 'O', 
+		'T', '\x5', '\b', '\x5', '\x2', 'P', 'Q', '\a', '\r', '\x2', '\x2', 'Q', 
+		'S', '\x5', '\b', '\x5', '\x2', 'R', 'P', '\x3', '\x2', '\x2', '\x2', 
+		'S', 'V', '\x3', '\x2', '\x2', '\x2', 'T', 'R', '\x3', '\x2', '\x2', '\x2', 
+		'T', 'U', '\x3', '\x2', '\x2', '\x2', 'U', '\a', '\x3', '\x2', '\x2', 
+		'\x2', 'V', 'T', '\x3', '\x2', '\x2', '\x2', 'W', '\\', '\x5', '\n', '\x6', 
+		'\x2', 'X', 'Y', '\t', '\x3', '\x2', '\x2', 'Y', '[', '\x5', '\n', '\x6', 
+		'\x2', 'Z', 'X', '\x3', '\x2', '\x2', '\x2', '[', '^', '\x3', '\x2', '\x2', 
+		'\x2', '\\', 'Z', '\x3', '\x2', '\x2', '\x2', '\\', ']', '\x3', '\x2', 
+		'\x2', '\x2', ']', '\t', '\x3', '\x2', '\x2', '\x2', '^', '\\', '\x3', 
+		'\x2', '\x2', '\x2', '_', '\x64', '\x5', '\f', '\a', '\x2', '`', '\x61', 
+		'\t', '\x4', '\x2', '\x2', '\x61', '\x63', '\x5', '\f', '\a', '\x2', '\x62', 
 		'`', '\x3', '\x2', '\x2', '\x2', '\x63', '\x66', '\x3', '\x2', '\x2', 
 		'\x2', '\x64', '\x62', '\x3', '\x2', '\x2', '\x2', '\x64', '\x65', '\x3', 
 		'\x2', '\x2', '\x2', '\x65', '\v', '\x3', '\x2', '\x2', '\x2', '\x66', 
@@ -2554,18 +2546,18 @@ public partial class FormulaParser : Parser {
 		'\f', '\x2', '\x109', '\x102', '\x3', '\x2', '\x2', '\x2', '\x109', '\x103', 
 		'\x3', '\x2', '\x2', '\x2', '\x109', '\x107', '\x3', '\x2', '\x2', '\x2', 
 		'\x109', '\x108', '\x3', '\x2', '\x2', '\x2', '\x10A', '\x37', '\x3', 
-		'\x2', '\x2', '\x2', '\x10B', '\x10F', '\a', '*', '\x2', '\x2', '\x10C', 
-		'\x10D', '\t', '\x6', '\x2', '\x2', '\x10D', '\x10F', '\a', '*', '\x2', 
+		'\x2', '\x2', '\x2', '\x10B', '\x10F', '\a', '(', '\x2', '\x2', '\x10C', 
+		'\x10D', '\t', '\x6', '\x2', '\x2', '\x10D', '\x10F', '\a', '(', '\x2', 
 		'\x2', '\x10E', '\x10B', '\x3', '\x2', '\x2', '\x2', '\x10E', '\x10C', 
 		'\x3', '\x2', '\x2', '\x2', '\x10F', '\x39', '\x3', '\x2', '\x2', '\x2', 
 		'\x110', '\x112', '\x5', '<', '\x1F', '\x2', '\x111', '\x110', '\x3', 
 		'\x2', '\x2', '\x2', '\x111', '\x112', '\x3', '\x2', '\x2', '\x2', '\x112', 
-		'\x113', '\x3', '\x2', '\x2', '\x2', '\x113', '\x114', '\a', '+', '\x2', 
+		'\x113', '\x3', '\x2', '\x2', '\x2', '\x113', '\x114', '\a', ')', '\x2', 
 		'\x2', '\x114', ';', '\x3', '\x2', '\x2', '\x2', '\x115', '\x117', '\a', 
 		'\x1F', '\x2', '\x2', '\x116', '\x115', '\x3', '\x2', '\x2', '\x2', '\x116', 
 		'\x117', '\x3', '\x2', '\x2', '\x2', '\x117', '\x118', '\x3', '\x2', '\x2', 
 		'\x2', '\x118', '\x119', '\x5', '>', ' ', '\x2', '\x119', '=', '\x3', 
-		'\x2', '\x2', '\x2', '\x11A', '\x11B', '\a', '*', '\x2', '\x2', '\x11B', 
+		'\x2', '\x2', '\x2', '\x11A', '\x11B', '\a', '(', '\x2', '\x2', '\x11B', 
 		'?', '\x3', '\x2', '\x2', '\x2', '\x11C', '\x11D', '\a', '%', '\x2', '\x2', 
 		'\x11D', '\x11E', '\x5', '$', '\x13', '\x2', '\x11E', '\x11F', '\a', '\x18', 
 		'\x2', '\x2', '\x11F', '\x41', '\x3', '\x2', '\x2', '\x2', '\x120', '\x121', 
