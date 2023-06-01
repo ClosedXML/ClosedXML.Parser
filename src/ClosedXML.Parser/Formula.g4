@@ -111,7 +111,7 @@ cell_reference
 
 // TODO: Argument count should be 0-253, but ANTLR doesn't accept specificic number of repeats
 argument_list
-        : argument (COMMA argument)*
+        : argument (COMMA argument)* CLOSE_BRACE
         ;
 argument
         : arg_expression?
@@ -205,11 +205,11 @@ table_name
 /* ---------------------------- Function calls ----------------------------- */
 
 ref_function_call
-        : REF_FUNCTION_LIST argument_list CLOSE_BRACE
+        : REF_FUNCTION_LIST argument_list
         ;
 
 function_call
-        : (/*FUNCTION_LIST | FUTURE_FUNCTION_LIST |*/ CELL_FUNCTION_LIST | USER_DEFINED_FUNCTION_NAME) argument_list CLOSE_BRACE
+        : (/*FUNCTION_LIST | FUTURE_FUNCTION_LIST |*/ CELL_FUNCTION_LIST | USER_DEFINED_FUNCTION_NAME) argument_list
         ;
 
 /* ----------------------------------------------------------------------------
