@@ -140,12 +140,6 @@ public interface IFormulaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArgument_list([NotNull] FormulaParser.Argument_listContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FormulaParser.argument"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitArgument([NotNull] FormulaParser.ArgumentContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FormulaParser.arg_expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

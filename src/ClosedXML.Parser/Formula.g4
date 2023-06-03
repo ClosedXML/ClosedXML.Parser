@@ -427,7 +427,8 @@ fragment SHEET_NAME_CHARACTER
         | '\u0040' .. '\u005A' // 005B [ 005C \ 005D ] 005E ^
         | '\u005F' .. '\uD7FF'
         | '\uE000' .. '\uFFFD'
-        | '\u{10000}' .. '\u{10FFFF}';
+        | '\u{10000}' .. '\u{10FFFF}'
+        ;
 
 fragment SHEET_NAME_SPECIAL
         : SHEET_NAME_BASE_CHARACTER+ ((SHEET_NAME_CHARACTER_SPECIAL)* SHEET_NAME_BASE_CHARACTER)?
@@ -451,7 +452,8 @@ fragment SHEET_NAME_BASE_CHARACTER
         | '\u0040' .. '\u005A' // 005B [ 005C \ 005D ]
         | '\u005E' .. '\uD7FF'
         | '\uE000' .. '\uFFFD'
-        | '\u{10000}' .. '\u{10FFFF}';
+        | '\u{10000}' .. '\u{10FFFF}'
+        ;
 
 /* -------------------------- Local A1 References -------------------------- */
 
@@ -694,7 +696,8 @@ fragment UNESCAPED_COLUMN_CHARACTER // MUST NOT match escape-column-character or
         | '\u005C'             // 005D ]
         | '\u005E' .. '\uD7FF'
         | '\uE000' .. '\uFFFD'
-        | '\u{10000}' .. '\u{10FFFF}'; // ; as defined by the production Char in the [W3C-XML] section 2.2
+        | '\u{10000}' .. '\u{10FFFF}' // ; as defined by the production Char in the [W3C-XML] section 2.2
+        ;
 
 fragment ANY_COLUMN_CHARACTER
         : ANY_NOSPACE_COLUMN_CHARACTER
