@@ -35,10 +35,19 @@ percent_expression
         ;
 
 prefix_atom_expression
-        : (PLUS | MINUS) atom_expression
+        : (PLUS | MINUS) prefix_atom_expression
         | atom_expression
         ;
 
+/*
+ * Atom is not LL(1), because there are two possible paths for a OPEN_BRACE:
+ * * `OPEN_BRACE expression CLOSE_BRACE`
+ * * `OPEN_BRACE ref_expression CLOSE_BRACE` through ref_intersection_expression
+ * * Of course, it can be nested, so this is the key pain point.
+ * It causes issues for expressions like `SUM((A1:A5) (A2:G4))` that should go
+ * through ref expressions, but go through normal expression instead
+ * and expression doesn't associate reference operations.
+ */
 atom_expression
         : constant
         | OPEN_BRACE expression CLOSE_BRACE
@@ -111,10 +120,7 @@ cell_reference
 
 // TODO: Argument count should be 0-253, but ANTLR doesn't accept specificic number of repeats
 argument_list
-        : argument (COMMA argument)* CLOSE_BRACE
-        ;
-argument
-        : arg_expression?
+        : arg_expression? (COMMA arg_expression?)* CLOSE_BRACE
         ;
 
 /*
@@ -150,7 +156,7 @@ arg_percent_expression
         ;
 
 arg_prefix_atom_expression
-        : (PLUS | MINUS) arg_atom_expression
+        : (PLUS | MINUS) arg_prefix_atom_expression
         | arg_atom_expression
         ;
 
