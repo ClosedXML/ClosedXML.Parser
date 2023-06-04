@@ -11,4 +11,11 @@
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ClosedXML.Lexer\ClosedXML.Lexer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\ClosedXML.Lexer\FormulaLexer.tokens" Link="FormulaLexer.tokens" CopyToOutputDirectory="Never" />
+  </ItemGroup>
 </Project>

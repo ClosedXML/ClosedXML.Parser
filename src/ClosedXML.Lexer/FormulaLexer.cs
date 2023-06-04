@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from c:\\Users\\havli\\source\\repos\\ClosedXML.Parser\\src\\ClosedXML.Parser\\Formula.g4 by ANTLR 4.9.2
+// Generated from c:\\Users\\havli\\source\\repos\\ClosedXML.Parser\\src\\ClosedXML.Lexer\\FormulaLexer.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -108,7 +108,7 @@ public partial class FormulaLexer : Lexer {
 		}
 	}
 
-	public override string GrammarFileName { get { return "Formula.g4"; } }
+	public override string GrammarFileName { get { return "FormulaLexer.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 

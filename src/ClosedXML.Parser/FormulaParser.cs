@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from c:\\Users\\havli\\source\\repos\\ClosedXML.Parser\\src\\ClosedXML.Parser\\Formula.g4 by ANTLR 4.9.2
+// Generated from c:\\Users\\havli\\source\\repos\\ClosedXML.Parser\\src\\ClosedXML.Parser\\FormulaParser.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -92,7 +92,7 @@ public partial class FormulaParser : Parser {
 		}
 	}
 
-	public override string GrammarFileName { get { return "Formula.g4"; } }
+	public override string GrammarFileName { get { return "FormulaParser.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
@@ -123,12 +123,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_formula; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitFormula(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -191,12 +185,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitExpression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -261,12 +249,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_concat_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitConcat_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -328,12 +310,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_additive_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitAdditive_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -402,12 +378,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_multiplying_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitMultiplying_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -472,12 +442,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_pow_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitPow_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -529,12 +493,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_percent_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitPercent_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -584,12 +542,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_prefix_atom_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitPrefix_atom_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -677,12 +629,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_atom_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitAtom_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -754,12 +700,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_ref_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRef_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -817,12 +757,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_ref_intersection_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRef_intersection_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -880,12 +814,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_ref_range_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRef_range_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -951,12 +879,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_ref_atom_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRef_atom_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1041,12 +963,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_constant; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitConstant(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1127,12 +1043,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_constant_list_rows; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitConstant_list_rows(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1194,12 +1104,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_constant_list_row; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitConstant_list_row(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1291,12 +1195,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_cell_reference; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitCell_reference(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1369,12 +1267,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_argument_list; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArgument_list(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1470,12 +1362,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1540,12 +1426,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_concat_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_concat_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1607,12 +1487,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_additive_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_additive_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1681,12 +1555,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_multiplying_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_multiplying_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1751,12 +1619,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_pow_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_pow_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1808,12 +1670,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_percent_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_percent_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1863,12 +1719,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_prefix_atom_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_prefix_atom_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -1956,12 +1806,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_arg_atom_expression; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArg_atom_expression(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -2026,12 +1870,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_name_reference; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitName_reference(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -2092,12 +1930,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_structure_reference; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitStructure_reference(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -2143,12 +1975,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_table_identifier; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitTable_identifier(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -2191,12 +2017,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_table_name; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitTable_name(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -2231,12 +2051,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_ref_function_call; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRef_function_call(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
@@ -2274,12 +2088,6 @@ public partial class FormulaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_function_call; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IFormulaVisitor<TResult> typedVisitor = visitor as IFormulaVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitFunction_call(this);
-			else return visitor.VisitChildren(this);
-		}
 	}
 
 	[RuleVersion(0)]
