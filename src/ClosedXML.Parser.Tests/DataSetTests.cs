@@ -1,8 +1,11 @@
-﻿using CsvHelper;
+﻿using System.Diagnostics;
+using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using System.Globalization;
 using JetBrains.Annotations;
+using Antlr4.Runtime;
+using ClosedXML.Parser.Tests.Rds;
 
 namespace ClosedXML.Parser.Tests;
 
@@ -38,19 +41,29 @@ public class DataSetTests
         var badFormulas = new HashSet<string>();
         foreach (var badFormulaPath in badFormulaPaths)
             badFormulas.UnionWith(Read(badFormulaPath));
-
+        
+        var sw = Stopwatch.StartNew();
+        var formulaCount = 0;
         foreach (var formula in Read(input))
         {
+            formulaCount++;
             try
             {
-                AssertFormula.CstParsed(formula);
+                var stream = new CodePointCharStream(formula);
+                var lexer = new FormulaLexer(stream);
+                lexer.RemoveErrorListeners();
+                var parser = new Lexer.FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
+                parser.Formula();
                 Assert.IsFalse(badFormulas.Contains(formula), formula);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Assert.IsTrue(badFormulas.Contains(formula), formula);
+                Assert.IsTrue(badFormulas.Contains(formula), $"Parsing '{formula}' failes: {e.Message}");
             }
         }
+        
+        sw.Stop();
+        Console.WriteLine($"Parsed {formulaCount} formulas in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula)");
     }
 
     private IEnumerable<string> Read(string filename)

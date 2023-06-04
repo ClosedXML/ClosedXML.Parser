@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ClosedXML.Lexer\ClosedXML.Lexer.csproj" />
     <ProjectReference Include="..\ClosedXML.Parser\ClosedXML.Parser.csproj" />
   </ItemGroup>
 

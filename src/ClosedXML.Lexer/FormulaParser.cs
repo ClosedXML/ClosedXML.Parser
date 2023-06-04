@@ -36,144 +36,167 @@ public class FormulaParser<TScalarValue, TNode>
     /// </summary>
     public TNode Formula()
     {
-        var expression = Expression(false).Node;
+        if (_la == FormulaLexer.SPACE)
+            Consume();
+        var expression = Expression(false, out _);
         if (_la != FormulaLexer.Eof)
             throw new Exception("Expression is not completely parsed.");
 
         return expression;
     }
 
-    private (bool IsPureRef, TNode Node) Expression(bool skipRangeUnion)
+    private TNode Expression(bool skipRangeUnion, out bool isPureRef)
     {
-        var (isPureRef, currentNode) = ConcatExpression(skipRangeUnion);
+        var leftNode = ConcatExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
-            char op;
-            var la = _la;
-            switch (la)
+            char cmpOp;
+            switch (_la)
             {
                 case FormulaLexer.GREATER_OR_EQUAL_THAN:
-                    op = '≥';
+                    cmpOp = '≥';
                     break;
                 case FormulaLexer.LESS_OR_EQUAL_THAN:
-                    op = '≤';
+                    cmpOp = '≤';
                     break;
                 case FormulaLexer.LESS_THAN:
-                    op = '<';
+                    cmpOp = '<';
                     break;
                 case FormulaLexer.GREATER_THAN:
-                    op = '>';
+                    cmpOp = '>';
                     break;
                 case FormulaLexer.NOT_EQUAL:
-                    op = '≠';
+                    cmpOp = '≠';
                     break;
                 case FormulaLexer.EQUAL:
-                    op = '=';
+                    cmpOp = '=';
                     break;
                 default:
-                    return (isPureRef, currentNode);
+                    return leftNode;
             }
 
             Consume();
             isPureRef = false;
 
-            var appendNode = ConcatExpression(skipRangeUnion).Node;
-            currentNode = _factory.BinaryNode(op, currentNode, appendNode);
+            var rightNode = ConcatExpression(skipRangeUnion, out _);
+            leftNode = _factory.BinaryNode(cmpOp, leftNode, rightNode);
         }
     }
 
-    private (bool IsPureRef, TNode Node) ConcatExpression(bool skipRangeUnion)
+    private TNode ConcatExpression(bool skipRangeUnion, out bool isPureRef)
     {
-        var (isPureRef, currentNode) = AdditiveExpression(skipRangeUnion);
-        for (var la = _la; la == FormulaLexer.CONCAT; la = _la)
+        var leftNode = AdditiveExpression(skipRangeUnion, out isPureRef);
+        while (_la == FormulaLexer.CONCAT)
         {
             Consume();
             isPureRef = false;
-            var appendNode = AdditiveExpression(skipRangeUnion).Node;
-            currentNode = _factory.BinaryNode('&', currentNode, appendNode);
+            var rightNode = AdditiveExpression(skipRangeUnion, out _);
+            leftNode = _factory.BinaryNode('&', leftNode, rightNode);
         }
 
-        return (isPureRef, currentNode);
+        return leftNode;
     }
-    private (bool IsPureRef, TNode Node) AdditiveExpression(bool skipRangeUnion)
+    private TNode AdditiveExpression(bool skipRangeUnion, out bool isPureRef)
     {
-        var (isPureRef, currentNode) = MultiplyingExpression(skipRangeUnion);
-        for (var la = _la; la is FormulaLexer.PLUS or FormulaLexer.MINUS; la = _la)
+        var leftNode = MultiplyingExpression(skipRangeUnion, out isPureRef);
+        while (true)
+        {
+            char op;
+            switch (_la)
+            {
+                case FormulaLexer.PLUS:
+                    op = '+';
+                    break;
+                case FormulaLexer.MINUS:
+                    op = '-';
+                    break;
+                default: 
+                    return leftNode;
+            }
+
+            Consume();
+            isPureRef = false;
+            var rightNode = MultiplyingExpression(skipRangeUnion, out _);
+            leftNode = _factory.BinaryNode(op, leftNode, rightNode);
+        }
+    }
+
+    private TNode MultiplyingExpression(bool skipRangeUnion, out bool isPureRef)
+    {
+        var leftNode = PowExpression(skipRangeUnion, out isPureRef);
+        while (true)
+        {
+            char op;
+            switch (_la)
+            {
+                case FormulaLexer.MULT:
+                    op = '*';
+                    break;
+                case FormulaLexer.DIV:
+                    op = '/';
+                    break;
+                default:
+                    return leftNode;
+            }
+
+            Consume();
+            isPureRef = false;
+            var appendNode = PowExpression(skipRangeUnion, out _);
+            leftNode = _factory.BinaryNode(op, leftNode, appendNode);
+        }
+    }
+
+    private TNode PowExpression(bool skipRangeUnion, out bool isPureRef)
+    {
+        var leftNode = PercentExpression(skipRangeUnion, out isPureRef);
+        while (_la == FormulaLexer.POW)
         {
             Consume();
             isPureRef = false;
-            var appendNode = MultiplyingExpression(skipRangeUnion).Item2;
-            currentNode = _factory.BinaryNode(la == FormulaLexer.PLUS ? '+' : '-', currentNode, appendNode);
+            var rightNode = PercentExpression(skipRangeUnion, out _);
+            leftNode = _factory.BinaryNode('^', leftNode, rightNode);
         }
 
-        return (isPureRef, currentNode);
+        return leftNode;
     }
 
-    private (bool IsPureRef, TNode Node) MultiplyingExpression(bool skipRangeUnion)
+    private TNode PercentExpression(bool skipRangeUnion, out bool isPureRef)
     {
-        var (isPureRef, currentNode) = PowExpression(skipRangeUnion);
-        for (var la = _la; la is FormulaLexer.MULT or FormulaLexer.DIV; la = _la)
-        {
-            Consume();
-            isPureRef = false;
-            var appendNode = PowExpression(skipRangeUnion).Node;
-            currentNode = _factory.BinaryNode(la == FormulaLexer.MULT ? '*' : '/', currentNode, appendNode);
-        }
-
-        return (isPureRef, currentNode);
-    }
-
-
-    private (bool IsPureRef, TNode Node) PowExpression(bool skipRangeUnion)
-    {
-        var (isPureRef, currentNode) = PercentExpression(skipRangeUnion);
-        for (var la = _la; la == FormulaLexer.POW; la = _la)
-        {
-            Consume();
-            isPureRef = false;
-            var appendNode = PercentExpression(skipRangeUnion).Node;
-            currentNode = _factory.BinaryNode('^', currentNode, appendNode);
-        }
-
-        return (isPureRef, currentNode);
-    }
-
-    private (bool IsPureRef, TNode Node) PercentExpression(bool skipRangeUnion)
-    {
-        var (isPureRef, prefixAtomNode) = PrefixAtomExpression(skipRangeUnion);
+        var prefixAtomNode = PrefixAtomExpression(skipRangeUnion, out isPureRef);
         if (_la == FormulaLexer.PERCENT)
         {
             Consume();
-            return (false, _factory.Unary('%', prefixAtomNode));
+            isPureRef = false;
+            return _factory.Unary('%', prefixAtomNode);
         }
 
-        return (isPureRef, prefixAtomNode);
+        return prefixAtomNode;
     }
 
-    private (bool IsPureRef, TNode Node) PrefixAtomExpression(bool skipRangeUnion)
+    private TNode PrefixAtomExpression(bool skipRangeUnion, out bool isPureRef)
     {
-        var la = _la;
-        switch (la)
+        char op;
+        switch (_la)
         {
             case FormulaLexer.PLUS:
-                Consume();
-                var neutralAtom = PrefixAtomExpression(skipRangeUnion).Node;
-                return (false, _factory.Unary('+', neutralAtom));
-
+                op = '+';
+                break;
             case FormulaLexer.MINUS:
-                Consume();
-                var minusAtom = PrefixAtomExpression(skipRangeUnion).Node;
-                return (false, _factory.Unary('-', minusAtom));
-
+                op = '+';
+                break;
             default:
-                return AtomExpression(skipRangeUnion);
+                return AtomExpression(skipRangeUnion, out isPureRef);
         }
+
+        Consume();
+        var neutralAtom = PrefixAtomExpression(skipRangeUnion, out _);
+        isPureRef = false;
+        return _factory.Unary(op, neutralAtom);
     }
 
-    private (bool IsPureRef, TNode Node) AtomExpression(bool skipRangeUnion)
+    private TNode AtomExpression(bool skipRangeUnion, out bool isPureRef)
     {
-        var la = _la;
-        switch (la)
+        switch (_la)
         {
             // Constant
             case FormulaLexer.NONREF_ERRORS:
@@ -181,89 +204,106 @@ public class FormulaParser<TScalarValue, TNode>
             case FormulaLexer.NUMERICAL_CONSTANT:
             case FormulaLexer.STRING_CONSTANT:
             case FormulaLexer.OPEN_CURLY:
-                var constant = Constant();
-                return (false, constant);
+                isPureRef = false;
+                var constantNode = Constant();
+                return constantNode;
 
             // '(' expression ')'
             case FormulaLexer.OPEN_BRACE:
                 Consume();
-                var (isPureRef, expression) = Expression(false);
+                var nestedNode = Expression(false, out isPureRef);
                 Match(FormulaLexer.CLOSE_BRACE);
+
+                // This is the point of an ambiguity. Atom should be a value, but it can
+                // be determined by calling an expression inside the braces or
+                // it can go through ref_expression path that also has an ref_expression
+                // in braces. The second option should be seriously rare, so parser
+                // tracks whether expression is a ref_expression and if it is, we 'backtrack'
+                // through patching to the correct path of the 'ref_expression' below.
+                // Example: '(A1) A1:B2' <- the '(A1)' should be detected as ref_expression
+                // and thus the ' ' intersection operator be valid. Of course, braces can be
+                // very nested '(((A1))) A1:B2' and when we are entering the brace, there is
+                // no way to detect whether it is ref_expression or expression.
                 if (isPureRef)
                 {
+                    // Incorrect expectation, backtrack to the ref_expression
+                    // note the passed true argument for 'replaceFirstAtom'
                     if (skipRangeUnion)
-                        return (true, RefIntersectionExpression(true, expression));
-                    else
-                        // The only remaining stuff is for this, isn't recursive
-                        return (true, RefExpression(true, expression));
+                        return RefIntersectionExpression(true, nestedNode);
+
+                    return RefExpression(true, nestedNode);
                 }
 
-                return (isPureRef, expression);
+                return nestedNode;
 
             // function_call
             case FormulaLexer.CELL_FUNCTION_LIST:
             case FormulaLexer.USER_DEFINED_FUNCTION_NAME:
-                var funName = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                isPureRef = false;
+                var functionName = GetCurrentToken();
                 Consume();
                 var args = ArgumentList();
-                return (false, _factory.Function(funName, args));
+                return _factory.Function(functionName, args);
 
             // ref_expression
             default:
                 if (skipRangeUnion)
-                    return (true, RefIntersectionExpression());
-                else
-                    // The only remaining stuff is for this, isn't recursive
-                    return (true, RefExpression());
+                {
+                    isPureRef = true;
+                    return RefIntersectionExpression();
+                }
+
+                isPureRef = true;
+                return RefExpression();
         }
     }
 
     private TNode RefExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
-        var currentNode = RefIntersectionExpression(replaceFirstAtom, refAtom);
-        for (var la = _la; la == FormulaLexer.COMMA; la = _la)
+        var leftNode = RefIntersectionExpression(replaceFirstAtom, refAtom);
+        while (_la == FormulaLexer.COMMA)
         {
             Consume();
-            var appendNode = RefIntersectionExpression();
-            currentNode = _factory.BinaryNode(',', currentNode, appendNode);
+            var rightNode = RefIntersectionExpression();
+            leftNode = _factory.BinaryNode(',', leftNode, rightNode);
         }
 
-        return currentNode;
+        return leftNode;
     }
 
     private TNode RefIntersectionExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
-        var currentNode = RefRangeExpression(replaceFirstAtom, refAtom);
-        for (var la = _la; la == FormulaLexer.SPACE; la = _la)
+        var leftNode = RefRangeExpression(replaceFirstAtom, refAtom);
+        while (_la == FormulaLexer.SPACE)
         {
             Consume();
-            var appendNode = RefRangeExpression();
-            currentNode = _factory.BinaryNode(' ', currentNode, appendNode);
+            var rightNode = RefRangeExpression();
+            leftNode = _factory.BinaryNode(' ', leftNode, rightNode);
         }
 
-        return currentNode;
+        return leftNode;
     }
 
     private TNode RefRangeExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
-        var currentNode = RefAtomExpression(replaceFirstAtom, refAtom);
-        for (var la = _la; la == FormulaLexer.COLON; la = _la)
+        var leftNode = RefAtomExpression(replaceFirstAtom, refAtom);
+        while (_la == FormulaLexer.COLON)
         {
             Consume();
-            var appendNode = RefAtomExpression();
-            currentNode = _factory.BinaryNode(':', currentNode, appendNode);
+            var rightNode = RefAtomExpression();
+            leftNode = _factory.BinaryNode(':', leftNode, rightNode);
         }
 
-        return currentNode;
+        return leftNode;
     }
 
     private TNode RefAtomExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
+        // A backtracking of an incorrect detection whether an expression in a braces is value expression or ref expression.
         if (replaceFirstAtom)
             return refAtom!;
 
-        var la = _la;
-        switch (la)
+        switch (_la)
         {
             case FormulaLexer.REF_CONSTANT:
                 var refError = _factory.ErrorNode(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
@@ -276,7 +316,7 @@ public class FormulaParser<TScalarValue, TNode>
                 Match(FormulaLexer.CLOSE_BRACE);
                 return refExpression;
 
-            // cell_reference has been inlined
+            // cell_reference has been inlined into this switch
 
             // local_cell_reference
             case FormulaLexer.A1_REFERENCE:
@@ -285,7 +325,7 @@ public class FormulaParser<TScalarValue, TNode>
                 return localCellReferenceNode;
 
             // external_cell_reference
-            case FormulaLexer.BANG_REFERENCE:
+            // case FormulaLexer.BANG_REFERENCE: Formula shouldn't contain BANG_REFERENCE, see grammar
             case FormulaLexer.SINGLE_SHEET_REFERENCE:
                 var externalCellReferenceNode = _factory.ExternalCellReference(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
                 Consume();
@@ -293,71 +333,70 @@ public class FormulaParser<TScalarValue, TNode>
 
             // external_cell_reference
             case FormulaLexer.SHEET_RANGE_PREFIX:
-                var start = _tokenSource.TokenStartCharIndex;
+                var startCharIndex = _tokenSource.TokenStartCharIndex;
                 Consume();
                 Match(FormulaLexer.A1_REFERENCE);
-                var sheetRangeReferenceNode = _factory.ExternalCellReference(_input, start, _tokenSource.CharIndex - start);
+                var sheetRangeReferenceNode = _factory.ExternalCellReference(_input, startCharIndex, _tokenSource.CharIndex - startCharIndex);
                 return sheetRangeReferenceNode;
 
             // ref_function_call
             case FormulaLexer.REF_FUNCTION_LIST:
-                var refFunName = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var refFunctionName = GetCurrentToken();
                 Consume();
                 var args = ArgumentList();
-                return _factory.Function(refFunName, args);
+                return _factory.Function(refFunctionName, args);
 
-            // name_reference | structure_reference
+            // name_reference | structure_reference - all variants are expanded from the grammar.
+            
+            // Either defined name or table name for a structure reference
             case FormulaLexer.NAME:
-                var localName = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var localName = GetCurrentToken();
                 Consume();
                 if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
                 {
-                    var tableReference = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                    var tableReference = GetCurrentToken();
                     Consume();
                     return _factory.StructureReference(localName, tableReference);
                 }
 
                 return _factory.LocalNameReference(localName);
 
+            // reference to another workbook
             case FormulaLexer.BOOK_PREFIX:
-                var bookPrefix = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var bookPrefix = GetCurrentToken();
                 Consume();
-                var externalName = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var externalName = GetCurrentToken();
                 Match(FormulaLexer.NAME);
                 if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
                 {
-                    var intraTableReference = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                    var intraTableReference = GetCurrentToken();
                     Consume();
                     return _factory.StructureReference(bookPrefix, externalName, intraTableReference);
                 }
 
                 return _factory.ExternalNameReference(bookPrefix, externalName);
 
+            // name_reference - name in a specific sheet.
             case FormulaLexer.SINGLE_SHEET_PREFIX:
-                var sheetPrefix = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var sheetPrefix = GetCurrentToken();
                 Consume();
-                if (_la != FormulaLexer.NAME)
-                    throw new Exception("Expecred NAME token");
-
-                var name = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
-                Consume();
+                var name = GetCurrentToken();
+                Match(FormulaLexer.NAME);
                 return _factory.LocalNameReference(sheetPrefix, name);
 
+            // structure_reference - only for formulas directly in the table, e.g. totals row.
             case FormulaLexer.INTRA_TABLE_REFERENCE:
-                // This can be done only if formula is directly in the table
-                var localTableReference = _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var localTableReference = GetCurrentToken();
                 Consume();
                 return _factory.StructureReference(localTableReference);
         }
 
-        throw MakeException("Unex[ected token");
-
+        throw UnexpectedTokenError();
     }
 
     private TNode Constant()
     {
-        var la = _la;
-        switch (la)
+        switch (_la)
         {
             case FormulaLexer.NONREF_ERRORS:
                 var errorNode = _factory.ErrorNode(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - 1);
@@ -381,90 +420,80 @@ public class FormulaParser<TScalarValue, TNode>
 
             case FormulaLexer.OPEN_CURLY:
                 Consume();
-                var array = ConstantListRows();
+                var arrayElements = ConstantListRows(out var rows, out var columns);
                 Match(FormulaLexer.CLOSE_CURLY);
-                return _factory.ArrayNode(array);
+                return _factory.ArrayNode(rows, columns, arrayElements);
 
             default:
-                throw MakeException("Unexpected token");
+                throw UnexpectedTokenError();
         }
     }
 
-    private TScalarValue[,] ConstantListRows()
+    private List<TScalarValue> ConstantListRows(out int rows, out int columns)
     {
+        // First use list with doubling strategy
         var elements = new List<TScalarValue>();
-        var firstRowWidth = ConstantListRow(elements);
+        var rowSize = ConstantListRow(elements);
         var height = 1;
-        var la = _la;
-        while (la == FormulaLexer.SEMICOLON)
+        while (_la == FormulaLexer.SEMICOLON)
         {
             Consume();
-            var nextRowWidth = ConstantListRow(elements);
-            if (nextRowWidth != firstRowWidth)
-                throw new Exception("Sucks");
+            var nextRowSize = ConstantListRow(elements);
+            if (nextRowSize != rowSize)
+                throw Error("Rows of an array don't have same size.");
 
             height++;
-            la = _la;
         }
 
-        var idx = 0;
-        var array = new TScalarValue[height, firstRowWidth];
-        for (var row = 0; row < height; ++row)
-        {
-            for (var col = 0; col < firstRowWidth; ++col)
-            {
-                array[row, col] = elements[idx++];
-            }
-        }
-
-        return array;
+        rows = height;
+        columns = rowSize;
+        return elements;
     }
 
-    private int ConstantListRow(List<TScalarValue> buffer)
+    private int ConstantListRow(List<TScalarValue> arrayElements)
     {
-        var firstValue = ArrayConstant();
-        var origSize = buffer.Count;
-        buffer.Add(firstValue);
-        var la = _la;
-        while (la == FormulaLexer.COMMA)
+        var origSize = arrayElements.Count;
+        var arrayElement = ArrayConstant();
+        arrayElements.Add(arrayElement);
+        while (_la == FormulaLexer.COMMA)
         {
             Consume();
-            var next = ArrayConstant();
-            buffer.Add(next);
-            la = _la;
+            var nextElement = ArrayConstant();
+            arrayElements.Add(nextElement);
         }
 
-        return buffer.Count - origSize;
+        return arrayElements.Count - origSize;
     }
 
     private TScalarValue ArrayConstant()
     {
-        var la = _la;
-        TScalarValue? value;
-        switch (la)
+        TScalarValue value;
+        switch (_la)
         {
             case FormulaLexer.REF_CONSTANT:
             case FormulaLexer.NONREF_ERRORS:
                 value = _factory.ErrorValue(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
                 break;
             case FormulaLexer.LOGICAL_CONSTANT:
-                value = _factory.LogicalValue(_input[_tokenSource.TokenStartCharIndex] == 'T');
+                value = _factory.LogicalValue(GetTokenLogicalValue());
                 break;
             case FormulaLexer.MINUS:
                 Consume();
                 if (_la != FormulaLexer.NUMERICAL_CONSTANT)
-                    throw new Exception("Expecting number");
-                value = _factory.NumberValue(-ParseNumber(_input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex)));
+                    throw UnexpectedTokenError(FormulaLexer.NUMERICAL_CONSTANT);
+
+                value = _factory.NumberValue(-ParseNumber(GetCurrentToken()));
                 break;
             case FormulaLexer.NUMERICAL_CONSTANT:
-                value = _factory.NumberValue(ParseNumber(_input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex)));
+                value = _factory.NumberValue(ParseNumber(GetCurrentToken()));
                 break;
             case FormulaLexer.STRING_CONSTANT:
                 value = _factory.TextValue(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
                 break;
             default:
-                throw MakeException("");
+                throw UnexpectedTokenError();
         }
+
         Consume();
         return value;
     }
@@ -472,24 +501,22 @@ public class FormulaParser<TScalarValue, TNode>
     private List<TNode> ArgumentList()
     {
         var args = new List<TNode>();
-
         while (true)
         {
-            var la = _la;
-            if (la == FormulaLexer.CLOSE_BRACE)
+            if (_la == FormulaLexer.CLOSE_BRACE)
             {
                 Consume();
                 return args;
             }
 
-            if (la == FormulaLexer.COMMA)
+            if (_la == FormulaLexer.COMMA)
             {
                 Consume();
                 args.Add(_factory.BlankNode());
             }
             else
             {
-                var (_, arg) = Expression(true);
+                var arg = Expression(true, out _);
                 args.Add(arg);
                 if (_la == FormulaLexer.CLOSE_BRACE)
                 {
@@ -505,7 +532,7 @@ public class FormulaParser<TScalarValue, TNode>
     private void Match(int expected)
     {
         if (_la != expected)
-            throw UnexpectedToken(expected);
+            throw UnexpectedTokenError(expected);
 
         Consume();
     }
@@ -516,7 +543,7 @@ public class FormulaParser<TScalarValue, TNode>
         _la = token.Type;
     }
 
-    private double ParseNumber(ReadOnlySpan<char> number)
+    private static double ParseNumber(ReadOnlySpan<char> number)
     {
         return double.Parse(
 #if NETSTANDARD2_1
@@ -530,12 +557,17 @@ public class FormulaParser<TScalarValue, TNode>
 
     private TNode ConvertLogical()
     {
-        return _factory.LogicalNode(_input[_tokenSource.TokenStartCharIndex] == 'T');
+        return _factory.LogicalNode(GetTokenLogicalValue());
+    }
+
+    private bool GetTokenLogicalValue()
+    {
+        return _input[_tokenSource.TokenStartCharIndex] is 'T' or 't';
     }
 
     private TNode ConvertNumber()
     {
-        var number = ParseNumber(_input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex));
+        var number = ParseNumber(GetCurrentToken());
         var numberNode = _factory.NumberNode(number);
         return numberNode;
     }
@@ -545,15 +577,25 @@ public class FormulaParser<TScalarValue, TNode>
         var textNode = _factory.TextNode(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
         return textNode;
     }
-    
-    private Exception UnexpectedToken(params int[] expectedToken)
+
+    private Exception UnexpectedTokenError(params int[] expectedToken)
     {
-        return MakeException($"Unexpected token {GetLaTokenName()}, expected one of {string.Join(",", expectedToken.Select(GetTokenName))}.");
+        return Error($"Unexpected token {GetLaTokenName()}, expected one of {string.Join(",", expectedToken.Select(GetTokenName))}.");
     }
 
-    private Exception MakeException(string message)
+    private Exception UnexpectedTokenError()
+    {
+        return Error($"Unexpected token {GetLaTokenName()}.");
+    }
+
+    private Exception Error(string message)
     {
         return new Exception($"Error at line {_tokenSource.Line}:{_tokenSource.Column} of '{_input}': {message}");
+    }
+
+    private ReadOnlySpan<char> GetCurrentToken()
+    {
+        return _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
     }
 
     private static string GetTokenName(int tokenType) => FormulaLexer.ruleNames[tokenType - 1];
