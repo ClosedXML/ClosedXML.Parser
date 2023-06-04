@@ -6,7 +6,12 @@ Official source for the grammar is [MS-XML](https://learn.microsoft.com/en-us/op
 
 # Goals
 
-Fast parser to create AST for cell formulas and other places that need to parse formula (e.g. sparklines, data validation) for ClosedXML. There shoudl be a ANTLR4 grammar file and possibly in the future hand-made recrusive descent parser that doesn't construct concrete syntax tree at all, but directly produces AST.
+* __Performance__ - ClosedXML needs to parse formula really fast. Limit allocation and so on.
+* __Evaluation oriented__ - Parser should concentrates on creation of abstract syntax trees, not concrete syntax tree. Goal is evaluation of formulas, not transformation.
+* __Multi-use__ - Formulas are mostly used in cells, but there are other places with different grammar rules (e.g. sparklines, data validation)
+* __Multi notation (A1 or R1C1)__ - Parser should be able to parse both A1 and R1C1 formulas. I.e. `SUM(R5)` can mean return sum of cell `R5` in _A1_ notation, but return sum of all cells on row 5 in _R1C1_ notation.
+
+Project uses ANTLR4 grammar file as the source of truth and a lexer. There is also ANTLR parser is not used, but is used as a basis of recursive descent parser (ANTLR parser takes up 8 seconds vs 700ms for enron dataset). 
 
 ANTLR4 one of few maintained parser generators with C# target.
 
