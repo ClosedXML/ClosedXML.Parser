@@ -251,23 +251,27 @@ fragment A1_COLUMN
         ;
 
 fragment A1_RELATIVE_COLUMN
-        : LETTER
-        | LETTER LETTER
-        | A_to_W LETTER LETTER
-        | 'X' A_to_E LETTER
+        : COLUMN_LETTER
+        | COLUMN_LETTER COLUMN_LETTER
+        | A_to_W COLUMN_LETTER COLUMN_LETTER
+        | 'X' A_to_E COLUMN_LETTER
         | 'XF' A_to_D
         ;
 
 fragment A_to_D
-        : [a-dA-D]
+        : [A-D]
         ;
 
 fragment A_to_E
-        : [a-eA-E]
+        : [A-E]
         ;
 
 fragment A_to_W
-        : [a-wA-W]
+        : [A-W]
+        ;
+
+fragment COLUMN_LETTER
+        : [A-Z]
         ;
 
 fragment LETTER
