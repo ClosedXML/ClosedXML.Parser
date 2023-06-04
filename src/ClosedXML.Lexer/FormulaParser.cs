@@ -110,7 +110,7 @@ public class FormulaParser<TScalarValue, TNode>
                 case FormulaLexer.MINUS:
                     op = '-';
                     break;
-                default: 
+                default:
                     return leftNode;
             }
 
@@ -347,7 +347,7 @@ public class FormulaParser<TScalarValue, TNode>
                 return _factory.Function(refFunctionName, args);
 
             // name_reference | structure_reference - all variants are expanded from the grammar.
-            
+
             // Either defined name or table name for a structure reference
             case FormulaLexer.NAME:
                 var localName = GetCurrentToken();
@@ -547,11 +547,11 @@ public class FormulaParser<TScalarValue, TNode>
     {
         return double.Parse(
 #if NETSTANDARD2_1
-            number, 
+        number,
 #else
             number.ToString(),
 #endif
-            NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+        NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
             CultureInfo.InvariantCulture);
     }
 

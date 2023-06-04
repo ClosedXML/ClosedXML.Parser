@@ -58,7 +58,7 @@ public class DataSetTests
             }
             catch (Exception e)
             {
-                Assert.IsTrue(badFormulas.Contains(formula), $"Parsing '{formula}' failes: {e.Message}");
+                Assert.IsTrue(badFormulas.Contains(formula), $"Parsing formula '{formula}' failed: {e.Message}");
             }
         }
         
