@@ -30,11 +30,9 @@ ClosedXML is currently using [XLParser](https://github.com/spreadsheetlab/XLPars
 
 ANTLR lexer takes up about 3.2 seconds for Enron dataset. With ANTLR parsing, it takes up 11 seconds. I want that 7+ seconds in performance and no allocation, so RDS that takes up 700 ms.
 
-## Debugging
+## Current state
 
-Use [vscode-antlr4](https://github.com/mike-lischke/vscode-antlr4/blob/master/doc/grammar-debugging.md) plugin for debugging the grammar.
-
-Current state - ENRON dataset parsing RDS + ANTLR lexer
+ENRON dataset parsing RDS + ANTLR lexer
 
 * Total: *946320*
 * Elapsed: *2964 ms*
@@ -44,11 +42,9 @@ Current state - ENRON dataset parsing RDS + ANTLR lexer
 
 Bad ones fail on external workbook name reference that uses apostrophe (e.g `[1]!'Some name in external wb'`), otherwise they are parsed.
 
-* Convert to LL(1) parser. Per maintainer [SO post](https://stackoverflow.com/a/26457201/2622707), once there are no calls to `AdaptivePredict`, it's LL(1).
-* Prerequisite for recursive descent parser
-  * Remove left recusion
-  * Remove left factoring
-* Make recursive descent parser
+## Debugging
+
+Use [vscode-antlr4](https://github.com/mike-lischke/vscode-antlr4/blob/master/doc/grammar-debugging.md) plugin for debugging the grammar.
 
 ## Resource
 
