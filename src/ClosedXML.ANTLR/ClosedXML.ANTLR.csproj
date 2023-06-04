@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClosedXML.Lexer\ClosedXML.Lexer.csproj" />
+    <Content Include="..\ClosedXML.Parser\FormulaLexer.tokens" Link="FormulaLexer.tokens" CopyToOutputDirectory="Never" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\ClosedXML.Lexer\FormulaLexer.tokens" Link="FormulaLexer.tokens" CopyToOutputDirectory="Never" />
+    <ProjectReference Include="..\ClosedXML.Parser\ClosedXML.Parser.csproj" />
   </ItemGroup>
 </Project>
