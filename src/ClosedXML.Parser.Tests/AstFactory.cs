@@ -6,9 +6,9 @@ using System.Globalization;
 
 namespace ClosedXML.Parser.Tests;
 
-public readonly record struct ScalarValue(string Type, string Value);
+public readonly record struct ScalarValue(string Type, object Value);
 
-internal record AstNode(string Type, string Text);
+internal record AstNode(string Type, object Value);
 
 internal class F : IAstFactory<ScalarValue, AstNode>
 {
@@ -19,7 +19,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public ScalarValue LogicalValue(bool value)
     {
-        return new ScalarValue("Logical", value ? "TRUE" : "FALSE");
+        return new ScalarValue("Logical", value);
     }
 
     public ScalarValue NumberValue(double value)
@@ -44,7 +44,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode LogicalNode(bool value)
     {
-        return new AstNode("Logical", value ? "TRUE" : "FALSE");
+        return new AstNode("Logical", value);
     }
 
     public AstNode ErrorNode(string input, int firstIndex, int length)

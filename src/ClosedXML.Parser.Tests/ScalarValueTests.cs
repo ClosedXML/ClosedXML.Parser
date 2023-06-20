@@ -27,11 +27,24 @@ public class ScalarValueTests
         AssertText(unescaped, escaped);
     }
 
-    private static void AssertText(string formula, string expectedText)
+    [TestMethod]
+    [DataRow("TRUE", true)]
+    [DataRow("FALSE", false)]
+    public void Can_parse_logical(string formula, bool value)
+    {
+        AssertValue(formula, "Logical", value);
+    }
+
+    private static void AssertText<T>(string formula, T expected)
+    {
+        AssertValue(formula, "Text", expected);
+    }
+
+    private static void AssertValue<T>(string formula, string expectedType, T expected)
     {
         var node = ParseText(formula, new F());
-        Assert.AreEqual("Text", node.Type);
-        Assert.AreEqual(expectedText, node.Text);
+        Assert.AreEqual(expectedType, node.Type);
+        Assert.AreEqual(expected, node.Value);
     }
 
     private static AstNode ParseText(string formula, IAstFactory<ScalarValue, AstNode> factory)
