@@ -15,7 +15,7 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TScalarValue NumberValue(double value);
 
-    TScalarValue TextValue(string input, int firstIndex, int length);
+    TScalarValue TextValue(ReadOnlySpan<char> text);
 
     TScalarValue ErrorValue(string input, int firstIndex, int length);
 
@@ -29,7 +29,7 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TNode NumberNode(double value);
 
-    TNode TextNode(string input, int firstIndex, int length);
+    TNode TextNode(ReadOnlySpan<char> text);
 
     TNode LocalCellReference(string input, int firstIndex, int length);
 

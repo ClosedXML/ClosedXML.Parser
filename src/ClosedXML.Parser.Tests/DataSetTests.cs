@@ -5,7 +5,6 @@ using CsvHelper.Configuration.Attributes;
 using System.Globalization;
 using JetBrains.Annotations;
 using Antlr4.Runtime;
-using ClosedXML.Parser.Tests.Rds;
 
 namespace ClosedXML.Parser.Tests;
 

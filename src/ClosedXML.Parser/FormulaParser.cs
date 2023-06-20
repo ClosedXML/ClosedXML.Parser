@@ -488,7 +488,7 @@ public class FormulaParser<TScalarValue, TNode>
                 value = _factory.NumberValue(ParseNumber(GetCurrentToken()));
                 break;
             case FormulaLexer.STRING_CONSTANT:
-                value = _factory.TextValue(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                value = ConvertTextValue();
                 break;
             default:
                 throw UnexpectedTokenError();
@@ -574,10 +574,51 @@ public class FormulaParser<TScalarValue, TNode>
 
     private TNode ConvertText()
     {
-        var textNode = _factory.TextNode(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
-        return textNode;
+        var token = GetCurrentToken();
+        Span<char> buffer = stackalloc char[token.Length];
+        return ConvertTextValue(GetCurrentToken(), out var slice, ref buffer)
+            ? _factory.TextNode(slice)
+            : _factory.TextNode(buffer);
     }
 
+    private TScalarValue ConvertTextValue()
+    {
+        var token = GetCurrentToken();
+        Span<char> buffer = stackalloc char[token.Length];
+        return ConvertTextValue(GetCurrentToken(), out var slice, ref buffer)
+            ? _factory.TextValue(slice)
+            : _factory.TextValue(buffer);
+    }
+
+    private static bool ConvertTextValue(ReadOnlySpan<char> token, out ReadOnlySpan<char> copy, ref Span<char> buffer)
+    {
+        var text = token.Slice(1, token.Length - 2);
+        var indexOfDQuote = text.IndexOf('"');
+        var textMustBeUnescaped = indexOfDQuote >= 0;
+        if (!textMustBeUnescaped)
+        {
+            copy = text;
+            return true;
+        }
+
+        Span<char> unescaped = buffer;
+        var tail = unescaped;
+        var quoteCount = 0;
+        do
+        {
+            var quoteText = text.Slice(0, indexOfDQuote + 1);
+            quoteText.CopyTo(tail);
+            tail = tail.Slice(indexOfDQuote + 1);
+            text = text.Slice(indexOfDQuote + 2);
+            indexOfDQuote = text.IndexOf('"');
+            quoteCount++;
+        } while (indexOfDQuote >= 0);
+        
+        text.CopyTo(tail);
+        buffer = unescaped.Slice(0, token.Length - 2 - quoteCount);
+        copy = default;
+        return false;
+    }
     private Exception UnexpectedTokenError(params int[] expectedToken)
     {
         return Error($"Unexpected token {GetLaTokenName()}, expected one of {string.Join(",", expectedToken.Select(GetTokenName))}.");
