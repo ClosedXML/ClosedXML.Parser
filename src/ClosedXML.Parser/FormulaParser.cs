@@ -50,26 +50,26 @@ public class FormulaParser<TScalarValue, TNode>
         var leftNode = ConcatExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
-            char cmpOp;
+            BinaryOperation cmpOp;
             switch (_la)
             {
                 case FormulaLexer.GREATER_OR_EQUAL_THAN:
-                    cmpOp = '≥';
+                    cmpOp = BinaryOperation.GreaterOrEqualThan;
                     break;
                 case FormulaLexer.LESS_OR_EQUAL_THAN:
-                    cmpOp = '≤';
+                    cmpOp = BinaryOperation.LessOrEqualThan;
                     break;
                 case FormulaLexer.LESS_THAN:
-                    cmpOp = '<';
+                    cmpOp = BinaryOperation.LessThan;
                     break;
                 case FormulaLexer.GREATER_THAN:
-                    cmpOp = '>';
+                    cmpOp = BinaryOperation.GreaterThan;
                     break;
                 case FormulaLexer.NOT_EQUAL:
-                    cmpOp = '≠';
+                    cmpOp = BinaryOperation.NotEqual;
                     break;
                 case FormulaLexer.EQUAL:
-                    cmpOp = '=';
+                    cmpOp = BinaryOperation.Equal;
                     break;
                 default:
                     return leftNode;
@@ -91,7 +91,7 @@ public class FormulaParser<TScalarValue, TNode>
             Consume();
             isPureRef = false;
             var rightNode = AdditiveExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode('&', leftNode, rightNode);
+            leftNode = _factory.BinaryNode(BinaryOperation.Concat, leftNode, rightNode);
         }
 
         return leftNode;
@@ -101,14 +101,14 @@ public class FormulaParser<TScalarValue, TNode>
         var leftNode = MultiplyingExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
-            char op;
+            BinaryOperation op;
             switch (_la)
             {
                 case FormulaLexer.PLUS:
-                    op = '+';
+                    op = BinaryOperation.Plus;
                     break;
                 case FormulaLexer.MINUS:
-                    op = '-';
+                    op = BinaryOperation.Minus;
                     break;
                 default:
                     return leftNode;
@@ -126,14 +126,14 @@ public class FormulaParser<TScalarValue, TNode>
         var leftNode = PowExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
-            char op;
+            BinaryOperation op;
             switch (_la)
             {
                 case FormulaLexer.MULT:
-                    op = '*';
+                    op = BinaryOperation.Mult;
                     break;
                 case FormulaLexer.DIV:
-                    op = '/';
+                    op = BinaryOperation.Div;
                     break;
                 default:
                     return leftNode;
@@ -154,7 +154,7 @@ public class FormulaParser<TScalarValue, TNode>
             Consume();
             isPureRef = false;
             var rightNode = PercentExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode('^', leftNode, rightNode);
+            leftNode = _factory.BinaryNode(BinaryOperation.Pow, leftNode, rightNode);
         }
 
         return leftNode;
@@ -265,7 +265,7 @@ public class FormulaParser<TScalarValue, TNode>
         {
             Consume();
             var rightNode = RefIntersectionExpression();
-            leftNode = _factory.BinaryNode(',', leftNode, rightNode);
+            leftNode = _factory.BinaryNode(BinaryOperation.Union, leftNode, rightNode);
         }
 
         return leftNode;
@@ -278,7 +278,7 @@ public class FormulaParser<TScalarValue, TNode>
         {
             Consume();
             var rightNode = RefRangeExpression();
-            leftNode = _factory.BinaryNode(' ', leftNode, rightNode);
+            leftNode = _factory.BinaryNode(BinaryOperation.Intersection, leftNode, rightNode);
         }
 
         return leftNode;
@@ -291,7 +291,7 @@ public class FormulaParser<TScalarValue, TNode>
         {
             Consume();
             var rightNode = RefAtomExpression();
-            leftNode = _factory.BinaryNode(':', leftNode, rightNode);
+            leftNode = _factory.BinaryNode(BinaryOperation.Range, leftNode, rightNode);
         }
 
         return leftNode;

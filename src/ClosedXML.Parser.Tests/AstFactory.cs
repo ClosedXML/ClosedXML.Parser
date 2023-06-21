@@ -12,11 +12,6 @@ internal record AstNode(string Type, object Value);
 
 internal class F : IAstFactory<ScalarValue, AstNode>
 {
-    public ScalarValue BlankValue(bool value)
-    {
-        return new ScalarValue("Blank", string.Empty);
-    }
-
     public ScalarValue LogicalValue(bool value)
     {
         return new ScalarValue("Logical", value);
@@ -117,7 +112,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return default;
     }
 
-    public AstNode BinaryNode(char operation, AstNode leftNode, AstNode rightNode)
+    public AstNode BinaryNode(BinaryOperation operation, AstNode leftNode, AstNode rightNode)
     {
         return default;
     }

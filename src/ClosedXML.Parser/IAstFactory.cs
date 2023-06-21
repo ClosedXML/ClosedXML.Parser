@@ -56,7 +56,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="leftNode"></param>
     /// <param name="rightNode"></param>
     /// <returns></returns>
-    TNode BinaryNode(char operation, TNode leftNode, TNode rightNode);
+    TNode BinaryNode(BinaryOperation operation, TNode leftNode, TNode rightNode);
 
     /// <summary>
     /// 
