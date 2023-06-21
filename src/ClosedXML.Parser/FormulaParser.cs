@@ -547,11 +547,11 @@ public class FormulaParser<TScalarValue, TNode>
     {
         return double.Parse(
 #if NETSTANDARD2_1
-        number,
+            number,
 #else
             number.ToString(),
 #endif
-        NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+            NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
             CultureInfo.InvariantCulture);
     }
 

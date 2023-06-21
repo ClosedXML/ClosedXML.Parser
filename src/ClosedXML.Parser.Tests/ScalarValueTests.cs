@@ -43,6 +43,19 @@ public class ScalarValueTests
         AssertValue(formula, "Error", value);
     }
 
+    [TestMethod]
+    [DataRow("1", 1)]
+    [DataRow("1.5", 1.5)]
+    [DataRow(".5", .5)]
+    [DataRow(".5E2", 50)]
+    // [DataRow(".5e2", 50)] TODO: Lower e
+    [DataRow(".5E+2", 50)]
+    [DataRow("50E-2", 0.5)]
+    public void Can_parse_number(string formula, double value)
+    {
+        AssertValue(formula, "Number", value);
+    }
+
     private static void AssertText<T>(string formula, T expected)
     {
         AssertValue(formula, "Text", expected);

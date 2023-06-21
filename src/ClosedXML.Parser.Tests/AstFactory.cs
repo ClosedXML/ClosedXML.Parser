@@ -52,7 +52,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode NumberNode(double value)
     {
-        return new AstNode("Number", value.ToString(CultureInfo.InvariantCulture));
+        return new AstNode("Number", value);
     }
 
     public AstNode TextNode(ReadOnlySpan<char> text)
