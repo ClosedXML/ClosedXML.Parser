@@ -1,1 +1,1 @@
-0.1E-4
+SUM((Total_Cost Jan):(Total_Cost Apr.))
