@@ -35,6 +35,14 @@ public class ScalarValueTests
         AssertValue(formula, "Logical", value);
     }
 
+    [TestMethod]
+    [DataRow("#REF!", "#REF!")]
+    [DataRow("#N/A", "#N/A")]
+    public void Can_parse_error(string formula, string value)
+    {
+        AssertValue(formula, "Error", value);
+    }
+
     private static void AssertText<T>(string formula, T expected)
     {
         AssertValue(formula, "Text", expected);

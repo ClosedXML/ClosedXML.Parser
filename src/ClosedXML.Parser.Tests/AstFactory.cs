@@ -8,7 +8,10 @@ namespace ClosedXML.Parser.Tests;
 
 public readonly record struct ScalarValue(string Type, object Value);
 
-internal record AstNode(string Type, object Value);
+internal record AstNode(string Type, object Value)
+{
+    internal AstNode[] Children { get; init; } = Array.Empty<AstNode>();
+};
 
 internal class F : IAstFactory<ScalarValue, AstNode>
 {
@@ -42,9 +45,9 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return new AstNode("Logical", value);
     }
 
-    public AstNode ErrorNode(string input, int firstIndex, int length)
+    public AstNode ErrorNode(ReadOnlySpan<char> error)
     {
-        return new AstNode("Error", input.Substring(firstIndex, length));
+        return new AstNode("Error", error.ToString());
     }
 
     public AstNode NumberNode(double value)
@@ -114,7 +117,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode BinaryNode(BinaryOperation operation, AstNode leftNode, AstNode rightNode)
     {
-        return default;
+        return new AstNode("Binary", operation) { Children = new[] { leftNode, rightNode } };
     }
 
     public AstNode Unary(char operation, AstNode node)

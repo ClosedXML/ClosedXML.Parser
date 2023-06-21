@@ -306,7 +306,7 @@ public class FormulaParser<TScalarValue, TNode>
         switch (_la)
         {
             case FormulaLexer.REF_CONSTANT:
-                var refError = _factory.ErrorNode(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var refError = _factory.ErrorNode(GetCurrentToken());
                 Consume();
                 return refError;
 
@@ -399,7 +399,7 @@ public class FormulaParser<TScalarValue, TNode>
         switch (_la)
         {
             case FormulaLexer.NONREF_ERRORS:
-                var errorNode = _factory.ErrorNode(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - 1);
+                var errorNode = _factory.ErrorNode(GetCurrentToken());
                 Consume();
                 return errorNode;
 

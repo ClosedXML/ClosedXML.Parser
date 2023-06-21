@@ -25,7 +25,7 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TNode LogicalNode(bool value);
 
-    TNode ErrorNode(string input, int firstIndex, int length);
+    TNode ErrorNode(ReadOnlySpan<char> error);
 
     TNode NumberNode(double value);
 
