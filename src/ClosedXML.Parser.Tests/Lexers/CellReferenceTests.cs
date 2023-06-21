@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
 
-namespace ClosedXML.Parser.Tests;
+namespace ClosedXML.Parser.Tests.Lexers;
 
 [TestClass]
 public class CellReferenceTests
