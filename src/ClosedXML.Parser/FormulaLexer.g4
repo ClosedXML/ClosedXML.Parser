@@ -176,7 +176,7 @@ fragment SHEET_RANGE
                 ;
 
 fragment WORKBOOK_INDEX
-        : OPEN_SQUARE WHOLE_NUMBER_PART CLOSE_SQUARE
+        : '[' WHOLE_NUMBER_PART ']'
         ;
 
 fragment SHEET_NAME
