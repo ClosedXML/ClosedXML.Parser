@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ClosedXML.Lexer;
+namespace ClosedXML.Parser;
 
 /// <summary>
 /// A factory used to create an AST through <see cref="FormulaParser{TScalarValue,TNode}"/>.
@@ -31,7 +31,7 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TNode TextNode(ReadOnlySpan<char> text);
 
-    TNode LocalCellReference(string input, int firstIndex, int length);
+    TNode LocalCellReference(ReadOnlySpan<char> input, CellArea area);
 
     TNode ExternalCellReference(string input, int firstIndex, int length);
 

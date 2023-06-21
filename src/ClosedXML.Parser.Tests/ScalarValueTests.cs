@@ -1,5 +1,4 @@
 ﻿using Antlr4.Runtime;
-using ClosedXML.Lexer;
 
 namespace ClosedXML.Parser.Tests;
 

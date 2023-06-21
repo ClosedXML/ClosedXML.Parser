@@ -51,7 +51,7 @@ public class DataSetTests
                 var stream = new CodePointCharStream(formula);
                 var lexer = new FormulaLexer(stream);
                 lexer.RemoveErrorListeners();
-                var parser = new Lexer.FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
+                var parser = new FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
                 parser.Formula();
                 Assert.IsFalse(badFormulas.Contains(formula), formula);
             }

@@ -1,4 +1,4 @@
-﻿namespace ClosedXML.Lexer;
+﻿namespace ClosedXML.Parser;
 
 public enum BinaryOperation
 {

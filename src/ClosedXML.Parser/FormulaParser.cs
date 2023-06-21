@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace ClosedXML.Lexer;
+namespace ClosedXML.Parser;
 
 /// <summary>
 /// A parser of Excel formulas, with main purpose of creating an abstract syntax tree.
@@ -320,7 +320,9 @@ public class FormulaParser<TScalarValue, TNode>
 
             // local_cell_reference
             case FormulaLexer.A1_REFERENCE:
-                var localCellReferenceNode = _factory.LocalCellReference(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                var referenceToken = GetCurrentToken();
+                var cellArea = TokenParser.ParseA1Reference(referenceToken);
+                var localCellReferenceNode = _factory.LocalCellReference(referenceToken, cellArea);
                 Consume();
                 return localCellReferenceNode;
 

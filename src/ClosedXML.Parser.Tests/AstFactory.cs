@@ -1,7 +1,6 @@
 ﻿#nullable disable
 
 using Antlr4.Runtime;
-using ClosedXML.Lexer;
 using System.Globalization;
 
 namespace ClosedXML.Parser.Tests;
@@ -65,9 +64,9 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return new AstNode("Array", $"{{{rows}x{columns}}}");
     }
 
-    public AstNode LocalCellReference(string input, int firstIndex, int length)
+    public AstNode LocalCellReference(ReadOnlySpan<char> input, CellArea area)
     {
-        return default;
+        return new AstNode("LocalCellReference", area);
     }
 
     public AstNode ExternalCellReference(string input, int firstIndex, int length)
