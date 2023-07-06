@@ -8,6 +8,86 @@ internal static class TokenParser
     private const int MaxRow = 1048576;
 
     /// <summary>
+    /// Parse token <see cref="FormulaLexer.SHEET_RANGE_PREFIX"/>
+    /// </summary>
+    internal static void ParseSheetRangePrefix(ReadOnlySpan<char> input, out int? index,
+        out string firstSheetName, out string secondSheetName)
+    {
+        var i = 0;
+        var isEscaped = input[0] == '\'';
+        if (isEscaped)
+            ++i;
+
+        // Parse optional WORKBOOK_INDEX
+        if (input[i] == '[')
+        {
+            var workbookIndex = 0;
+            var c = input[++i];
+            do
+            {
+                workbookIndex = workbookIndex * 10 + c - '0';
+                c = input[++i];
+            } while (c != ']');
+
+            index = workbookIndex;
+            i++;
+        }
+        else
+        {
+            index = null;
+        }
+
+        var sheetRangeSpan = input.Slice(i);
+        if (!isEscaped)
+        {
+            // SHEET_NAME ':' SHEET_NAME
+            var endIndex = sheetRangeSpan.IndexOf(':');
+            firstSheetName = sheetRangeSpan.Slice(0, endIndex).ToString();
+            secondSheetName = sheetRangeSpan.Slice(endIndex + 1, sheetRangeSpan.Length - endIndex - 2).ToString();
+            return;
+        }
+
+        // Parse SHEET_NAME_SPECIAL which can contain escaped tick (') as double tick
+        Span<char> buffer = stackalloc char[sheetRangeSpan.Length];
+        var bufferIdx = 0;
+        var sheetNameIdx = 0;
+        do
+        {
+            if (sheetRangeSpan[sheetNameIdx] == '\'')
+                sheetNameIdx++;
+
+            buffer[bufferIdx++] = sheetRangeSpan[sheetNameIdx];
+        } while (sheetRangeSpan[++sheetNameIdx] != ':'); // Even escaped sheet name can't contain :
+
+        firstSheetName = buffer.Slice(0, bufferIdx).ToString();
+
+        // second sheet name ends with TICK EXCLAMATION_MARK ('!).
+        sheetRangeSpan = sheetRangeSpan.Slice(
+            sheetNameIdx + 1,   // +1 to skip the ':'
+            sheetRangeSpan.Length - sheetNameIdx - 3 //
+            );
+        bufferIdx = 0;
+        for (var j = 0; j < sheetRangeSpan.Length; ++j)
+        {
+            if (sheetRangeSpan[j] == '\'')
+                j++;
+            buffer[bufferIdx++] = sheetRangeSpan[j];
+        }
+
+        secondSheetName = buffer.Slice(0, bufferIdx).ToString();
+    }
+
+    /// <summary>
+    /// Parse <see cref="FormulaLexer.SINGLE_SHEET_PREFIX"/> token.
+    /// </summary>
+    public static void ParseSingleSheetPrefix(ReadOnlySpan<char> token, out int? workbookIndex, out string sheetName)
+    {
+        // TODO: Implement
+        workbookIndex = null;
+        sheetName = "TODO sheet name";
+    }
+
+    /// <summary>
     /// Extract info about cell reference from a <c>A1_REFERENCE</c> token.
     /// </summary>
     internal static CellArea ParseA1Reference(ReadOnlySpan<char> input)

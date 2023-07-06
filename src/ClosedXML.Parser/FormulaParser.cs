@@ -328,18 +328,23 @@ public class FormulaParser<TScalarValue, TNode>
 
             // external_cell_reference
             // case FormulaLexer.BANG_REFERENCE: Formula shouldn't contain BANG_REFERENCE, see grammar
-            case FormulaLexer.SINGLE_SHEET_REFERENCE:
-                var externalCellReferenceNode = _factory.ExternalCellReference(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
-                Consume();
-                return externalCellReferenceNode;
-
             // external_cell_reference
             case FormulaLexer.SHEET_RANGE_PREFIX:
-                var startCharIndex = _tokenSource.TokenStartCharIndex;
-                Consume();
-                Match(FormulaLexer.A1_REFERENCE);
-                var sheetRangeReferenceNode = _factory.ExternalCellReference(_input, startCharIndex, _tokenSource.CharIndex - startCharIndex);
-                return sheetRangeReferenceNode;
+                {
+                    var startIndex = _tokenSource.TokenStartCharIndex;
+                    var sheetRangePrefixToken = GetCurrentToken();
+                    TokenParser.ParseSheetRangePrefix(sheetRangePrefixToken, out var wbIdx, out var firstName,
+                        out var secondName);
+                    Consume();
+                    var a1ReferenceToken = GetCurrentToken();
+                    Match(FormulaLexer.A1_REFERENCE);
+                    var sheetRangeSpan = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
+                    var localReference = TokenParser.ParseA1Reference(a1ReferenceToken);
+                    var reference3D = new CellArea(firstName, secondName, localReference.First, localReference.Last);
+                    return wbIdx is not null
+                        ? _factory.ExternalCellReference(sheetRangeSpan, wbIdx.Value, reference3D)
+                        : _factory.LocalCellReference(sheetRangeSpan, reference3D);
+                }
 
             // ref_function_call
             case FormulaLexer.REF_FUNCTION_LIST:
@@ -378,13 +383,37 @@ public class FormulaParser<TScalarValue, TNode>
 
                 return _factory.ExternalNameReference(bookPrefix, externalName);
 
-            // name_reference - name in a specific sheet.
+            // name_reference: SINGLE_SHEET_PREFIX NAME
+            // external_cell_reference: SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)
             case FormulaLexer.SINGLE_SHEET_PREFIX:
-                var sheetPrefix = GetCurrentToken();
-                Consume();
-                var name = GetCurrentToken();
-                Match(FormulaLexer.NAME);
-                return _factory.LocalNameReference(sheetPrefix, name);
+                {
+                    var startIdx = _tokenSource.TokenStartCharIndex;
+                    var sheetPrefix = GetCurrentToken();
+                    TokenParser.ParseSingleSheetPrefix(sheetPrefix, out var wbIdx, out var sheetName);
+                    Consume();
+                    if (_la == FormulaLexer.A1_REFERENCE)
+                    {
+                        var localReferenceToken = GetCurrentToken();
+                        var localReference = TokenParser.ParseA1Reference(localReferenceToken);
+                        Consume();
+                        var nodeText = _input.AsSpan(startIdx, _tokenSource.TokenStartCharIndex - startIdx);
+                        return wbIdx is null
+                            ? _factory.LocalCellReference(nodeText, localReference)
+                            : _factory.ExternalCellReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
+                    }
+
+                    if (_la == FormulaLexer.REF_CONSTANT)
+                    {
+                        var errorReference = _factory.ErrorNode(GetCurrentToken()); // Sheet1!#REF! is a valid
+                        Consume();
+                        return errorReference;
+                    }
+
+                    // name_reference
+                    var name = GetCurrentToken();
+                    Match(FormulaLexer.NAME);
+                    return _factory.LocalNameReference(sheetPrefix, name);
+                }
 
             // structure_reference - only for formulas directly in the table, e.g. totals row.
             case FormulaLexer.INTRA_TABLE_REFERENCE:
@@ -615,7 +644,7 @@ public class FormulaParser<TScalarValue, TNode>
             indexOfDQuote = text.IndexOf('"');
             quoteCount++;
         } while (indexOfDQuote >= 0);
-        
+
         text.CopyTo(tail);
         buffer = unescaped.Slice(0, token.Length - 2 - quoteCount);
         copy = default;

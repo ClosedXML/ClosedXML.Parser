@@ -1,16 +1,21 @@
 ﻿#nullable disable
 
-using Antlr4.Runtime;
 using System.Globalization;
 
 namespace ClosedXML.Parser.Tests;
 
 public readonly record struct ScalarValue(string Type, object Value);
 
-internal record AstNode(string Type, object Value)
+internal record AstNode
 {
     internal AstNode[] Children { get; init; } = Array.Empty<AstNode>();
 };
+
+internal record ValueNode(string Type, object Value) : AstNode;
+
+internal record LocalReferenceNode(CellArea Reference) : AstNode;
+
+internal record ExternalReferenceNode(int WorkbookIndex, CellArea Reference) : AstNode;
 
 internal class F : IAstFactory<ScalarValue, AstNode>
 {
@@ -36,42 +41,42 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode BlankNode()
     {
-        return new AstNode("Blank", string.Empty);
+        return new ValueNode("Blank", string.Empty);
     }
 
     public AstNode LogicalNode(bool value)
     {
-        return new AstNode("Logical", value);
+        return new ValueNode("Logical", value);
     }
 
     public AstNode ErrorNode(ReadOnlySpan<char> error)
     {
-        return new AstNode("Error", error.ToString());
+        return new ValueNode("Error", error.ToString());
     }
 
     public AstNode NumberNode(double value)
     {
-        return new AstNode("Number", value);
+        return new ValueNode("Number", value);
     }
 
     public AstNode TextNode(ReadOnlySpan<char> text)
     {
-        return new AstNode("Text", text.ToString());
+        return new ValueNode("Text", text.ToString());
     }
 
     public AstNode ArrayNode(int rows, int columns, IList<ScalarValue> array)
     {
-        return new AstNode("Array", $"{{{rows}x{columns}}}");
+        return new ValueNode("Array", $"{{{rows}x{columns}}}");
     }
 
     public AstNode LocalCellReference(ReadOnlySpan<char> input, CellArea area)
     {
-        return new AstNode("LocalCellReference", area);
+        return new LocalReferenceNode(area);
     }
 
-    public AstNode ExternalCellReference(string input, int firstIndex, int length)
+    public AstNode ExternalCellReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area)
     {
-        return default;
+        return new ExternalReferenceNode(workbookIndex, area);
     }
 
     public AstNode Function(ReadOnlySpan<char> name, IList<AstNode> args)
@@ -116,7 +121,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode BinaryNode(BinaryOperation operation, AstNode leftNode, AstNode rightNode)
     {
-        return new AstNode("Binary", operation) { Children = new[] { leftNode, rightNode } };
+        return new ValueNode("Binary", operation) { Children = new[] { leftNode, rightNode } };
     }
 
     public AstNode Unary(char operation, AstNode node)

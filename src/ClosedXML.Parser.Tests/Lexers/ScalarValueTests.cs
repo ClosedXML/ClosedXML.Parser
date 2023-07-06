@@ -62,7 +62,7 @@ public class ScalarValueTests
 
     private static void AssertValue<T>(string formula, string expectedType, T expected)
     {
-        var node = ParseText(formula, new F());
+        var node = (ValueNode)ParseText(formula, new F());
         Assert.AreEqual(expectedType, node.Type);
         Assert.AreEqual(expected, node.Value);
     }

@@ -40,7 +40,7 @@ public class DataSetTests
         var badFormulas = new HashSet<string>();
         foreach (var badFormulaPath in badFormulaPaths)
             badFormulas.UnionWith(Read(badFormulaPath));
-        
+
         var sw = Stopwatch.StartNew();
         var formulaCount = 0;
         foreach (var formula in Read(input))
@@ -60,7 +60,7 @@ public class DataSetTests
                 Assert.IsTrue(badFormulas.Contains(formula), $"Parsing formula '{formula}' failed: {e.Message}");
             }
         }
-        
+
         sw.Stop();
         Console.WriteLine($"Parsed {formulaCount} formulas in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula)");
     }

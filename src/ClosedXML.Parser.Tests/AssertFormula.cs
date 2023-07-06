@@ -5,6 +5,33 @@ namespace ClosedXML.Parser.Tests;
 
 internal static class AssertFormula
 {
+    /// <summary>
+    /// Assert that a formula is parsed into a single childless node.
+    /// </summary>
+    public static void SingleNodeParsed<TNode>(string formula, TNode expectedNode)
+        where TNode : AstNode
+    {
+        var lexer = new FormulaLexer(new CodePointCharStream(formula), TextWriter.Null, TextWriter.Null);
+        var parser = new FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
+        var node = (TNode)parser.Formula();
+        Assert.AreEqual(0, node.Children.Length);
+        Assert.AreEqual(expectedNode, node);
+    }
+    
+    /// <summary>
+    /// Assert that text is recognized as a single token of a token type.
+    /// </summary>
+    /// <param name="tokenText">Text that should contain a single token.</param>
+    /// <param name="tokenType">Expected token type, from <see cref="FormulaLexer"/> const .</param>
+    public static void AssertTokenType(string tokenText, int tokenType)
+    {
+        var commonTokenStream = new CommonTokenStream(new FormulaLexer(new AntlrInputStream(tokenText)));
+        commonTokenStream.Fill();
+        Assert.AreEqual(2, commonTokenStream.Size);
+        Assert.AreEqual(tokenType, commonTokenStream.Get(0).Type);
+        Assert.AreEqual(FormulaLexer.Eof, commonTokenStream.Get(1).Type);
+    }
+
     public static void CstParsed(string formula)
     {
         var inputStream = new AntlrInputStream(formula);

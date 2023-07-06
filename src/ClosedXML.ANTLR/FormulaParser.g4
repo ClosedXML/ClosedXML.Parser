@@ -112,10 +112,10 @@ constant_list_row
 /* ---------------------------- Cell references ---------------------------- */
 
 cell_reference
-        : A1_REFERENCE                      // local_cell_reference
-        | BANG_REFERENCE                    // external_cell_reference
-        | SHEET_RANGE_PREFIX A1_REFERENCE   // external_cell_reference
-        | SINGLE_SHEET_REFERENCE            // external_cell_reference
+        : A1_REFERENCE                                       // local_cell_reference
+        | BANG_REFERENCE                                     // external_cell_reference
+        | SHEET_RANGE_PREFIX A1_REFERENCE                    // external_cell_reference
+        | SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)  // external_cell_reference
         ;
 
 /* ------------------------------- Arguments ------------------------------- */

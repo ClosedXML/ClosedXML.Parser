@@ -33,7 +33,7 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TNode LocalCellReference(ReadOnlySpan<char> input, CellArea area);
 
-    TNode ExternalCellReference(string input, int firstIndex, int length);
+    TNode ExternalCellReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area);
 
     TNode Function(ReadOnlySpan<char> name, IList<TNode> args);
 
