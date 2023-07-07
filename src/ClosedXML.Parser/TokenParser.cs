@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace ClosedXML.Parser;
 
@@ -8,16 +9,39 @@ internal static class TokenParser
     private const int MaxRow = 1048576;
 
     /// <summary>
+    /// Parse <see cref="FormulaLexer.SINGLE_SHEET_PREFIX"/> token.
+    /// </summary>
+    internal static void ParseSingleSheetPrefix(ReadOnlySpan<char> input, out int? index, out string sheetName)
+    {
+        var isEscaped = input[0] == '\'';
+        input = isEscaped 
+            ? input.Slice(1, input.Length - 3) // second sheet name ends with TICK EXCLAMATION_MARK ('!). 
+            : input.Slice(0, input.Length - 1); // only strip exclamation mark
+
+        // Parse optional WORKBOOK_INDEX
+        input = ExtractWorkbookIndex(input, out index);
+
+        var sheetRangeSpan = input;
+        if (!isEscaped)
+        {
+            // SHEET_NAME
+            sheetName = sheetRangeSpan.ToString();
+            return;
+        }
+
+        // The ending '! have been stripped from escape
+        sheetName = GetEscapedSheetName(input);
+    }
+
+    /// <summary>
     /// Parse token <see cref="FormulaLexer.SHEET_RANGE_PREFIX"/>
     /// </summary>
     internal static void ParseSheetRangePrefix(ReadOnlySpan<char> input, out int? index, out string firstSheetName, out string secondSheetName)
     {
         var isEscaped = input[0] == '\'';
-        if (isEscaped)
-        {
-            // second sheet name ends with TICK EXCLAMATION_MARK ('!).
-            input = input.Slice(1, input.Length - 3);
-        }
+        input = isEscaped
+            ? input.Slice(1, input.Length - 3) // second sheet name ends with TICK EXCLAMATION_MARK ('!). 
+            : input.Slice(0, input.Length - 1); // only strip exclamation mark
 
         // Parse optional WORKBOOK_INDEX
         input = ExtractWorkbookIndex(input, out index);
@@ -28,7 +52,7 @@ internal static class TokenParser
             // SHEET_NAME ':' SHEET_NAME
             var endIndex = sheetRangeSpan.IndexOf(':');
             firstSheetName = sheetRangeSpan.Slice(0, endIndex).ToString();
-            secondSheetName = sheetRangeSpan.Slice(endIndex + 1, sheetRangeSpan.Length - endIndex - 2).ToString();
+            secondSheetName = sheetRangeSpan.Slice(endIndex + 1).ToString();
             return;
         }
 
@@ -89,16 +113,6 @@ internal static class TokenParser
         } while (input.Length > inputIdx);
 
         return buffer.Slice(0, bufferIdx).ToString();
-    }
-
-    /// <summary>
-    /// Parse <see cref="FormulaLexer.SINGLE_SHEET_PREFIX"/> token.
-    /// </summary>
-    internal static void ParseSingleSheetPrefix(ReadOnlySpan<char> token, out int? workbookIndex, out string sheetName)
-    {
-        // TODO: Implement
-        workbookIndex = null;
-        sheetName = "TODO sheet name";
     }
 
     /// <summary>
