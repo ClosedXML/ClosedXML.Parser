@@ -49,20 +49,7 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TNode ExternalNameReference(ReadOnlySpan<char> bookPrefix, ReadOnlySpan<char> name);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="operation">One of <c>'≥'</c>, <c>'≤'</c>, <c>'&lt;'</c>, <c>'&gt;'</c>, <c>'≠'</c>, <c>'='</c>, <c>'&amp;'</c>, <c>'+'</c>, <c>'-'</c>, <c>'^'</c>, <c>','</c>, <c>' '</c>, <c>':'</c></param>
-    /// <param name="leftNode"></param>
-    /// <param name="rightNode"></param>
-    /// <returns></returns>
     TNode BinaryNode(BinaryOperation operation, TNode leftNode, TNode rightNode);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="operation"><c>+</c>, <c>-</c> or <c>%</c>.</param>
-    /// <param name="node"></param>
-    /// <returns></returns>
-    TNode Unary(char operation, TNode node);
+    TNode Unary(UnaryOperation operation, TNode node);
 }

@@ -167,7 +167,7 @@ public class FormulaParser<TScalarValue, TNode>
         {
             Consume();
             isPureRef = false;
-            return _factory.Unary('%', prefixAtomNode);
+            return _factory.Unary(UnaryOperation.Percent, prefixAtomNode);
         }
 
         return prefixAtomNode;
@@ -175,14 +175,14 @@ public class FormulaParser<TScalarValue, TNode>
 
     private TNode PrefixAtomExpression(bool skipRangeUnion, out bool isPureRef)
     {
-        char op;
+        UnaryOperation op;
         switch (_la)
         {
             case FormulaLexer.PLUS:
-                op = '+';
+                op = UnaryOperation.Plus;
                 break;
             case FormulaLexer.MINUS:
-                op = '+';
+                op = UnaryOperation.Minus;
                 break;
             default:
                 return AtomExpression(skipRangeUnion, out isPureRef);

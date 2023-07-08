@@ -124,7 +124,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return new ValueNode("Binary", operation) { Children = new[] { leftNode, rightNode } };
     }
 
-    public AstNode Unary(char operation, AstNode node)
+    public AstNode Unary(UnaryOperation operation, AstNode node)
     {
         return default;
     }

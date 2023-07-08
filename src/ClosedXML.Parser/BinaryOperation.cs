@@ -4,28 +4,28 @@ public enum BinaryOperation
 {
     /// <summary><c>&amp;</c></summary>
     Concat,
-    
+
     /// <summary><c>&gt;=</c></summary>
     GreaterOrEqualThan,
-    
+
     /// <summary><c>&lt;=</c></summary>
     LessOrEqualThan,
-    
+
     /// <summary><c>&lt;</c></summary>
     LessThan,
-    
+
     /// <summary><c>&gt;</c></summary>
     GreaterThan,
-    
+
     /// <summary><c>!=</c></summary>
     NotEqual,
-    
+
     /// <summary><c>=</c></summary>
     Equal,
-    
+
     /// <summary><c>+</c></summary>
     Plus,
-    
+
     /// <summary><c>-</c></summary>
     Minus,
 
@@ -40,7 +40,7 @@ public enum BinaryOperation
 
     /// <summary><c>,</c></summary>
     Union,
-    
+
     /// <summary><c>SPACE</c></summary>
     Intersection,
 
