@@ -484,13 +484,13 @@ fragment ANY_NOSPACE_COLUMN_CHARACTER
         ;
 
 fragment SPACED_COMMA
-        : SPACE? COMMA SPACE?
+        : WHITESPACES COMMA WHITESPACES
         ;
 
 fragment SPACED_LBRACKET
-        : OPEN_SQUARE SPACE?
+        : OPEN_SQUARE WHITESPACES
         ;
 
 fragment SPACED_RBRACKET
-        : SPACE? CLOSE_SQUARE
+        : WHITESPACES CLOSE_SQUARE
         ;
