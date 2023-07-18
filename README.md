@@ -1,6 +1,6 @@
 # ClosedParser
 
-ClosedParser is a project to parse OOXML grammar.
+ClosedParser is a project to parse OOXML grammar to create an abstract syntax tree that can be later evaluated.
 
 Official source for the grammar is [MS-XML](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/2c5dee00-eff2-4b22-92b6-0738acd4475e), chapter 2.2.2 Formulas. The provided grammar is not usable for parser generators, it's full of ambiguities and the rules don't take into account operator precedence.
 

@@ -5,7 +5,24 @@
     <LangVersion>10</LangVersion>
     <Nullable Condition="'$(TargetFramework)' == 'netstandard2.1'">enable</Nullable>
     <Nullable Condition="'$(TargetFramework)' == 'netstandard2.0'">annotations</Nullable>
+    <Authors>Jan Havlíček</Authors>
+    <PackageId>ClosedXML.Parser</PackageId>
+    <PackageTags>ClosedXML;parser;formula;xlsx</PackageTags>
+    <Description>
+      A lexer and parser of Excel formulas with focus on performance. Its goal is to create
+      an abstract syntax tree from a formula text to enable formula evaluation.
+    </Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ClosedXML/ClosedXML.Parser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ClosedXML/ClosedXML.Parser</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageVersion>1.0.0-alpha2</PackageVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
