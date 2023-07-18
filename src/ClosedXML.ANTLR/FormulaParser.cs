@@ -19,6 +19,10 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+
+// ANTLR generated file is marked as a non-CLS compliant, but that is not necessary, because whole assembly is not CLS compliant.
+#pragma warning disable 3021
+
 using System;
 using System.IO;
 using System.Text;

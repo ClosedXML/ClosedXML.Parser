@@ -2,6 +2,11 @@ parser grammar FormulaParser;
 
 options { tokenVocab = FormulaLexer; }
 
+@header {
+// ANTLR generated file is marked as a non-CLS compliant, but that is not necessary, because whole assembly is not CLS compliant.
+#pragma warning disable 3021
+}
+
 /* ----------------------------------------------------------------------------
  *                               PARSER RULES
  * -------------------------------------------------------------------------- */
