@@ -68,7 +68,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return new ValueNode("Text", text.ToString());
     }
 
-    public AstNode ArrayNode(int rows, int columns, IList<ScalarValue> array)
+    public AstNode ArrayNode(int rows, int columns, IReadOnlyList<ScalarValue> array)
     {
         return new ValueNode("Array", $"{{{rows}x{columns}}}");
     }
@@ -83,7 +83,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return new ExternalReferenceNode(workbookIndex, area);
     }
 
-    public AstNode Function(ReadOnlySpan<char> name, IList<AstNode> args)
+    public AstNode Function(ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
         return default;
     }
