@@ -39,12 +39,19 @@ public class CellReferenceRuleTests
     [TestMethod]
     public void SINGLE_SHEET_PREFIX__A1_REFERENCE_is_external_cell_reference()
     {
-        Assert.Fail("TODO");
+        var node = new ExternalReferenceNode(
+            2,
+            new CellArea(
+                "First",
+                new CellReference(2, 3),
+                new CellReference(4, 5)));
+        AssertFormula.SingleNodeParsed("[2]First!B3:D5", node);
     }
 
     [TestMethod]
-    public void SINGLE_SHEET_PREFIX__REF_CONSTANT_is_external_cell_reference()
+    public void SINGLE_SHEET_PREFIX__REF_CONSTANT_is_ref_error()
     {
-        Assert.Fail("TODO");
+        var node = new ValueNode("Error", "#REF!");
+        AssertFormula.SingleNodeParsed("Sheet5!#REF!", node);
     }
 }
