@@ -357,32 +357,39 @@ public class FormulaParser<TScalarValue, TNode>
 
             // Either defined name or table name for a structure reference
             case FormulaLexer.NAME:
-                var localName = GetCurrentToken();
-                Consume();
-                if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
                 {
-                    var tableReference = GetCurrentToken();
+                    var startIndex = _tokenSource.TokenStartCharIndex;
+                    var localName = GetCurrentToken();
                     Consume();
-                    return _factory.StructureReference(localName, tableReference);
-                }
+                    if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
+                    {
+                        TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
+                        Consume();
+                        var text = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
+                        return _factory.StructureReference(text, localName.ToString(), specifics, firstColumn, lastColumn);
+                    }
 
-                return _factory.LocalNameReference(localName);
+                    return _factory.LocalNameReference(localName);
+                }
 
             // reference to another workbook
             case FormulaLexer.BOOK_PREFIX:
-                var bookPrefix = GetCurrentToken();
-                Consume();
-                var externalName = GetCurrentToken();
-                Match(FormulaLexer.NAME);
-                if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
                 {
-                    var intraTableReference = GetCurrentToken();
+                    var startIndex = _tokenSource.TokenStartCharIndex;
+                    var bookPrefix = TokenParser.ParseBookPrefix(GetCurrentToken());
                     Consume();
-                    return _factory.StructureReference(bookPrefix, externalName, intraTableReference);
+                    var externalName = GetCurrentToken();
+                    Match(FormulaLexer.NAME);
+                    if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
+                    {
+                        TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
+                        Consume();
+                        var text = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
+                        return _factory.ExternalStructureReference(text, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn);
+                    }
+
+                    return _factory.ExternalNameReference(bookPrefix, externalName);
                 }
-
-                return _factory.ExternalNameReference(bookPrefix, externalName);
-
             // name_reference: SINGLE_SHEET_PREFIX NAME
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)
             case FormulaLexer.SINGLE_SHEET_PREFIX:
@@ -417,9 +424,12 @@ public class FormulaParser<TScalarValue, TNode>
 
             // structure_reference - only for formulas directly in the table, e.g. totals row.
             case FormulaLexer.INTRA_TABLE_REFERENCE:
-                var localTableReference = GetCurrentToken();
-                Consume();
-                return _factory.StructureReference(localTableReference);
+                {
+                    var localTableReference = GetCurrentToken();
+                    TokenParser.ParseIntraTableReference(localTableReference, out var specifics, out var firstColumn, out var lastColumn);
+                    Consume();
+                    return _factory.StructureReference(localTableReference, specifics, firstColumn, lastColumn);
+                }
         }
 
         throw UnexpectedTokenError();

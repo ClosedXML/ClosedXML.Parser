@@ -1,6 +1,8 @@
 ﻿#nullable disable
 
 using System.Globalization;
+using System.Xml.Linq;
+using JetBrains.Annotations;
 
 namespace ClosedXML.Parser.Tests;
 
@@ -16,6 +18,8 @@ internal record ValueNode(string Type, object Value) : AstNode;
 internal record LocalReferenceNode(CellArea Reference) : AstNode;
 
 internal record ExternalReferenceNode(int WorkbookIndex, CellArea Reference) : AstNode;
+
+internal record StructuredReferenceNode([CanBeNull] string Table, StructuredReferenceSpecific Specific, string FirstColumn, string LastColumn) : AstNode;
 
 internal class F : IAstFactory<ScalarValue, AstNode>
 {
@@ -89,17 +93,18 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return default;
     }
 
-    public AstNode StructureReference(ReadOnlySpan<char> intraTableReference)
+    public AstNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn,
+        string lastColumn)
     {
         return default;
     }
 
-    public AstNode StructureReference(ReadOnlySpan<char> tableName, ReadOnlySpan<char> intraTableReference)
+    public AstNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
     {
         return default;
     }
 
-    public AstNode StructureReference(ReadOnlySpan<char> bookPrefix, ReadOnlySpan<char> tableName, ReadOnlySpan<char> intraTableReference)
+    public AstNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
     {
         return default;
     }
@@ -114,7 +119,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return default;
     }
 
-    public AstNode ExternalNameReference(ReadOnlySpan<char> bookPrefix, ReadOnlySpan<char> name)
+    public AstNode ExternalNameReference(int workbookIndex, ReadOnlySpan<char> name)
     {
         return default;
     }

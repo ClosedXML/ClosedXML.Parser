@@ -37,17 +37,17 @@ public interface IAstFactory<TScalarValue, TNode>
 
     TNode Function(ReadOnlySpan<char> name, IList<TNode> args);
 
-    TNode StructureReference(ReadOnlySpan<char> intraTableReference);
+    TNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn, string lastColumn);
 
-    TNode StructureReference(ReadOnlySpan<char> tableName, ReadOnlySpan<char> intraTableReference);
+    TNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn);
 
-    TNode StructureReference(ReadOnlySpan<char> bookPrefix, ReadOnlySpan<char> tableName, ReadOnlySpan<char> intraTableReference);
+    TNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn);
 
     TNode LocalNameReference(ReadOnlySpan<char> name);
 
     TNode LocalNameReference(ReadOnlySpan<char> sheet, ReadOnlySpan<char> name);
 
-    TNode ExternalNameReference(ReadOnlySpan<char> bookPrefix, ReadOnlySpan<char> name);
+    TNode ExternalNameReference(int workbookIndex, ReadOnlySpan<char> name);
 
     TNode BinaryNode(BinaryOperation operation, TNode leftNode, TNode rightNode);
 

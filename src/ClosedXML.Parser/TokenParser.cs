@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Reflection;
+using System.Diagnostics;
 
 namespace ClosedXML.Parser;
 
@@ -14,7 +14,7 @@ internal static class TokenParser
     internal static void ParseSingleSheetPrefix(ReadOnlySpan<char> input, out int? index, out string sheetName)
     {
         var isEscaped = input[0] == '\'';
-        input = isEscaped 
+        input = isEscaped
             ? input.Slice(1, input.Length - 3) // second sheet name ends with TICK EXCLAMATION_MARK ('!). 
             : input.Slice(0, input.Length - 1); // only strip exclamation mark
 
@@ -225,5 +225,171 @@ internal static class TokenParser
 
         startIdx = i;
         return row;
+    }
+
+    internal static void ParseIntraTableReference(ReadOnlySpan<char> input, out StructuredReferenceSpecific specifics, out string? firstColumn, out string? lastColumn)
+    {
+        // Skip first char, it's always '['
+        var i = 1;
+        if (input[i] == '#')
+        {
+            // Pattern is a KEYWORD
+            specifics = GetSpecifier(input, i);
+            firstColumn = null;
+            lastColumn = null;
+            return;
+        }
+
+        if (input[i] != '[' && input[i] != ' ')
+        {
+            // Pattern is '[]', '[First]' or '[First:Last]' or '[First:[Last]]'
+            // because simple column can't start with a space.
+            specifics = StructuredReferenceSpecific.None;
+            if (input[i] == ']')
+            {
+                // Pattern is '[]', i.e. whole table.
+                firstColumn = null;
+                lastColumn = null;
+                return;
+            }
+
+            // Read simple column
+            i = GetStructuredName(input, i, out firstColumn);
+            if (i < input.Length && input[i] == ':')
+                GetStructuredName(input, i + 1, out lastColumn);
+            else
+                lastColumn = null;
+
+            return;
+        }
+
+        // Pattern is SPACED_LBRACKET INNER_REFERENCE SPACED_RBRACKET
+
+        // Skip potential whitespaces at the beginning of a structured reference (SPACED_LBRACKET)
+        i = SkipWhitespaces(input, i);
+        specifics = StructuredReferenceSpecific.None;
+        if (input[i + 1] == '#')
+        {
+            // Inner reference contains a keyword.
+            var listItem = GetSpecifier(input, ++i);
+            i += GetLength(listItem) + 1;
+            specifics |= listItem;
+
+            i = SkipComma(input, i);
+        }
+
+        if (input[i + 1] == '#')
+        {
+            // Item is a keyword list, either
+            // * '[#Headers]' SPACED_COMMA '[#Data]'
+            // * '[#Data]' SPACED_COMMA '[#Totals]'
+            var listItem = GetSpecifier(input, ++i);
+            i += GetLength(listItem) + 1;
+            specifics |= listItem;
+
+            i = SkipComma(input, i);
+        }
+
+        // KEYWORD_LIST can contain at most two item specifiers.
+        // After keyword list, we get either a COLUMN or a COLUMN:COLUMN
+        i = GetStructuredName(input, i, out firstColumn);
+        if (i < input.Length && input[i] == ':')
+            GetStructuredName(input, i + 1, out lastColumn);
+        else
+            lastColumn = null;
+    }
+
+    private static int SkipComma(ReadOnlySpan<char> input, int i)
+    {
+        // comma might be wrapped in whitespaces.
+        i = SkipWhitespaces(input, i);
+
+        Debug.Assert(input[i] == ',');
+        i++;
+        i = SkipWhitespaces(input, i);
+        return i;
+    }
+
+    private static int SkipWhitespaces(ReadOnlySpan<char> input, int i)
+    {
+        for (; i < input.Length; i++)
+        {
+            if (!IsWhiteSpace(input[i]))
+                break;
+        }
+
+        return i;
+    }
+
+    /// <summary>
+    /// Read a structured name until the end bracket or column
+    /// </summary>
+    /// <param name="input">Input span.</param>
+    /// <param name="startIdx">First index of expected name. It will either contain a bracket or first letter of column name.</param>
+    /// <param name="columnName">Parsed name.</param>
+    private static int GetStructuredName(ReadOnlySpan<char> input, int startIdx, out string columnName)
+    {
+        Span<char> buffer = stackalloc char[input.Length];
+        var bufferIdx = 0;
+        var i = startIdx + (input[startIdx] == '[' ? 1 : 0);
+        var c = input[i];
+        for (; c is not ']' and not ':'; c = input[++i])
+        {
+            if (c == '\'')
+                c = input[++i];
+
+            buffer[bufferIdx++] = c;
+        }
+
+        columnName = buffer.Slice(0, bufferIdx).ToString();
+        return i + (c == ']' ? 1 : 0); // char after last bracket
+    }
+
+    private static StructuredReferenceSpecific GetSpecifier(ReadOnlySpan<char> input, int i)
+    {
+        var item = input[i + 1] switch
+        {
+            'A' => StructuredReferenceSpecific.All,
+            'a' => StructuredReferenceSpecific.All,
+            'D' => StructuredReferenceSpecific.Data,
+            'd' => StructuredReferenceSpecific.Data,
+            'H' => StructuredReferenceSpecific.Headers,
+            'h' => StructuredReferenceSpecific.Headers,
+            'T' => input[i + 2] switch
+            {
+                'O' => StructuredReferenceSpecific.Totals,
+                'o' => StructuredReferenceSpecific.Totals,
+                'H' => StructuredReferenceSpecific.ThisRow,
+                'h' => StructuredReferenceSpecific.ThisRow,
+                _ => throw new NotSupportedException()
+            },
+            _ => throw new NotSupportedException()
+        };
+        return item;
+    }
+
+    private static int GetLength(StructuredReferenceSpecific item)
+    {
+        return item switch
+        {
+            StructuredReferenceSpecific.All => 4,
+            StructuredReferenceSpecific.Data => 5,
+            StructuredReferenceSpecific.Headers => 8,
+            StructuredReferenceSpecific.ThisRow => 9,
+            StructuredReferenceSpecific.Totals => 7,
+            _ => throw new InvalidOperationException()
+        };
+    }
+
+    private static bool IsWhiteSpace(char c)
+    {
+        return c is ' ' or '\n' or '\r';
+    }
+
+    internal static int ParseBookPrefix(ReadOnlySpan<char> input)
+    {
+        ExtractWorkbookIndex(input, out var index);
+        Debug.Assert(index.HasValue);
+        return index.Value;
     }
 }
