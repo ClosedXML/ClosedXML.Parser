@@ -11,15 +11,27 @@ namespace ClosedXML.Parser;
 public interface IAstFactory<TScalarValue, TNode>
     where TNode : class
 {
+    /// <summary>
+    /// Create a logical value for an array item.
+    /// </summary>
+    /// <param name="value">The logical value of an array.</param>
     TScalarValue LogicalValue(bool value);
 
+    /// <summary>
+    /// Create a numerical value for an array item.
+    /// </summary>
+    /// <param name="value">The numeric value of an array. Never <c>NaN</c> or <c>Infinity</c>.</param>
     TScalarValue NumberValue(double value);
 
+    /// <summary>
+    /// Create a text value for an array item.
+    /// </summary>
+    /// <param name="text">The text. The characters of text are already unescaped.</param>
     TScalarValue TextValue(ReadOnlySpan<char> text);
 
-    TScalarValue ErrorValue(string input, int firstIndex, int length);
+    TScalarValue ErrorValue(ReadOnlySpan<char> error);
 
-    TNode ArrayNode(int rows, int column, IList<TScalarValue> elements);
+    TNode ArrayNode(int rows, int columns, IList<TScalarValue> elements);
 
     TNode BlankNode();
 

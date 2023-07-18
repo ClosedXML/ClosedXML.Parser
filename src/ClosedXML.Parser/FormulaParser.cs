@@ -513,7 +513,7 @@ public class FormulaParser<TScalarValue, TNode>
         {
             case FormulaLexer.REF_CONSTANT:
             case FormulaLexer.NONREF_ERRORS:
-                value = _factory.ErrorValue(_input, _tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+                value = _factory.ErrorValue(GetCurrentToken());
                 break;
             case FormulaLexer.LOGICAL_CONSTANT:
                 value = _factory.LogicalValue(GetTokenLogicalValue());

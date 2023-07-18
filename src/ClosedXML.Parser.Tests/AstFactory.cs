@@ -38,9 +38,9 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         return new ScalarValue("Text", input.ToString());
     }
 
-    public ScalarValue ErrorValue(string input, int firstIndex, int length)
+    public ScalarValue ErrorValue(ReadOnlySpan<char> error)
     {
-        return new ScalarValue("Error", input.Substring(firstIndex, length));
+        return new ScalarValue("Error", error.ToString());
     }
 
     public AstNode BlankNode()
