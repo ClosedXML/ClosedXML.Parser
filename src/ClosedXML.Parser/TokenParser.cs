@@ -115,6 +115,16 @@ internal static class TokenParser
         return buffer.Slice(0, bufferIdx).ToString();
     }
 
+    internal static ReadOnlySpan<char> ExtractLocalFunctionName(ReadOnlySpan<char> functionNameWithBrace)
+    {
+        // In most cases, there won't be any whitespace
+        var endPosition = functionNameWithBrace[functionNameWithBrace.Length - 1] == '('
+            ? functionNameWithBrace.Length - 1
+            : functionNameWithBrace.LastIndexOf('(');
+        var functionName = functionNameWithBrace.Slice(0, endPosition);
+        return functionName;
+    }
+
     /// <summary>
     /// Extract info about cell reference from a <c>A1_REFERENCE</c> token.
     /// </summary>

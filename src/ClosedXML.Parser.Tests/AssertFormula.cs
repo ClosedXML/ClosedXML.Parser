@@ -14,7 +14,6 @@ internal static class AssertFormula
         var lexer = new FormulaLexer(new CodePointCharStream(formula), TextWriter.Null, TextWriter.Null);
         var parser = new FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
         var node = (TNode)parser.Formula();
-        Assert.AreEqual(0, node.Children.Length);
         Assert.AreEqual(expectedNode, node);
     }
     

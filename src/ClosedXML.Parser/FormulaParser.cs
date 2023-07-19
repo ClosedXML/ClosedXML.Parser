@@ -42,7 +42,7 @@ public class FormulaParser<TScalarValue, TNode>
             Consume();
         var expression = Expression(false, out _);
         if (_la != FormulaLexer.Eof)
-            throw new Exception("Expression is not completely parsed.");
+            throw new Exception($"Expression '{_input}' is not completely parsed.");
 
         return expression;
     }
@@ -242,13 +242,36 @@ public class FormulaParser<TScalarValue, TNode>
             case FormulaLexer.CELL_FUNCTION_LIST:
             case FormulaLexer.USER_DEFINED_FUNCTION_NAME:
                 isPureRef = false;
-                var functionName = GetCurrentToken();
-                Consume();
-                var args = ArgumentList();
-                return _factory.Function(functionName, args);
+                return LocalFunctionCall();
 
-            // ref_expression
             default:
+                // function_call : SINGLE_SHEET_PREFIX USER_DEFINED_FUNCTION_NAME argument_list
+                if (_la == FormulaLexer.SINGLE_SHEET_PREFIX && LL(1) == FormulaLexer.USER_DEFINED_FUNCTION_NAME)
+                {
+                    isPureRef = false;
+                    TokenParser.ParseSingleSheetPrefix(GetCurrentToken(), out var wbIndex, out var sheetName);
+                    Consume();
+                    var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
+                    Consume();
+                    var args = ArgumentList();
+                    return wbIndex is null 
+                        ? _factory.Function(sheetName.AsSpan(), functionName, args) 
+                        : _factory.ExternalFunction(wbIndex.Value, sheetName.AsSpan(), functionName, args);
+                }
+
+                // function_call : BOOK_PREFIX USER_DEFINED_FUNCTION_NAME argument_list
+                if (_la == FormulaLexer.BOOK_PREFIX && LL(1) == FormulaLexer.USER_DEFINED_FUNCTION_NAME)
+                {
+                    isPureRef = false;
+                    var wbIndex = TokenParser.ParseBookPrefix(GetCurrentToken());
+                    Consume();
+                    var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
+                    Consume();
+                    var args = ArgumentList();
+                    return _factory.ExternalFunction(wbIndex, functionName, args);
+                }
+
+                // ref_expression 
                 if (skipRangeUnion)
                 {
                     isPureRef = true;
@@ -350,10 +373,7 @@ public class FormulaParser<TScalarValue, TNode>
 
             // ref_function_call
             case FormulaLexer.REF_FUNCTION_LIST:
-                var refFunctionName = GetCurrentToken();
-                Consume();
-                var args = ArgumentList();
-                return _factory.Function(refFunctionName, args);
+                return LocalFunctionCall();
 
             // name_reference | structure_reference - all variants are expanded from the grammar.
 
@@ -586,6 +606,12 @@ public class FormulaParser<TScalarValue, TNode>
         _la = _tokenSource.Type;
     }
 
+    private int LL(int lookAhead)
+    {
+        var idx = _tokenIndex + lookAhead;
+        return idx < _tokens.Count ? _tokens[idx].Type : FormulaLexer.Eof;
+    }
+
     private static double ParseNumber(ReadOnlySpan<char> number)
     {
         return double.Parse(
@@ -662,6 +688,15 @@ public class FormulaParser<TScalarValue, TNode>
         copy = default;
         return false;
     }
+
+    private TNode LocalFunctionCall()
+    {
+        var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
+        Consume();
+        var args = ArgumentList();
+        return _factory.Function(functionName, args);
+    }
+
     private Exception UnexpectedTokenError(params int[] expectedToken)
     {
         return Error($"Unexpected token {GetLaTokenName()}, expected one of {string.Join(",", expectedToken.Select(GetTokenName))}.");

@@ -222,5 +222,5 @@ ref_function_call
         ;
 
 function_call
-        : (/*FUNCTION_LIST | FUTURE_FUNCTION_LIST |*/ CELL_FUNCTION_LIST | USER_DEFINED_FUNCTION_NAME) argument_list
+        : (/*FUNCTION_LIST | FUTURE_FUNCTION_LIST |*/ CELL_FUNCTION_LIST | (SINGLE_SHEET_PREFIX | BOOK_PREFIX)? USER_DEFINED_FUNCTION_NAME) argument_list
         ;

@@ -346,8 +346,7 @@ CELL_FUNCTION_LIST
  * precedence.
  */
 USER_DEFINED_FUNCTION_NAME
-        : NAME '(' WHITESPACES                                      // local
-        | (SINGLE_SHEET_PREFIX | BOOK_PREFIX) NAME '(' WHITESPACES  // external
+        : NAME '(' WHITESPACES
         ;
 
 /* --------------------------------- Name ---------------------------------- */

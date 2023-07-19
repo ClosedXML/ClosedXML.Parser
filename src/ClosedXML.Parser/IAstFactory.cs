@@ -93,6 +93,18 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="args">Nodes of argument values.</param>
     TNode Function(ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
 
+    /// <summary>
+    /// Create a node for a function on a sheet. Might happen for VBA.
+    /// </summary>
+    /// <param name="sheetName">Name of a sheet.</param>
+    /// <param name="name">Name of a function.</param>
+    /// <param name="args">Nodes of argument values.</param>
+    TNode Function(ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+
+    TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+
+    TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+
     TNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn, string lastColumn);
 
     TNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn);

@@ -1,6 +1,4 @@
-﻿#nullable disable
-
-using System.Globalization;
+﻿using System.Globalization;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 
@@ -11,6 +9,10 @@ public readonly record struct ScalarValue(string Type, object Value);
 internal record AstNode
 {
     internal AstNode[] Children { get; init; } = Array.Empty<AstNode>();
+
+    public virtual bool Equals(AstNode? other) => other is not null && Children.SequenceEqual(other.Children);
+
+    public override int GetHashCode() => Children.Sum(child => child.GetHashCode());
 };
 
 internal record ValueNode(string Type, object Value) : AstNode;
@@ -19,7 +21,18 @@ internal record LocalReferenceNode(CellArea Reference) : AstNode;
 
 internal record ExternalReferenceNode(int WorkbookIndex, CellArea Reference) : AstNode;
 
-internal record StructuredReferenceNode([CanBeNull] string Table, StructuredReferenceSpecific Specific, string FirstColumn, string LastColumn) : AstNode;
+internal record FunctionNode(string? Sheet, string Name) : AstNode
+{
+    public FunctionNode(string name) : this(null, name)
+    {
+    }
+};
+
+internal record ExternalFunctionNode(int WorkbookIndex, string? Sheet, string Name) : AstNode;
+
+internal record StructuredReferenceNode(string? Table, StructuredReferenceSpecific Specific, string FirstColumn, string LastColumn) : AstNode;
+
+#nullable disable
 
 internal class F : IAstFactory<ScalarValue, AstNode>
 {
@@ -85,16 +98,31 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode Function(ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
-        return default;
+        return new FunctionNode(null, name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode Function(ReadOnlySpan<char> name, AstNode[] args)
+    public AstNode Function(ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
-        return default;
+        return new FunctionNode(sheetName.ToString(), name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn,
-        string lastColumn)
+    public AstNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    {
+        return new ExternalFunctionNode(workbookIndex, sheetName.ToString(), name.ToString())
+        {
+            Children = args.ToArray()
+        };
+    }
+
+    public AstNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    {
+        return new ExternalFunctionNode(workbookIndex, null, name.ToString())
+        {
+            Children = args.ToArray()
+        };
+    }
+
+    public AstNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
     {
         return default;
     }
