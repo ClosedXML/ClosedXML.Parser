@@ -46,6 +46,12 @@ Bad ones fail on external workbook name reference that uses apostrophe (e.g `[1]
 
 Use [vscode-antlr4](https://github.com/mike-lischke/vscode-antlr4/blob/master/doc/grammar-debugging.md) plugin for debugging the grammar.
 
+## Testing strategy
+
+* Each token that contains some data that are extracted for a node (e.g. `A1_REFERENCE` `C5` to `row 5`, `column 3`) has a separate test class in `Lexers` directory with a `{TokenPascalName}TokenTests.cs`
+* Each parser rule has a test class in `Rules` directory. It should contain all possible combinatins of a rule and comparing it with the AST nodes.
+* Data set tests are in `DataSetTests.cs`. Each test tries to parse formula and ensures that **ANTLR** can parse it RDS can and can't parse a formula when **ANTLR** can't. There is no check of the output, just that formulas can be parsed. Data are contained in a `data` directory in CSV format with a one column.
+
 ## Resource
 
 * [MS-XML](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/2c5dee00-eff2-4b22-92b6-0738acd4475e)
