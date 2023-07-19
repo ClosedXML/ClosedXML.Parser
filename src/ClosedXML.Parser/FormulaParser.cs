@@ -17,16 +17,18 @@ public class FormulaParser<TScalarValue, TNode>
     where TNode : class
 {
     private readonly string _input;
-    private readonly FormulaLexer _tokenSource;
+    private readonly List<(int Type, int StartIndex, int CharIndexStopIndex)> _tokens;
     private readonly IAstFactory<TScalarValue, TNode> _factory;
+    private (int Type, int TokenStartCharIndex, int CharIndex) _tokenSource;
+    private int _tokenIndex = -1;
 
     // Current lookahead token index
     private int _la;
 
-    public FormulaParser(string input, FormulaLexer tokenSource, IAstFactory<TScalarValue, TNode> factory)
+    public FormulaParser(string input, FormulaLexer lexer, IAstFactory<TScalarValue, TNode> factory)
     {
         _input = input;
-        _tokenSource = tokenSource;
+        _tokens = lexer.GetAllTokens().Select(x => (x.Type, x.StartIndex, x.StopIndex + 1)).Append(new(-1, input.Length, input.Length)).ToList();
         _factory = factory;
         Consume();
     }
@@ -580,8 +582,8 @@ public class FormulaParser<TScalarValue, TNode>
 
     private void Consume()
     {
-        var token = _tokenSource.NextToken();
-        _la = token.Type;
+        _tokenSource = _tokens[++_tokenIndex];
+        _la = _tokenSource.Type;
     }
 
     private static double ParseNumber(ReadOnlySpan<char> number)
@@ -672,7 +674,7 @@ public class FormulaParser<TScalarValue, TNode>
 
     private Exception Error(string message)
     {
-        return new Exception($"Error at line {_tokenSource.Line}:{_tokenSource.Column} of '{_input}': {message}");
+        return new Exception($"Error at char {_tokenSource.TokenStartCharIndex} of '{_input}': {message}");
     }
 
     private ReadOnlySpan<char> GetCurrentToken()
