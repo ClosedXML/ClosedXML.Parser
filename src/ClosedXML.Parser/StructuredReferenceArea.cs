@@ -2,8 +2,14 @@
 
 namespace ClosedXML.Parser;
 
+/// <summary>
+/// Structure reference is basically a set of cells in an area of an intersection between a range of columns
+/// in a table and a vertical range. This enum represents possible values. Thanks to the pattern of a structure
+/// reference token, the vertical range of a formula is always continuous (i.e. no <c>Headers</c> and <c>Totals</c>
+/// together).
+/// </summary>
 [Flags]
-public enum StructuredReferenceSpecific
+public enum StructuredReferenceArea
 {
     /// <summary>
     /// Nothing was specified in the structure reference. Should have same impact as <see cref="Data"/>.

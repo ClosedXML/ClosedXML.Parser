@@ -237,14 +237,14 @@ internal static class TokenParser
         return row;
     }
 
-    internal static void ParseIntraTableReference(ReadOnlySpan<char> input, out StructuredReferenceSpecific specifics, out string? firstColumn, out string? lastColumn)
+    internal static void ParseIntraTableReference(ReadOnlySpan<char> input, out StructuredReferenceArea area, out string? firstColumn, out string? lastColumn)
     {
         // Skip first char, it's always '['
         var i = 1;
         if (input[i] == '#')
         {
             // Pattern is a KEYWORD
-            specifics = GetSpecifier(input, i);
+            area = GetArea(input, i);
             firstColumn = null;
             lastColumn = null;
             return;
@@ -254,7 +254,7 @@ internal static class TokenParser
         {
             // Pattern is '[]', '[First]' or '[First:Last]' or '[First:[Last]]'
             // because simple column can't start with a space.
-            specifics = StructuredReferenceSpecific.None;
+            area = StructuredReferenceArea.None;
             if (input[i] == ']')
             {
                 // Pattern is '[]', i.e. whole table.
@@ -277,13 +277,13 @@ internal static class TokenParser
 
         // Skip potential whitespaces at the beginning of a structured reference (SPACED_LBRACKET)
         i = SkipWhitespaces(input, i);
-        specifics = StructuredReferenceSpecific.None;
+        area = StructuredReferenceArea.None;
         if (input[i + 1] == '#')
         {
             // Inner reference contains a keyword.
-            var listItem = GetSpecifier(input, ++i);
+            var listItem = GetArea(input, ++i);
             i += GetLength(listItem) + 1;
-            specifics |= listItem;
+            area |= listItem;
 
             i = SkipComma(input, i);
         }
@@ -293,9 +293,9 @@ internal static class TokenParser
             // Item is a keyword list, either
             // * '[#Headers]' SPACED_COMMA '[#Data]'
             // * '[#Data]' SPACED_COMMA '[#Totals]'
-            var listItem = GetSpecifier(input, ++i);
+            var listItem = GetArea(input, ++i);
             i += GetLength(listItem) + 1;
-            specifics |= listItem;
+            area |= listItem;
 
             i = SkipComma(input, i);
         }
@@ -355,22 +355,22 @@ internal static class TokenParser
         return i + (c == ']' ? 1 : 0); // char after last bracket
     }
 
-    private static StructuredReferenceSpecific GetSpecifier(ReadOnlySpan<char> input, int i)
+    private static StructuredReferenceArea GetArea(ReadOnlySpan<char> input, int i)
     {
         var item = input[i + 1] switch
         {
-            'A' => StructuredReferenceSpecific.All,
-            'a' => StructuredReferenceSpecific.All,
-            'D' => StructuredReferenceSpecific.Data,
-            'd' => StructuredReferenceSpecific.Data,
-            'H' => StructuredReferenceSpecific.Headers,
-            'h' => StructuredReferenceSpecific.Headers,
+            'A' => StructuredReferenceArea.All,
+            'a' => StructuredReferenceArea.All,
+            'D' => StructuredReferenceArea.Data,
+            'd' => StructuredReferenceArea.Data,
+            'H' => StructuredReferenceArea.Headers,
+            'h' => StructuredReferenceArea.Headers,
             'T' => input[i + 2] switch
             {
-                'O' => StructuredReferenceSpecific.Totals,
-                'o' => StructuredReferenceSpecific.Totals,
-                'H' => StructuredReferenceSpecific.ThisRow,
-                'h' => StructuredReferenceSpecific.ThisRow,
+                'O' => StructuredReferenceArea.Totals,
+                'o' => StructuredReferenceArea.Totals,
+                'H' => StructuredReferenceArea.ThisRow,
+                'h' => StructuredReferenceArea.ThisRow,
                 _ => throw new NotSupportedException()
             },
             _ => throw new NotSupportedException()
@@ -378,15 +378,15 @@ internal static class TokenParser
         return item;
     }
 
-    private static int GetLength(StructuredReferenceSpecific item)
+    private static int GetLength(StructuredReferenceArea item)
     {
         return item switch
         {
-            StructuredReferenceSpecific.All => 4,
-            StructuredReferenceSpecific.Data => 5,
-            StructuredReferenceSpecific.Headers => 8,
-            StructuredReferenceSpecific.ThisRow => 9,
-            StructuredReferenceSpecific.Totals => 7,
+            StructuredReferenceArea.All => 4,
+            StructuredReferenceArea.Data => 5,
+            StructuredReferenceArea.Headers => 8,
+            StructuredReferenceArea.ThisRow => 9,
+            StructuredReferenceArea.Totals => 7,
             _ => throw new InvalidOperationException()
         };
     }

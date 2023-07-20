@@ -18,39 +18,39 @@ public class StructureReferenceRuleTests
             yield return new object[]
             {
                 "[Column]",
-                new StructureReferenceNode(null, StructuredReferenceSpecific.None, "Column", "Column")
+                new StructureReferenceNode(null, StructuredReferenceArea.None, "Column", "Column")
             };
 
             yield return new object[]
             {
                 "[#Totals]",
-                new StructureReferenceNode(null, StructuredReferenceSpecific.Totals, null, null)
+                new StructureReferenceNode(null, StructuredReferenceArea.Totals, null, null)
             };
 
             yield return new object[]
             {
                 "[]",
-                new StructureReferenceNode(null, StructuredReferenceSpecific.None, null, null)
+                new StructureReferenceNode(null, StructuredReferenceArea.None, null, null)
             };
 
             yield return new object[]
             {
                 "[[#Data],[First Column]:[Last Column]]",
-                new StructureReferenceNode(null, StructuredReferenceSpecific.Data, "First Column", "Last Column")
+                new StructureReferenceNode(null, StructuredReferenceArea.Data, "First Column", "Last Column")
             };
 
             // structure_reference : NAME INTRA_TABLE_REFERENCE
             yield return new object[]
             {
                 "SomeTable[Column]",
-                new StructureReferenceNode("SomeTable", StructuredReferenceSpecific.None, "Column", "Column")
+                new StructureReferenceNode("SomeTable", StructuredReferenceArea.None, "Column", "Column")
             };
 
             // structure_reference: BOOK_PREFIX NAME INTRA_TABLE_REFERENCE
             yield return new object[]
             {
                 "[4]!SomeTable[Column]",
-                new ExternalStructureReferenceNode(4, "SomeTable", StructuredReferenceSpecific.None, "Column", "Column")
+                new ExternalStructureReferenceNode(4, "SomeTable", StructuredReferenceArea.None, "Column", "Column")
             };
         }
     }

@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using System.Xml.Linq;
-using JetBrains.Annotations;
 
 namespace ClosedXML.Parser.Tests;
 
@@ -30,9 +28,9 @@ internal record FunctionNode(string? Sheet, string Name) : AstNode
 
 internal record ExternalFunctionNode(int WorkbookIndex, string? Sheet, string Name) : AstNode;
 
-internal record StructureReferenceNode(string? Table, StructuredReferenceSpecific Specific, string? FirstColumn, string? LastColumn) : AstNode;
+internal record StructureReferenceNode(string? Table, StructuredReferenceArea Area, string? FirstColumn, string? LastColumn) : AstNode;
 
-internal record ExternalStructureReferenceNode(int WorkbookIndex, string Table, StructuredReferenceSpecific Specific, string? FirstColumn, string? LastColumn) : AstNode;
+internal record ExternalStructureReferenceNode(int WorkbookIndex, string Table, StructuredReferenceArea Area, string? FirstColumn, string? LastColumn) : AstNode;
 
 #nullable disable
 
@@ -124,19 +122,19 @@ internal class F : IAstFactory<ScalarValue, AstNode>
         };
     }
 
-    public AstNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
+    public AstNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceArea area, string firstColumn, string lastColumn)
     {
-        return new StructureReferenceNode(null, specific, firstColumn, lastColumn);
+        return new StructureReferenceNode(null, area, firstColumn, lastColumn);
     }
 
-    public AstNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
+    public AstNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceArea area, string firstColumn, string lastColumn)
     {
-        return new StructureReferenceNode(table, specific, firstColumn, lastColumn);
+        return new StructureReferenceNode(table, area, firstColumn, lastColumn);
     }
 
-    public AstNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
+    public AstNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceArea area, string firstColumn, string lastColumn)
     {
-        return new ExternalStructureReferenceNode(workbookIndex, table, specific, firstColumn, lastColumn);
+        return new ExternalStructureReferenceNode(workbookIndex, table, area, firstColumn, lastColumn);
     }
 
     public AstNode LocalNameReference(ReadOnlySpan<char> name)
