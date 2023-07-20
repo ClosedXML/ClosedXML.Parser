@@ -6,7 +6,7 @@ namespace ClosedXML.Parser.Tests;
 
 public readonly record struct ScalarValue(string Type, object Value);
 
-internal record AstNode
+public record AstNode
 {
     internal AstNode[] Children { get; init; } = Array.Empty<AstNode>();
 
@@ -30,7 +30,9 @@ internal record FunctionNode(string? Sheet, string Name) : AstNode
 
 internal record ExternalFunctionNode(int WorkbookIndex, string? Sheet, string Name) : AstNode;
 
-internal record StructuredReferenceNode(string? Table, StructuredReferenceSpecific Specific, string FirstColumn, string LastColumn) : AstNode;
+internal record StructureReferenceNode(string? Table, StructuredReferenceSpecific Specific, string? FirstColumn, string? LastColumn) : AstNode;
+
+internal record ExternalStructureReferenceNode(int WorkbookIndex, string Table, StructuredReferenceSpecific Specific, string? FirstColumn, string? LastColumn) : AstNode;
 
 #nullable disable
 
@@ -124,17 +126,17 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
     {
-        return default;
+        return new StructureReferenceNode(null, specific, firstColumn, lastColumn);
     }
 
     public AstNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
     {
-        return default;
+        return new StructureReferenceNode(table, specific, firstColumn, lastColumn);
     }
 
     public AstNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceSpecific specific, string firstColumn, string lastColumn)
     {
-        return default;
+        return new ExternalStructureReferenceNode(workbookIndex, table, specific, firstColumn, lastColumn);
     }
 
     public AstNode LocalNameReference(ReadOnlySpan<char> name)

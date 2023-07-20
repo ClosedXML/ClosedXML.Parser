@@ -388,7 +388,7 @@ public class FormulaParser<TScalarValue, TNode>
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
                         var text = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
-                        return _factory.StructureReference(text, localName.ToString(), specifics, firstColumn, lastColumn);
+                        return _factory.StructureReference(text, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
                     return _factory.LocalNameReference(localName);
@@ -407,7 +407,7 @@ public class FormulaParser<TScalarValue, TNode>
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
                         var text = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
-                        return _factory.ExternalStructureReference(text, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn);
+                        return _factory.ExternalStructureReference(text, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
                     return _factory.ExternalNameReference(bookPrefix, externalName);
@@ -450,7 +450,7 @@ public class FormulaParser<TScalarValue, TNode>
                     var localTableReference = GetCurrentToken();
                     TokenParser.ParseIntraTableReference(localTableReference, out var specifics, out var firstColumn, out var lastColumn);
                     Consume();
-                    return _factory.StructureReference(localTableReference, specifics, firstColumn, lastColumn);
+                    return _factory.StructureReference(localTableReference, specifics, firstColumn, lastColumn ?? firstColumn);
                 }
         }
 

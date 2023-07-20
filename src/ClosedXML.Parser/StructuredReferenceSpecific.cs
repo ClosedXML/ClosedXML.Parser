@@ -5,6 +5,9 @@ namespace ClosedXML.Parser;
 [Flags]
 public enum StructuredReferenceSpecific
 {
+    /// <summary>
+    /// Nothing was specified in the structure reference. Should have same impact as <see cref="Data"/>.
+    /// </summary>
     None = 0,
 
     /// <summary>
