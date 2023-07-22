@@ -254,8 +254,8 @@ public class FormulaParser<TScalarValue, TNode>
                     var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
                     Consume();
                     var args = ArgumentList();
-                    return wbIndex is null 
-                        ? _factory.Function(sheetName.AsSpan(), functionName, args) 
+                    return wbIndex is null
+                        ? _factory.Function(sheetName.AsSpan(), functionName, args)
                         : _factory.ExternalFunction(wbIndex.Value, sheetName.AsSpan(), functionName, args);
                 }
 
@@ -561,24 +561,39 @@ public class FormulaParser<TScalarValue, TNode>
         return value;
     }
 
-    private List<TNode> ArgumentList()
+    private IReadOnlyList<TNode> ArgumentList()
     {
+        // A special case, there are no arguments
+        if (_la == FormulaLexer.CLOSE_BRACE)
+        {
+            Consume();
+            return Array.Empty<TNode>();
+        }
+
         var args = new List<TNode>();
         while (true)
         {
-            if (_la == FormulaLexer.CLOSE_BRACE)
+            // At the start of the loop, previous argument
+            // should have been consumed with a comma.
+            if (_la == FormulaLexer.COMMA)
             {
+                // If there is a comma, it means there are
+                // two commas in a row and thus a blank argument.
+                args.Add(_factory.BlankNode());
+                Consume();
+            }
+            else if (_la == FormulaLexer.CLOSE_BRACE)
+            {
+                // if there is a brace, it means the previous
+                // comma is immediately followed by a brace `,)`
+                // thus there is a blank node and end of args.
+                args.Add(_factory.BlankNode());
                 Consume();
                 return args;
             }
-
-            if (_la == FormulaLexer.COMMA)
-            {
-                Consume();
-                args.Add(_factory.BlankNode());
-            }
             else
             {
+                // Path for a non-blank argument.
                 var arg = Expression(true, out _);
                 args.Add(arg);
                 if (_la == FormulaLexer.CLOSE_BRACE)
@@ -587,6 +602,7 @@ public class FormulaParser<TScalarValue, TNode>
                     return args;
                 }
 
+                // Each argument must be followed by a comma. 
                 Match(FormulaLexer.COMMA);
             }
         }

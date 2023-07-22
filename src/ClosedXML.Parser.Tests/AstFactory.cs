@@ -32,6 +32,8 @@ internal record StructureReferenceNode(string? Table, StructuredReferenceArea Ar
 
 internal record ExternalStructureReferenceNode(int WorkbookIndex, string Table, StructuredReferenceArea Area, string? FirstColumn, string? LastColumn) : AstNode;
 
+internal record UnaryNode(UnaryOperation Operation) : AstNode;
+
 #nullable disable
 
 internal class F : IAstFactory<ScalarValue, AstNode>
@@ -159,6 +161,6 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode Unary(UnaryOperation operation, AstNode node)
     {
-        return default;
+        return new UnaryNode(operation) { Children = new[] { node } };
     }
 }
