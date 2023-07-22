@@ -46,7 +46,7 @@ public class FormulaParser<TScalarValue, TNode>
             Consume();
         var expression = Expression(false, out _);
         if (_la != FormulaLexer.Eof)
-            throw new Exception($"Expression '{_input}' is not completely parsed.");
+            throw new ParsingException($"Expression '{_input}' is not completely parsed.");
 
         return expression;
     }

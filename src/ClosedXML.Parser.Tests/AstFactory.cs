@@ -32,9 +32,9 @@ internal record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elem
         if (ReferenceEquals(this, other))
             return true;
 
-        return base.Equals(other) && 
-               Rows == other.Rows && 
-               Columns == other.Columns && 
+        return base.Equals(other) &&
+               Rows == other.Rows &&
+               Columns == other.Columns &&
                Elements.SequenceEqual(other.Elements);
     }
 
@@ -52,6 +52,8 @@ internal record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elem
 
 internal record LocalReferenceNode(CellArea Reference) : AstNode;
 
+internal record NameNode(string Name) : AstNode;
+
 internal record ExternalReferenceNode(int WorkbookIndex, CellArea Reference) : AstNode;
 
 internal record FunctionNode(string? Sheet, string Name) : AstNode
@@ -68,6 +70,19 @@ internal record StructureReferenceNode(string? Table, StructuredReferenceArea Ar
 internal record ExternalStructureReferenceNode(int WorkbookIndex, string Table, StructuredReferenceArea Area, string? FirstColumn, string? LastColumn) : AstNode;
 
 internal record UnaryNode(UnaryOperation Operation) : AstNode;
+
+internal record BinaryNode(BinaryOperation Operation) : AstNode
+{
+    public BinaryNode(BinaryOperation operation, AstNode left, AstNode right)
+        : this(operation)
+    {
+        Children = new AstNode[] { left, right };
+    }
+
+    public AstNode Left => Children[0];
+
+    public AstNode Right => Children[1];
+};
 
 #nullable disable
 
@@ -176,7 +191,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode LocalNameReference(ReadOnlySpan<char> name)
     {
-        return default;
+        return new NameNode(name.ToString());
     }
 
     public AstNode LocalNameReference(ReadOnlySpan<char> sheet, ReadOnlySpan<char> name)
@@ -191,7 +206,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode BinaryNode(BinaryOperation operation, AstNode leftNode, AstNode rightNode)
     {
-        return new ValueNode("Binary", operation) { Children = new[] { leftNode, rightNode } };
+        return new BinaryNode(operation, leftNode, rightNode);
     }
 
     public AstNode Unary(UnaryOperation operation, AstNode node)
