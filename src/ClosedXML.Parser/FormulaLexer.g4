@@ -2,24 +2,24 @@ lexer grammar FormulaLexer;
 
 /* --------------------------------- Errors -------------------------------- */
 REF_CONSTANT
-        : '#REF!'
+        : '#' R E F '!'
         ;
 
 NONREF_ERRORS
-        : '#DIV/0!'
-        | '#N/A'
-        | '#NAME?'
-        | '#NULL!'
-        | '#NUM!'
-        | '#VALUE!'
-        | '#GETTING_DATA'
+        : '#' D I V '/0!'
+        | '#' N '/' A
+        | '#' N A M E '?'
+        | '#' N U L L '!'
+        | '#' N U M '!'
+        | '#' V A L U E '!'
+        | '#' G E T T I N G '_' D A T A
         ;
 
 /* ------------------------- Logical constant ------------------------------ */
 
 LOGICAL_CONSTANT
-        : 'FALSE'
-        | 'TRUE'
+        : F A L S E
+        | T R U E
         ;
 
 /* -------------------------- Number constant ------------------------------ */
@@ -57,7 +57,7 @@ fragment SIGN
         : '+' | '-'
         ;
 fragment EXPONENT_CHARACTER
-        : 'E'
+        : E
         ;
 
 fragment DIGIT_SEQUENCE
@@ -250,24 +250,24 @@ fragment A1_RELATIVE_COLUMN
         : COLUMN_LETTER
         | COLUMN_LETTER COLUMN_LETTER
         | A_to_W COLUMN_LETTER COLUMN_LETTER
-        | 'X' A_to_E COLUMN_LETTER
-        | 'XF' A_to_D
+        | X A_to_E COLUMN_LETTER
+        | X F A_to_D
         ;
 
 fragment A_to_D
-        : [A-D]
+        : [A-Da-d]
         ;
 
 fragment A_to_E
-        : [A-E]
+        : [A-Ea-e]
         ;
 
 fragment A_to_W
-        : [A-W]
+        : [A-Wa-w]
         ;
 
 fragment COLUMN_LETTER
-        : [A-Z]
+        : [A-Za-z]
         ;
 
 fragment LETTER
@@ -309,7 +309,7 @@ fragment A1_ABSOLUTE_ROW
 
 // Ref must be before function to keep priority
 REF_FUNCTION_LIST
-        : ('CHOOSE' | 'IF' | 'INDEX' | 'INDIRECT' | 'OFFSET') '(' WHITESPACES
+        : ( C H O O S E | I F | I N D E X | I N D I R E C T | O F F S E T ) '(' WHITESPACES
         ;
 
 /*
@@ -493,3 +493,32 @@ fragment SPACED_LBRACKET
 fragment SPACED_RBRACKET
         : WHITESPACES CLOSE_SQUARE
         ;
+
+/* ---------------------------- Case Insensitive Fragments ---------------------------- */
+
+fragment A : [Aa];
+fragment B : [Bb];
+fragment C : [Cc];
+fragment D : [Dd];
+fragment E : [Ee];
+fragment F : [Ff];
+fragment G : [Gg];
+fragment H : [Hh];
+fragment I : [Ii];
+fragment J : [Jj];
+fragment K : [Kk];
+fragment L : [Ll];
+fragment M : [Mm];
+fragment N : [Nn];
+fragment O : [Oo];
+fragment P : [Pp];
+fragment Q : [Qq];
+fragment R : [Rr];
+fragment S : [Ss];
+fragment T : [Tt];
+fragment U : [Uu];
+fragment V : [Vv];
+fragment W : [Ww];
+fragment X : [Xx];
+fragment Y : [Yy];
+fragment Z : [Zz];

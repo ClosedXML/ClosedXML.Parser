@@ -733,7 +733,10 @@ public class FormulaParser<TScalarValue, TNode>
         return _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
     }
 
-    private static string GetTokenName(int tokenType) => FormulaLexer.ruleNames[tokenType - 1];
+    private static string GetTokenName(int tokenType) => 
+        tokenType == -1 
+            ? "EOF" 
+            : FormulaLexer.ruleNames[tokenType - 1];
 
     private string GetLaTokenName() => GetTokenName(_la);
 }

@@ -137,7 +137,7 @@ internal static class TokenParser
         if (abs1)
             i++;
 
-        var colStart = input[i] >= 'A' && input[i] <= 'Z';
+        var colStart = IsLetter(input[i]);
         if (!colStart)
         {
             // A1_ROW ':' A1_ROW
@@ -213,10 +213,13 @@ internal static class TokenParser
 
         do
         {
-            var letter = input[i] - 'A' + 1;
+            var c = input[i];
+            var letter = c < 'a' // A is before a 
+                ? c - 'A' + 1
+                : c - 'a' + 1;
             column = column * 26 + letter;
             i++;
-        } while (i < input.Length && input[i] >= 'A' && input[i] <= 'Z');
+        } while (i < input.Length && IsLetter(input[i]));
 
         startIdx = i;
         return column;
@@ -402,4 +405,6 @@ internal static class TokenParser
         Debug.Assert(index.HasValue);
         return index.Value;
     }
+
+    private static bool IsLetter(char c) => (c is >= 'A' and <= 'Z') || (c is >= 'a' and <= 'z');
 }
