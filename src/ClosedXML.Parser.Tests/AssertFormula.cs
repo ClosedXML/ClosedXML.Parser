@@ -11,16 +11,14 @@ internal static class AssertFormula
     public static void SingleNodeParsed<TNode>(string formula, TNode expectedNode)
         where TNode : AstNode
     {
-        var lexer = new FormulaLexer(new CodePointCharStream(formula), TextWriter.Null, TextWriter.Null);
-        var parser = new FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
+        var parser = new FormulaParser<ScalarValue, AstNode>(formula, new F());
         var node = (TNode)parser.Formula();
         Assert.AreEqual(expectedNode, node);
     }
 
     public static void CheckParsingErrorContains(string formula, string errorSubstring)
     {
-        var lexer = new FormulaLexer(new CodePointCharStream(formula), TextWriter.Null, TextWriter.Null);
-        var parser = new FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
+        var parser = new FormulaParser<ScalarValue, AstNode>(formula, new F());
         var ex = Assert.ThrowsException<ParsingException>(() => parser.Formula());
         Assert.IsTrue(ex.Message.Contains(errorSubstring), $"Error message '{ex.Message}' doesn't contain '{errorSubstring}'."); ;
     }

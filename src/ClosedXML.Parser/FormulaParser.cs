@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 
@@ -28,10 +29,16 @@ public class FormulaParser<TScalarValue, TNode>
     // Current lookahead token index
     private int _la;
 
-    public FormulaParser(string input, FormulaLexer lexer, IAstFactory<TScalarValue, TNode> factory)
+    public FormulaParser(string input, IAstFactory<TScalarValue, TNode> factory)
     {
-        _vocabulary = lexer.Vocabulary;
+        // Trim the end, so ref_intersection_expression that tried to parse SPACE as an operator
+        // doesn't recognize spaces at the end of formula as operators. The control tokens of
+        // the formula have whitespaces around them (unlike params), so the whitespaces should
+        // be consumed by control tokens (e.g. ` IF ( A1 ) ` will be split into `IF ( `, `A1` and ` ) `)
+        // but to avoid the whitespace at the end, trim it.
+        var lexer = new FormulaLexer(new CodePointCharStream(input.TrimEnd()), TextWriter.Null, TextWriter.Null);
         _input = input;
+        _vocabulary = lexer.Vocabulary;
         _tokens = lexer.GetAllTokens().Select(x => (x.Type, x.StartIndex, x.StopIndex + 1)).Append(new(-1, input.Length, input.Length)).ToList();
         _factory = factory;
         Consume();

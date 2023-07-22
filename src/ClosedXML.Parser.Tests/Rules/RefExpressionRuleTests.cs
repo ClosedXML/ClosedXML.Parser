@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-namespace ClosedXML.Parser.Tests.Rules;
+﻿namespace ClosedXML.Parser.Tests.Rules;
 
 [TestClass]
 public class RefExpressionRuleTests
@@ -27,6 +25,16 @@ public class RefExpressionRuleTests
                     new LocalReferenceNode(new CellArea(1, 3)),
                     new LocalReferenceNode(new CellArea(1, 4))));
         AssertFormula.SingleNodeParsed("A1 A2,A3 A4", expectedNode);
+    }
+
+    [TestMethod]
+    public void Whitespaces_at_the_end_of_formula_are_ignored()
+    {
+        var expectedNode = new BinaryNode(
+            BinaryOperation.Union,
+            new NameNode("some_name"),
+            new LocalReferenceNode(new CellArea(1, 2)));
+        AssertFormula.SingleNodeParsed(" some_name , A2 ", expectedNode);
     }
 
     public static IEnumerable<object[]> TestCases
@@ -63,5 +71,4 @@ public class RefExpressionRuleTests
             };
         }
     }
-
 }
