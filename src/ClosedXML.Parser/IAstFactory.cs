@@ -32,7 +32,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <summary>
     /// Create an error for an array item.
     /// </summary>
-    /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace.</param>
+    /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace, converted to upper case, no matter the input..</param>
     TScalarValue ErrorValue(ReadOnlySpan<char> error);
 
     /// <summary>

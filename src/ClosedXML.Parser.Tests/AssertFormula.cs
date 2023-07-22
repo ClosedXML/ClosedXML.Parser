@@ -16,7 +16,15 @@ internal static class AssertFormula
         var node = (TNode)parser.Formula();
         Assert.AreEqual(expectedNode, node);
     }
-    
+
+    public static void CheckParsingErrorContains(string formula, string errorSubstring)
+    {
+        var lexer = new FormulaLexer(new CodePointCharStream(formula), TextWriter.Null, TextWriter.Null);
+        var parser = new FormulaParser<ScalarValue, AstNode>(formula, lexer, new F());
+        var ex = Assert.ThrowsException<ParsingException>(() => parser.Formula());
+        Assert.IsTrue(ex.Message.Contains(errorSubstring), $"Error message '{ex.Message}' doesn't contain '{errorSubstring}'."); ;
+    }
+
     /// <summary>
     /// Assert that text is recognized as a single token of a token type.
     /// </summary>

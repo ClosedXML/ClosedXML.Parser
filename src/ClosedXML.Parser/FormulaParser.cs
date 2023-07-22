@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Antlr4.Runtime;
 
 namespace ClosedXML.Parser;
 
@@ -16,6 +17,8 @@ namespace ClosedXML.Parser;
 public class FormulaParser<TScalarValue, TNode>
     where TNode : class
 {
+    // TODO: Replace with something more sensible
+    private readonly IVocabulary _vocabulary;
     private readonly string _input;
     private readonly List<(int Type, int StartIndex, int CharIndexStopIndex)> _tokens;
     private readonly IAstFactory<TScalarValue, TNode> _factory;
@@ -27,6 +30,7 @@ public class FormulaParser<TScalarValue, TNode>
 
     public FormulaParser(string input, FormulaLexer lexer, IAstFactory<TScalarValue, TNode> factory)
     {
+        _vocabulary = lexer.Vocabulary;
         _input = input;
         _tokens = lexer.GetAllTokens().Select(x => (x.Type, x.StartIndex, x.StopIndex + 1)).Append(new(-1, input.Length, input.Length)).ToList();
         _factory = factory;
@@ -535,7 +539,11 @@ public class FormulaParser<TScalarValue, TNode>
         {
             case FormulaLexer.REF_CONSTANT:
             case FormulaLexer.NONREF_ERRORS:
-                value = _factory.ErrorValue(GetCurrentToken());
+                // Convert to upper case on stack, because length of an error is limited to ~20
+                var errorToken = GetCurrentToken();
+                Span<char> normalizedError = stackalloc char[errorToken.Length];
+                errorToken.ToUpperInvariant(normalizedError);
+                value = _factory.ErrorValue(normalizedError);
                 break;
             case FormulaLexer.LOGICAL_CONSTANT:
                 value = _factory.LogicalValue(GetTokenLogicalValue());
@@ -725,7 +733,7 @@ public class FormulaParser<TScalarValue, TNode>
 
     private Exception Error(string message)
     {
-        return new Exception($"Error at char {_tokenSource.TokenStartCharIndex} of '{_input}': {message}");
+        return new ParsingException($"Error at char {_tokenSource.TokenStartCharIndex} of '{_input}': {message}");
     }
 
     private ReadOnlySpan<char> GetCurrentToken()
@@ -733,10 +741,7 @@ public class FormulaParser<TScalarValue, TNode>
         return _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
     }
 
-    private static string GetTokenName(int tokenType) => 
-        tokenType == -1 
-            ? "EOF" 
-            : FormulaLexer.ruleNames[tokenType - 1];
+    private string GetTokenName(int tokenType) => _vocabulary.GetSymbolicName(tokenType);
 
     private string GetLaTokenName() => GetTokenName(_la);
 }

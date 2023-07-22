@@ -2,7 +2,14 @@
 
 namespace ClosedXML.Parser.Tests;
 
-public readonly record struct ScalarValue(string Type, object Value);
+public readonly record struct ScalarValue(string Type, object Value)
+{
+    public ScalarValue(double value) : this("Number", value) { }
+
+    public ScalarValue(bool value) : this("Logical", value) { }
+
+    public ScalarValue(string value) : this("Text", value) { }
+};
 
 public record AstNode
 {
@@ -14,6 +21,34 @@ public record AstNode
 };
 
 internal record ValueNode(string Type, object Value) : AstNode;
+
+internal record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elements) : AstNode
+{
+    public virtual bool Equals(ArrayNode? other)
+    {
+        if (ReferenceEquals(null, other))
+            return false;
+
+        if (ReferenceEquals(this, other))
+            return true;
+
+        return base.Equals(other) && 
+               Rows == other.Rows && 
+               Columns == other.Columns && 
+               Elements.SequenceEqual(other.Elements);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hashCode = base.GetHashCode();
+            hashCode = (hashCode * 397) ^ Rows;
+            hashCode = (hashCode * 397) ^ Columns;
+            return hashCode;
+        }
+    }
+}
 
 internal record LocalReferenceNode(CellArea Reference) : AstNode;
 
@@ -45,7 +80,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public ScalarValue NumberValue(double value)
     {
-        return new ScalarValue("Number", value.ToString(CultureInfo.InvariantCulture));
+        return new ScalarValue("Number", value);
     }
 
     public ScalarValue TextValue(ReadOnlySpan<char> input)
@@ -85,7 +120,7 @@ internal class F : IAstFactory<ScalarValue, AstNode>
 
     public AstNode ArrayNode(int rows, int columns, IReadOnlyList<ScalarValue> array)
     {
-        return new ValueNode("Array", $"{{{rows}x{columns}}}");
+        return new ArrayNode(rows, columns, array);
     }
 
     public AstNode LocalCellReference(ReadOnlySpan<char> input, CellArea area)
