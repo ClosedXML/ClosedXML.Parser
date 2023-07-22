@@ -41,8 +41,10 @@ public class RefAtomExpressionRuleTests
 
     private static void VerifyNode(string formula, AstNode node)
     {
-        var adjustedFormula = $"{formula},#REF!";
-        var expected = new BinaryNode(BinaryOperation.Union, node, new ValueNode("Error", "#REF!"));
+        // Force the formula into a ref_atom_expression through ref_range_expression. 
+        // ref_range_expression: ref_atom_expression (COLON ref_atom_expression)*
+        var adjustedFormula = $"#REF!:{formula}";
+        var expected = new BinaryNode(BinaryOperation.Range, new ValueNode("Error", "#REF!"), node);
         AssertFormula.SingleNodeParsed(adjustedFormula, expected);
     }
 }
