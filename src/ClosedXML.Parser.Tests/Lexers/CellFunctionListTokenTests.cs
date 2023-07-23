@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace ClosedXML.Parser.Tests.Lexers;
+﻿namespace ClosedXML.Parser.Tests.Lexers;
 
 public class CellFunctionListTokenTests
 {
@@ -22,11 +20,10 @@ public class CellFunctionListTokenTests
     {
         get
         {
-//            yield return new object[] { "A1(", new CellReference(1, 1) };
-            var b = new CellReference(true, 1, true, 1);
-            yield return new object[] { "$A$1(", b };
-//            yield return new object[] { "$B3(", new CellReference(true, 2, false, 3) };
-  //          yield return new object[] { "B$3(", new CellReference(false, 2, true, 3) };
+            yield return new object[] { "A1(", new CellReference(1, 1) };
+            yield return new object[] { "$A$1(", new CellReference(true, 1, true, 1) };
+            yield return new object[] { "$B3(", new CellReference(true, 2, false, 3) };
+            yield return new object[] { "B$3(", new CellReference(false, 2, true, 3) };
         }
     }
 }
