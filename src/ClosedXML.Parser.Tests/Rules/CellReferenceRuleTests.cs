@@ -6,52 +6,63 @@
 [TestClass]
 public class CellReferenceRuleTests
 {
-    // cell_reference: A1_REFERENCE
     [TestMethod]
-    public void A1_REFERENCE_extracts_local_reference()
+    [DynamicData(nameof(TokenCombinations))]
+    public void Possible_token_combinations_are_converted_to_node(string formula, AstNode expectedNode)
     {
-        var expected = new LocalReferenceNode(new CellArea(26, 5));
-        AssertFormula.SingleNodeParsed("Z5", expected);
+        AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
-    // cell_reference: BANG_REFERENCE
-    [TestMethod]
-    [Ignore("MS-XLSX 2.2.2.1: The formula MUST NOT use the bang-reference or bang-name.")]
-    public void BANG_REFERENCE_is_external_cell_reference()
+    public static IEnumerable<object[]> TokenCombinations
     {
-        Assert.Fail("TODO");
-    }
+        get
+        {
+            // cell_reference: A1_REFERENCE
+            yield return new object[]
+            {
+                "Z5",
+                new LocalReferenceNode(new CellArea(26, 5))
+            };
 
-    // cell_reference: SHEET_RANGE_PREFIX A1_REFERENCE
-    [TestMethod]
-    public void SHEET_RANGE_PREFIX__A1_REFERENCE_is_external_cell_reference()
-    {
-        var node = new ExternalReferenceNode(
-            2,
-            new CellArea(
-                "First",
-                "Second",
-                new CellReference(2, 3),
-                new CellReference(4, 5)));
-        AssertFormula.SingleNodeParsed("[2]First:Second!B3:D5", node);
-    }
+            // "MS-XLSX 2.2.2.1: The formula MUST NOT use the bang-reference or bang-name.
+            // cell_reference: BANG_REFERENCE
+            // yield return new object[]
+            // {
+            //     "!A1",
+            //     ...
+            // };
 
-    [TestMethod]
-    public void SINGLE_SHEET_PREFIX__A1_REFERENCE_is_external_cell_reference()
-    {
-        var node = new ExternalReferenceNode(
-            2,
-            new CellArea(
-                "First",
-                new CellReference(2, 3),
-                new CellReference(4, 5)));
-        AssertFormula.SingleNodeParsed("[2]First!B3:D5", node);
-    }
+            // cell_reference: SHEET_RANGE_PREFIX A1_REFERENCE
+            yield return new object[]
+            {
+                "[2]First:Second!B3:D5",
+                new ExternalReferenceNode(
+                    2,
+                    new CellArea(
+                        "First",
+                        "Second",
+                        new CellReference(2, 3),
+                        new CellReference(4, 5)))
+            };
 
-    [TestMethod]
-    public void SINGLE_SHEET_PREFIX__REF_CONSTANT_is_ref_error()
-    {
-        var node = new ValueNode("Error", "#REF!");
-        AssertFormula.SingleNodeParsed("Sheet5!#REF!", node);
+            // cell_reference: SINGLE_SHEET_PREFIX A1_REFERENCE
+            yield return new object[]
+            {
+                "[2]First!B3:D5",
+                new ExternalReferenceNode(
+                    2,
+                    new CellArea(
+                        "First",
+                        new CellReference(2, 3),
+                        new CellReference(4, 5)))
+            };
+
+            // cell_reference: SINGLE_SHEET_PREFIX REF_CONSTANT
+            yield return new object[]
+            {
+                "Sheet5!#REF!",
+                new ValueNode("Error", "#REF!")
+            };
+        }
     }
 }

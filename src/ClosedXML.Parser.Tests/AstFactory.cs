@@ -20,7 +20,10 @@ public record AstNode
     public override int GetHashCode() => Children.Sum(child => child.GetHashCode());
 };
 
-internal record ValueNode(string Type, object Value) : AstNode;
+internal record ValueNode(string Type, object Value) : AstNode
+{
+    public ValueNode(double value) : this("Number", value) { }
+};
 
 internal record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elements) : AstNode
 {

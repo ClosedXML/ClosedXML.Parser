@@ -342,9 +342,7 @@ public class FormulaParser<TScalarValue, TNode>
         switch (_la)
         {
             case FormulaLexer.REF_CONSTANT:
-                var refError = _factory.ErrorNode(GetCurrentToken());
-                Consume();
-                return refError;
+                return ErrorNode();
 
             case FormulaLexer.OPEN_BRACE:
                 Consume();
@@ -468,14 +466,22 @@ public class FormulaParser<TScalarValue, TNode>
         throw UnexpectedTokenError();
     }
 
+    private TNode ErrorNode()
+    {
+        var errorToken = GetCurrentToken();
+        Span<char> normalizedError = stackalloc char[errorToken.Length];
+        errorToken.ToUpperInvariant(normalizedError);
+        var refError = _factory.ErrorNode(normalizedError);
+        Consume();
+        return refError;
+    }
+
     private TNode Constant()
     {
         switch (_la)
         {
             case FormulaLexer.NONREF_ERRORS:
-                var errorNode = _factory.ErrorNode(GetCurrentToken());
-                Consume();
-                return errorNode;
+                return ErrorNode();
 
             case FormulaLexer.LOGICAL_CONSTANT:
                 var logicalNode = ConvertLogical();

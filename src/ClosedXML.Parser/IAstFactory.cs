@@ -56,7 +56,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <summary>
     /// Create a node with an error value.
     /// </summary>
-    /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace.</param>
+    /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace. In upper case format.</param>
     TNode ErrorNode(ReadOnlySpan<char> error);
 
     /// <summary>

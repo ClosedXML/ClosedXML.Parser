@@ -15,16 +15,16 @@ public class ConstantRuleTests
     public void NonRefErrors(string error)
     {
         AssertFormula.SingleNodeParsed(error, new ValueNode("Error", error));
+        AssertFormula.SingleNodeParsed(error.ToLowerInvariant(), new ValueNode("Error", error));
     }
 
     [TestMethod]
     [DataRow("TRUE", true)]
     [DataRow("FALSE", false)]
-    [DataRow("true", true)]
-    [DataRow("false", false)]
     public void LogicalConstant(string formula, bool value)
     {
         AssertFormula.SingleNodeParsed(formula, new ValueNode("Logical", value));
+        AssertFormula.SingleNodeParsed(formula.ToLowerInvariant(), new ValueNode("Logical", value));
     }
 
     [TestMethod]
@@ -35,6 +35,7 @@ public class ConstantRuleTests
     public void NumericalConstant(string formula, double value)
     {
         AssertFormula.SingleNodeParsed(formula, new ValueNode("Number", value));
+        AssertFormula.SingleNodeParsed(formula.ToUpperInvariant(), new ValueNode("Number", value));
     }
 
     [TestMethod]

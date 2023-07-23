@@ -7,8 +7,29 @@ public class ArgumentListRuleTests
 {
     [TestMethod]
     [DynamicData(nameof(TestCases))]
-    public void Argument_list_is_parsed_to_children_of_a_function_node(string formula, AstNode expectedNode)
+    public void Argument_list_can_have_zero_or_more_arguments(string formula, AstNode expectedNode)
     {
+        AssertFormula.SingleNodeParsed(formula, expectedNode);
+    }
+
+    [TestMethod]
+    [DataRow("FUN(1,(A1,two),3)")]
+    [DataRow("FUN(1,((A1,two)),3)")]
+    [DataRow("FUN( 1 , ( ( A1 , two ) ) , 3 ) ")]
+    public void Argument_list_interpreters_comma_as_argument_separator_but_nested_expression_interprets_comma_as_range_union_operator(string formula)
+    {
+        var expectedNode = new FunctionNode("FUN")
+        {
+            Children = new AstNode[]
+            {
+                new ValueNode(1),
+                new BinaryNode(
+                    BinaryOperation.Union,
+                    new LocalReferenceNode(new CellArea(1,1)),
+                    new NameNode("two")),
+                new ValueNode(3)
+            }
+        };
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
@@ -73,8 +94,8 @@ public class ArgumentListRuleTests
             yield return new object[]
             {
                 "FUN(  TRUE ,  , 1.0 )",
-                new FunctionNode("FUN") 
-                { 
+                new FunctionNode("FUN")
+                {
                     Children = new AstNode[]
                     {
                         new ValueNode("Logical", true),
@@ -83,7 +104,7 @@ public class ArgumentListRuleTests
                     }
                 }
             };
- 
+
             // argument_list : COMMA arg_expression COMMA CLOSE_BRACE
             yield return new object[]
             {
