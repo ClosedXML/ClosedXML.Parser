@@ -106,6 +106,14 @@ public interface IAstFactory<TScalarValue, TNode>
     TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
 
     /// <summary>
+    /// Create a cell function. It references another function that should likely contain a LAMBDA value.
+    /// </summary>
+    /// <remarks>Cell functions are not yet supported by Excel, but are part of a grammar.</remarks>
+    /// <param name="cell">A reference to a cell with a LAMBDA.</param>
+    /// <param name="args">Arguments to pass to a LAMBDA.</param>
+    TNode CellFunction(CellReference cell, IReadOnlyList<TNode> args);
+
+    /// <summary>
     /// Create a node to represent a structure reference without a table to a range of columns.
     /// Such reference is only allowed in the table (e.g. total formulas).
     /// </summary>

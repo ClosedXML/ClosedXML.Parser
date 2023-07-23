@@ -251,6 +251,14 @@ public class FormulaParser<TScalarValue, TNode>
 
             // function_call
             case FormulaLexer.CELL_FUNCTION_LIST:
+                {
+                    isPureRef = false;
+                    var cellReference = TokenParser.ExtractCellFunction(GetCurrentToken());
+                    Consume();
+                    var args = ArgumentList();
+                    return _factory.CellFunction(cellReference, args);
+                }
+
             case FormulaLexer.USER_DEFINED_FUNCTION_NAME:
                 isPureRef = false;
                 return LocalFunctionCall();

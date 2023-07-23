@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace ClosedXML.Parser.Tests;
+﻿namespace ClosedXML.Parser.Tests;
 
 public readonly record struct ScalarValue(string Type, object Value)
 {
@@ -65,6 +63,8 @@ internal record FunctionNode(string? Sheet, string Name) : AstNode
     {
     }
 };
+
+internal record CellFunctionNode(CellReference Cell) : AstNode;
 
 internal record ExternalFunctionNode(int WorkbookIndex, string? Sheet, string Name) : AstNode;
 
@@ -190,6 +190,14 @@ internal class F : IAstFactory<ScalarValue, AstNode>
     public AstNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceArea area, string firstColumn, string lastColumn)
     {
         return new ExternalStructureReferenceNode(workbookIndex, table, area, firstColumn, lastColumn);
+    }
+
+    public AstNode CellFunction(CellReference cell, IReadOnlyList<AstNode> args)
+    {
+        return new CellFunctionNode(cell)
+        {
+            Children = args.ToArray()
+        };
     }
 
     public AstNode LocalNameReference(ReadOnlySpan<char> name)
