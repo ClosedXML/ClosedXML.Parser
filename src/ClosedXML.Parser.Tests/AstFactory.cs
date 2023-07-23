@@ -21,6 +21,7 @@ public record AstNode
 internal record ValueNode(string Type, object Value) : AstNode
 {
     public ValueNode(double value) : this("Number", value) { }
+    public ValueNode(bool value) : this("Logical", value) { }
 };
 
 internal record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elements) : AstNode

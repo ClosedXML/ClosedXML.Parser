@@ -9,9 +9,28 @@ public class RefAtomExpressionRuleTests
     }
 
     [Fact]
+    public void Nested_ref_expression()
+    {
+        VerifyNode("((#REF!))", new ValueNode("Error", "#REF!"));
+    }
+
+    [Fact]
     public void Cell_reference()
     {
         VerifyNode("A1", new LocalReferenceNode(new CellArea(1, 1)));
+    }
+
+    [Fact]
+    public void Ref_function_call()
+    {
+        VerifyNode("IF(TRUE,A1)", new FunctionNode("IF")
+        {
+            Children = new AstNode[]
+            {
+                new ValueNode(true),
+                new LocalReferenceNode(new CellArea(1,1))
+            }
+        });
     }
 
     [Fact]
@@ -24,12 +43,6 @@ public class RefAtomExpressionRuleTests
     public void Structure_reference()
     {
         VerifyNode("Table[Column]", new StructureReferenceNode("Table", StructuredReferenceArea.None, "Column", "Column"));
-    }
-
-    [Fact]
-    public void Nested_ref_expression()
-    {
-        VerifyNode("((#REF!))", new ValueNode("Error", "#REF!"));
     }
 
     [Fact]
