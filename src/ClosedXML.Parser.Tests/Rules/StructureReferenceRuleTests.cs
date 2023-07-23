@@ -1,10 +1,9 @@
 ﻿namespace ClosedXML.Parser.Tests.Rules;
 
-[TestClass]
 public class StructureReferenceRuleTests
 {
-    [TestMethod]
-    [DynamicData(nameof(TestCases))]
+    [Theory]
+    [MemberData(nameof(TestCases))]
     public void Structure_reference_is_parsed_to_a_node(string formula, AstNode expectedNode)
     {
         AssertFormula.SingleNodeParsed(formula, expectedNode);

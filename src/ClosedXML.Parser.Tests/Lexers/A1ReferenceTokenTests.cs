@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser.Tests.Lexers;
+﻿using Xunit;
+
+namespace ClosedXML.Parser.Tests.Lexers;
 
 /// <summary>
 /// Test of a parsing of a token <c>A1_REFERENCE</c>.
@@ -11,13 +13,12 @@
 ///        ;
 /// </code>
 /// </summary>
-[TestClass]
 public class A1ReferenceTokenTests
 {
     private const int MaxCol = 16384;
     private const int MaxRow = 1048576;
 
-    [TestMethod]
+    [Fact]
     public void Parse_a1_cell()
     {
         // Check A1_CELL path
@@ -28,7 +29,7 @@ public class A1ReferenceTokenTests
         AssertAreaReferenceToken("$XFD$1048576", new CellArea(new CellReference(true, 16384, true, 1048576)));
     }
 
-    [TestMethod]
+    [Fact]
     public void Parse_row_range()
     {
         // Check A1_ROW ':' A1_ROW path
@@ -38,7 +39,7 @@ public class A1ReferenceTokenTests
         AssertAreaReferenceToken("$1048576:$1048576", new CellArea(new CellReference(true, 1, true, 1048576), new CellReference(true, MaxCol, true, 1048576)));
     }
 
-    [TestMethod]
+    [Fact]
     public void Parse_column_range()
     {
         // Check A1_COLUMN ':' A1_COLUMN path
@@ -49,7 +50,7 @@ public class A1ReferenceTokenTests
         AssertAreaReferenceToken("$XFD:$XFD", new CellArea(new CellReference(true, MaxCol, true, 1), new CellReference(true, MaxCol, true, MaxRow)));
     }
 
-    [TestMethod]
+    [Fact]
     public void Parse_area()
     {
         // Check A1_AREA path
@@ -62,6 +63,6 @@ public class A1ReferenceTokenTests
     {
         AssertFormula.AssertTokenType(token, FormulaLexer.A1_REFERENCE);
         var reference = TokenParser.ParseA1Reference(token);
-        Assert.AreEqual(expectedReference, reference);
+        Assert.Equal(expectedReference, reference);
     }
 }

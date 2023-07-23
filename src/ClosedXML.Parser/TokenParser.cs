@@ -115,6 +115,12 @@ internal static class TokenParser
         return buffer.Slice(0, bufferIdx).ToString();
     }
 
+    internal static CellReference ExtractCellFunction(ReadOnlySpan<char> cellFunctionToken)
+    {
+        var i = 0;
+        return ReadCell(cellFunctionToken, ref i);
+    }
+
     internal static ReadOnlySpan<char> ExtractLocalFunctionName(ReadOnlySpan<char> functionNameWithBrace)
     {
         // In most cases, there won't be any whitespace

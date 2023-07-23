@@ -1,16 +1,15 @@
 ﻿namespace ClosedXML.Parser.Tests.Rules;
 
-[TestClass]
 public class RefExpressionRuleTests
 {
-    [TestMethod]
-    [DynamicData(nameof(TestCases))]
+    [Theory]
+    [MemberData(nameof(TestCases))]
     public void Ref_expression_can_have_multiple_ref_intersection_expressions(string formula, AstNode expectedNode)
     {
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
-    [TestMethod]
+    [Fact]
     public void Union_operator_has_lower_priority_than_intersection()
     {
         var expectedNode =
@@ -27,7 +26,7 @@ public class RefExpressionRuleTests
         AssertFormula.SingleNodeParsed("A1 A2,A3 A4", expectedNode);
     }
 
-    [TestMethod]
+    [Fact]
     public void Whitespaces_at_the_end_of_formula_are_ignored()
     {
         var expectedNode = new BinaryNode(

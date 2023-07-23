@@ -1,21 +1,22 @@
-﻿namespace ClosedXML.Parser.Tests;
+﻿using Xunit;
 
-[TestClass]
+namespace ClosedXML.Parser.Tests;
+
 public class ConstantParsingTests
 {
-    [TestMethod]
-    [DataRow("1")]
-    [DataRow("10.5")]
-    [DataRow("10.5E5")]
-    [DataRow(".1E-4")]
+    [Theory]
+    [InlineData("1")]
+    [InlineData("10.5")]
+    [InlineData("10.5E5")]
+    [InlineData(".1E-4")]
     public void Number_is_parsed(string formula)
     {
         AssertFormula.CstParsed(formula);
     }
 
-    [TestMethod]
-    [DataRow("#REF!")]
-    [DataRow("#VALUE!")]
+    [Theory]
+    [InlineData("#REF!")]
+    [InlineData("#VALUE!")]
     public void Error_is_parsed(string formula)
     {
         AssertFormula.CstParsed(formula);

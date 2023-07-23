@@ -1,17 +1,18 @@
-﻿namespace ClosedXML.Parser.Tests.Lexers;
+﻿using Xunit;
 
-[TestClass]
+namespace ClosedXML.Parser.Tests.Lexers;
+
 public class SingleSheetPrefixTokenTests
 {
-    [TestMethod]
-    [DynamicData(nameof(Data))]
+    [Theory]
+    [MemberData(nameof(Data))]
     public void Token_data_are_extracted_and_unescaped(string tokenText, int? expectedWorkbookIndex, string expectedSheetName)
     {
         AssertFormula.AssertTokenType(tokenText, FormulaLexer.SINGLE_SHEET_PREFIX);
         TokenParser.ParseSingleSheetPrefix(tokenText, out var workbookIndex, out var sheetName);
 
-        Assert.AreEqual(expectedWorkbookIndex, workbookIndex);
-        Assert.AreEqual(expectedSheetName, sheetName);
+        Assert.Equal(expectedWorkbookIndex, workbookIndex);
+        Assert.Equal(expectedSheetName, sheetName);
     }
 
     public static IEnumerable<object?[]> Data

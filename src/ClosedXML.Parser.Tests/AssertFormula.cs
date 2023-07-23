@@ -13,14 +13,14 @@ internal static class AssertFormula
     {
         var parser = new FormulaParser<ScalarValue, AstNode>(formula, new F());
         var node = (TNode)parser.Formula();
-        Assert.AreEqual(expectedNode, node);
+        Assert.Equal(expectedNode, node);
     }
 
     public static void CheckParsingErrorContains(string formula, string errorSubstring)
     {
         var parser = new FormulaParser<ScalarValue, AstNode>(formula, new F());
-        var ex = Assert.ThrowsException<ParsingException>(() => parser.Formula());
-        Assert.IsTrue(ex.Message.Contains(errorSubstring), $"Error message '{ex.Message}' doesn't contain '{errorSubstring}'."); ;
+        var ex = Assert.Throws<ParsingException>(() => parser.Formula());
+        Assert.True(ex.Message.Contains(errorSubstring), $"Error message '{ex.Message}' doesn't contain '{errorSubstring}'."); ;
     }
 
     /// <summary>
@@ -32,9 +32,9 @@ internal static class AssertFormula
     {
         var commonTokenStream = new CommonTokenStream(new FormulaLexer(new AntlrInputStream(tokenText)));
         commonTokenStream.Fill();
-        Assert.AreEqual(2, commonTokenStream.Size);
-        Assert.AreEqual(tokenType, commonTokenStream.Get(0).Type);
-        Assert.AreEqual(FormulaLexer.Eof, commonTokenStream.Get(1).Type);
+        Assert.Equal(2, commonTokenStream.Size);
+        Assert.Equal(tokenType, commonTokenStream.Get(0).Type);
+        Assert.Equal(FormulaLexer.Eof, commonTokenStream.Get(1).Type);
     }
 
     public static void CstParsed(string formula)
@@ -53,8 +53,8 @@ internal static class AssertFormula
 
         var res = parser.formula();
 
-        Assert.IsNull(listener.Errors, $"{formula}  {listener.Errors}");
-        Assert.IsNull(res.exception, $"{formula} {res.exception}");
+        Assert.True(listener.Errors is null, $"{formula}  {listener.Errors}");
+        Assert.True(res.exception is null, $"{formula} {res.exception}");
     }
 
     private class LexerErrorListener : IAntlrErrorListener<int>

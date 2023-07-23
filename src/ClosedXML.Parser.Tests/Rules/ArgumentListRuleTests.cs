@@ -1,21 +1,18 @@
-﻿using System.Security;
+﻿namespace ClosedXML.Parser.Tests.Rules;
 
-namespace ClosedXML.Parser.Tests.Rules;
-
-[TestClass]
 public class ArgumentListRuleTests
 {
-    [TestMethod]
-    [DynamicData(nameof(TestCases))]
+    [Theory]
+    [MemberData(nameof(TestCases))]
     public void Argument_list_can_have_zero_or_more_arguments(string formula, AstNode expectedNode)
     {
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
-    [TestMethod]
-    [DataRow("FUN(1,(A1,two),3)")]
-    [DataRow("FUN(1,((A1,two)),3)")]
-    [DataRow("FUN( 1 , ( ( A1 , two ) ) , 3 ) ")]
+    [Theory]
+    [InlineData("FUN(1,(A1,two),3)")]
+    [InlineData("FUN(1,((A1,two)),3)")]
+    [InlineData("FUN( 1 , ( ( A1 , two ) ) , 3 ) ")]
     public void Argument_list_interpreters_comma_as_argument_separator_but_nested_expression_interprets_comma_as_range_union_operator(string formula)
     {
         var expectedNode = new FunctionNode("FUN")

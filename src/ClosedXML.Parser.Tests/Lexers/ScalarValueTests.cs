@@ -1,55 +1,54 @@
-﻿using Antlr4.Runtime;
+﻿using Xunit;
 
 namespace ClosedXML.Parser.Tests.Lexers;
 
-[TestClass]
 public class ScalarValueTests
 {
-    [TestMethod]
+    [Fact]
     public void Can_parse_empty_string()
     {
         AssertText("\"\"", string.Empty);
     }
 
-    [TestMethod]
+    [Fact]
     public void Can_parse_non_escaped_string()
     {
         AssertText("\"someone's\ntext\"", "someone's\ntext");
     }
 
-    [TestMethod]
-    [DataRow("\"\"\"\"", "\"")]
-    [DataRow("\"\"\"\"\"\"", "\"\"")]
-    [DataRow("\"Eastern \"\"Bonn's\"\" Tavern\"", "Eastern \"Bonn's\" Tavern")]
+    [Theory]
+    [InlineData("\"\"\"\"", "\"")]
+    [InlineData("\"\"\"\"\"\"", "\"\"")]
+    [InlineData("\"Eastern \"\"Bonn's\"\" Tavern\"", "Eastern \"Bonn's\" Tavern")]
     public void Can_parse_escaped_string(string unescaped, string escaped)
     {
         AssertText(unescaped, escaped);
     }
 
-    [TestMethod]
-    [DataRow("TRUE", true)]
-    [DataRow("FALSE", false)]
+    [Theory]
+    [InlineData("TRUE", true)]
+    [InlineData("FALSE", false)]
     public void Can_parse_logical(string formula, bool value)
     {
         AssertValue(formula, "Logical", value);
     }
 
-    [TestMethod]
-    [DataRow("#REF!", "#REF!")]
-    [DataRow("#N/A", "#N/A")]
+    [Theory]
+    [InlineData("#REF!", "#REF!")]
+    [InlineData("#N/A", "#N/A")]
     public void Can_parse_error(string formula, string value)
     {
         AssertValue(formula, "Error", value);
     }
 
-    [TestMethod]
-    [DataRow("1", 1)]
-    [DataRow("1.5", 1.5)]
-    [DataRow(".5", .5)]
-    [DataRow(".5E2", 50)]
-    // [DataRow(".5e2", 50)] TODO: Lower e
-    [DataRow(".5E+2", 50)]
-    [DataRow("50E-2", 0.5)]
+    [Theory]
+    [InlineData("1", 1)]
+    [InlineData("1.5", 1.5)]
+    [InlineData(".5", .5)]
+    [InlineData(".5E2", 50)]
+    // [InlineData(".5e2", 50)] TODO: Lower e
+    [InlineData(".5E+2", 50)]
+    [InlineData("50E-2", 0.5)]
     public void Can_parse_number(string formula, double value)
     {
         AssertValue(formula, "Number", value);
@@ -63,8 +62,8 @@ public class ScalarValueTests
     private static void AssertValue<T>(string formula, string expectedType, T expected)
     {
         var node = (ValueNode)ParseText(formula, new F());
-        Assert.AreEqual(expectedType, node.Type);
-        Assert.AreEqual(expected, node.Value);
+        Assert.Equal(expectedType, node.Type);
+        Assert.Equal(expected, node.Value);
     }
 
     private static AstNode ParseText(string formula, IAstFactory<ScalarValue, AstNode> factory)

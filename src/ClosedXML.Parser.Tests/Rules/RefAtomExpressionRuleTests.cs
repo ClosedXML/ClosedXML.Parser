@@ -1,39 +1,38 @@
 ﻿namespace ClosedXML.Parser.Tests.Rules;
 
-[TestClass]
 public class RefAtomExpressionRuleTests
 {
-    [TestMethod]
+    [Fact]
     public void Ref_error()
     {
         VerifyNode("#REF!", new ValueNode("Error", "#REF!"));
     }
 
-    [TestMethod]
+    [Fact]
     public void Cell_reference()
     {
         VerifyNode("A1", new LocalReferenceNode(new CellArea(1, 1)));
     }
 
-    [TestMethod]
+    [Fact]
     public void Name_reference()
     {
         VerifyNode("some_name", new NameNode("some_name"));
     }
 
-    [TestMethod]
+    [Fact]
     public void Structure_reference()
     {
         VerifyNode("Table[Column]", new StructureReferenceNode("Table", StructuredReferenceArea.None, "Column", "Column"));
     }
 
-    [TestMethod]
+    [Fact]
     public void Nested_ref_expression()
     {
         VerifyNode("((#REF!))", new ValueNode("Error", "#REF!"));
     }
 
-    [TestMethod]
+    [Fact]
     public void Nested_cant_be_non_ref()
     {
         AssertFormula.CheckParsingErrorContains("(1),#REF!", "not completely parsed");

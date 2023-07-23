@@ -1,16 +1,15 @@
 ﻿namespace ClosedXML.Parser.Tests.Rules;
 
-[TestClass]
 public class RefIntersectionExpressionRuleTests
 {
-    [TestMethod]
-    [DynamicData(nameof(TestCases))]
+    [Theory]
+    [MemberData(nameof(TestCases))]
     public void Has_one_or_more_elements_separated_by_space(string formula, AstNode expectedNode)
     {
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
-    [TestMethod]
+    [Fact]
     public void Intersection_operator_has_lower_priority_than_range()
     {
         var expectedNode =

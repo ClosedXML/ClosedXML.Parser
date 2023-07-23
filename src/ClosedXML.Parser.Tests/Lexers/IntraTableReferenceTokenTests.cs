@@ -1,18 +1,19 @@
-﻿namespace ClosedXML.Parser.Tests.Lexers;
+﻿using Xunit;
 
-[TestClass]
+namespace ClosedXML.Parser.Tests.Lexers;
+
 public class IntraTableReferenceTokenTests
 {
-    [TestMethod]
-    [DynamicData(nameof(Data))]
+    [Theory]
+    [MemberData(nameof(Data))]
     public void Token_data_are_extracted_and_unescaped(string tokenText, StructuredReferenceArea expectedArea, string expectedFirstColumn, string expectedLastColumn)
     {
         AssertFormula.AssertTokenType(tokenText, FormulaLexer.INTRA_TABLE_REFERENCE);
         TokenParser.ParseIntraTableReference(tokenText, out var area, out var firstColumn, out var lastColumn);
 
-        Assert.AreEqual(expectedArea, area);
-        Assert.AreEqual(expectedFirstColumn, firstColumn);
-        Assert.AreEqual(expectedLastColumn, lastColumn);
+        Assert.Equal(expectedArea, area);
+        Assert.Equal(expectedFirstColumn, firstColumn);
+        Assert.Equal(expectedLastColumn, lastColumn);
     }
 
     public static IEnumerable<object?[]> Data

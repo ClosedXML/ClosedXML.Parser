@@ -3,11 +3,10 @@
 /// <summary>
 /// Test rule <c>cell_reference</c>.
 /// </summary>
-[TestClass]
 public class CellReferenceRuleTests
 {
-    [TestMethod]
-    [DynamicData(nameof(TokenCombinations))]
+    [Theory]
+    [MemberData(nameof(TokenCombinations))]
     public void Possible_token_combinations_are_converted_to_node(string formula, AstNode expectedNode)
     {
         AssertFormula.SingleNodeParsed(formula, expectedNode);

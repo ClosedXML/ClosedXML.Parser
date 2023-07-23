@@ -1,19 +1,18 @@
 ﻿namespace ClosedXML.Parser.Tests.Lexers;
 
 // Tests of parsing SHEET_RANGE_PREFIX
-[TestClass]
 public class SheetRangePrefixTokenTests
 {
-    [TestMethod]
-    [DynamicData(nameof(Data))]
+    [Theory]
+    [MemberData(nameof(Data))]
     public void Token_data_are_extracted_and_unescaped(string tokenText, int? expectedWorkbookIndex, string expectedFirstSheetName, string expectedSecondSheetName)
     {
         AssertFormula.AssertTokenType(tokenText, FormulaLexer.SHEET_RANGE_PREFIX);
         TokenParser.ParseSheetRangePrefix(tokenText, out var workbookIndex, out var firstSheetName, out var secondSheetName);
 
-        Assert.AreEqual(expectedWorkbookIndex, workbookIndex);
-        Assert.AreEqual(expectedFirstSheetName, firstSheetName);
-        Assert.AreEqual(expectedSecondSheetName, secondSheetName);
+        Assert.Equal(expectedWorkbookIndex, workbookIndex);
+        Assert.Equal(expectedFirstSheetName, firstSheetName);
+        Assert.Equal(expectedSecondSheetName, secondSheetName);
     }
 
     public static IEnumerable<object?[]> Data

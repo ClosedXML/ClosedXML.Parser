@@ -5,13 +5,13 @@ using CsvHelper.Configuration.Attributes;
 using System.Globalization;
 using JetBrains.Annotations;
 using Antlr4.Runtime;
+using Xunit;
 
 namespace ClosedXML.Parser.Tests;
 
-[TestClass]
 public class DataSetTests
 {
-    [TestMethod]
+    [Fact]
     public void Enron_data_set_is_parseable()
     {
         Assert_formulas_parsed_or_not_as_expected(
@@ -23,7 +23,7 @@ public class DataSetTests
             });
     }
 
-    [TestMethod]
+    [Fact]
     public void Euses_data_set_is_parseable()
     {
         Assert_formulas_parsed_or_not_as_expected(
@@ -50,11 +50,11 @@ public class DataSetTests
             {
                 var parser = new FormulaParser<ScalarValue, AstNode>(formula, new F());
                 parser.Formula();
-                Assert.IsFalse(badFormulas.Contains(formula), formula);
+                Assert.False(badFormulas.Contains(formula), formula);
             }
             catch (Exception e)
             {
-                Assert.IsTrue(badFormulas.Contains(formula), $"Parsing formula '{formula}' failed: {e.Message}");
+                Assert.True(badFormulas.Contains(formula), $"Parsing formula '{formula}' failed: {e.Message}");
             }
         }
 
