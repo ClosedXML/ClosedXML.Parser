@@ -51,6 +51,12 @@ public class RefAtomExpressionRuleTests
         AssertFormula.CheckParsingErrorContains("(1),#REF!", "not completely parsed");
     }
 
+    [Fact]
+    public void Non_ref_function_cant_be_ref_atom()
+    {
+        AssertFormula.CheckParsingErrorContains("FUNC(),#REF!", "not completely parsed");
+    }
+
     private static void VerifyNode(string formula, AstNode node)
     {
         // Force the formula into a ref_atom_expression through ref_range_expression. 
