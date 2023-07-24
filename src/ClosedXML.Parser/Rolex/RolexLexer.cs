@@ -25,7 +25,7 @@ internal class RolexLexer
             i += length;
         }
 
-        tokens.Add(Token.Eof(formula.Length));
+        tokens.Add(Token.EofSymbol(formula.Length));
         return tokens;
     }
 

@@ -48,10 +48,10 @@ public class FormulaParser<TScalarValue, TNode>
         if (_tokens[_tokens.Count - 1].SymbolId == Token.ErrorSymbolId)
             throw new ParsingException($"Unable to determine token for '{_input}' at index {_tokens[_tokens.Count - 1].StartIndex}.");
 
-        if (_la == FormulaLexer.SPACE)
+        if (_la == Token.SPACE)
             Consume();
         var expression = Expression(false, out _);
-        if (_la != FormulaLexer.Eof)
+        if (_la != Token.EofSymbolId)
             throw new ParsingException($"Expression '{_input}' is not completely parsed.");
 
         return expression;
@@ -65,22 +65,22 @@ public class FormulaParser<TScalarValue, TNode>
             BinaryOperation cmpOp;
             switch (_la)
             {
-                case FormulaLexer.GREATER_OR_EQUAL_THAN:
+                case Token.GREATER_OR_EQUAL_THAN:
                     cmpOp = BinaryOperation.GreaterOrEqualThan;
                     break;
-                case FormulaLexer.LESS_OR_EQUAL_THAN:
+                case Token.LESS_OR_EQUAL_THAN:
                     cmpOp = BinaryOperation.LessOrEqualThan;
                     break;
-                case FormulaLexer.LESS_THAN:
+                case Token.LESS_THAN:
                     cmpOp = BinaryOperation.LessThan;
                     break;
-                case FormulaLexer.GREATER_THAN:
+                case Token.GREATER_THAN:
                     cmpOp = BinaryOperation.GreaterThan;
                     break;
-                case FormulaLexer.NOT_EQUAL:
+                case Token.NOT_EQUAL:
                     cmpOp = BinaryOperation.NotEqual;
                     break;
-                case FormulaLexer.EQUAL:
+                case Token.EQUAL:
                     cmpOp = BinaryOperation.Equal;
                     break;
                 default:
@@ -98,7 +98,7 @@ public class FormulaParser<TScalarValue, TNode>
     private TNode ConcatExpression(bool skipRangeUnion, out bool isPureRef)
     {
         var leftNode = AdditiveExpression(skipRangeUnion, out isPureRef);
-        while (_la == FormulaLexer.CONCAT)
+        while (_la == Token.CONCAT)
         {
             Consume();
             isPureRef = false;
@@ -116,10 +116,10 @@ public class FormulaParser<TScalarValue, TNode>
             BinaryOperation op;
             switch (_la)
             {
-                case FormulaLexer.PLUS:
+                case Token.PLUS:
                     op = BinaryOperation.Plus;
                     break;
-                case FormulaLexer.MINUS:
+                case Token.MINUS:
                     op = BinaryOperation.Minus;
                     break;
                 default:
@@ -141,10 +141,10 @@ public class FormulaParser<TScalarValue, TNode>
             BinaryOperation op;
             switch (_la)
             {
-                case FormulaLexer.MULT:
+                case Token.MULT:
                     op = BinaryOperation.Mult;
                     break;
-                case FormulaLexer.DIV:
+                case Token.DIV:
                     op = BinaryOperation.Div;
                     break;
                 default:
@@ -161,7 +161,7 @@ public class FormulaParser<TScalarValue, TNode>
     private TNode PowExpression(bool skipRangeUnion, out bool isPureRef)
     {
         var leftNode = PercentExpression(skipRangeUnion, out isPureRef);
-        while (_la == FormulaLexer.POW)
+        while (_la == Token.POW)
         {
             Consume();
             isPureRef = false;
@@ -175,7 +175,7 @@ public class FormulaParser<TScalarValue, TNode>
     private TNode PercentExpression(bool skipRangeUnion, out bool isPureRef)
     {
         var prefixAtomNode = PrefixAtomExpression(skipRangeUnion, out isPureRef);
-        if (_la == FormulaLexer.PERCENT)
+        if (_la == Token.PERCENT)
         {
             Consume();
             isPureRef = false;
@@ -190,10 +190,10 @@ public class FormulaParser<TScalarValue, TNode>
         UnaryOperation op;
         switch (_la)
         {
-            case FormulaLexer.PLUS:
+            case Token.PLUS:
                 op = UnaryOperation.Plus;
                 break;
-            case FormulaLexer.MINUS:
+            case Token.MINUS:
                 op = UnaryOperation.Minus;
                 break;
             default:
@@ -211,20 +211,20 @@ public class FormulaParser<TScalarValue, TNode>
         switch (_la)
         {
             // Constant
-            case FormulaLexer.NONREF_ERRORS:
-            case FormulaLexer.LOGICAL_CONSTANT:
-            case FormulaLexer.NUMERICAL_CONSTANT:
-            case FormulaLexer.STRING_CONSTANT:
-            case FormulaLexer.OPEN_CURLY:
+            case Token.NONREF_ERRORS:
+            case Token.LOGICAL_CONSTANT:
+            case Token.NUMERICAL_CONSTANT:
+            case Token.STRING_CONSTANT:
+            case Token.OPEN_CURLY:
                 isPureRef = false;
                 var constantNode = Constant();
                 return constantNode;
 
             // '(' expression ')'
-            case FormulaLexer.OPEN_BRACE:
+            case Token.OPEN_BRACE:
                 Consume();
                 var nestedNode = Expression(false, out isPureRef);
-                Match(FormulaLexer.CLOSE_BRACE);
+                Match(Token.CLOSE_BRACE);
 
                 // This is the point of an ambiguity. Atom should be a value, but it can
                 // be determined by calling an expression inside the braces or
@@ -249,7 +249,7 @@ public class FormulaParser<TScalarValue, TNode>
                 return nestedNode;
 
             // function_call
-            case FormulaLexer.CELL_FUNCTION_LIST:
+            case Token.CELL_FUNCTION_LIST:
                 {
                     isPureRef = false;
                     var cellReference = TokenParser.ExtractCellFunction(GetCurrentToken());
@@ -258,13 +258,13 @@ public class FormulaParser<TScalarValue, TNode>
                     return _factory.CellFunction(cellReference, args);
                 }
 
-            case FormulaLexer.USER_DEFINED_FUNCTION_NAME:
+            case Token.USER_DEFINED_FUNCTION_NAME:
                 isPureRef = false;
                 return LocalFunctionCall();
 
             default:
                 // function_call : SINGLE_SHEET_PREFIX USER_DEFINED_FUNCTION_NAME argument_list
-                if (_la == FormulaLexer.SINGLE_SHEET_PREFIX && LL(1) == FormulaLexer.USER_DEFINED_FUNCTION_NAME)
+                if (_la == Token.SINGLE_SHEET_PREFIX && LL(1) == Token.USER_DEFINED_FUNCTION_NAME)
                 {
                     isPureRef = false;
                     TokenParser.ParseSingleSheetPrefix(GetCurrentToken(), out var wbIndex, out var sheetName);
@@ -278,7 +278,7 @@ public class FormulaParser<TScalarValue, TNode>
                 }
 
                 // function_call : BOOK_PREFIX USER_DEFINED_FUNCTION_NAME argument_list
-                if (_la == FormulaLexer.BOOK_PREFIX && LL(1) == FormulaLexer.USER_DEFINED_FUNCTION_NAME)
+                if (_la == Token.BOOK_PREFIX && LL(1) == Token.USER_DEFINED_FUNCTION_NAME)
                 {
                     isPureRef = false;
                     var wbIndex = TokenParser.ParseBookPrefix(GetCurrentToken());
@@ -304,7 +304,7 @@ public class FormulaParser<TScalarValue, TNode>
     private TNode RefExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
         var leftNode = RefIntersectionExpression(replaceFirstAtom, refAtom);
-        while (_la == FormulaLexer.COMMA)
+        while (_la == Token.COMMA)
         {
             Consume();
             var rightNode = RefIntersectionExpression();
@@ -317,7 +317,7 @@ public class FormulaParser<TScalarValue, TNode>
     private TNode RefIntersectionExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
         var leftNode = RefRangeExpression(replaceFirstAtom, refAtom);
-        while (_la == FormulaLexer.SPACE)
+        while (_la == Token.SPACE)
         {
             Consume();
             var rightNode = RefRangeExpression();
@@ -330,7 +330,7 @@ public class FormulaParser<TScalarValue, TNode>
     private TNode RefRangeExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
         var leftNode = RefAtomExpression(replaceFirstAtom, refAtom);
-        while (_la == FormulaLexer.COLON)
+        while (_la == Token.COLON)
         {
             Consume();
             var rightNode = RefAtomExpression();
@@ -348,19 +348,19 @@ public class FormulaParser<TScalarValue, TNode>
 
         switch (_la)
         {
-            case FormulaLexer.REF_CONSTANT:
+            case Token.REF_CONSTANT:
                 return ErrorNode();
 
-            case FormulaLexer.OPEN_BRACE:
+            case Token.OPEN_BRACE:
                 Consume();
                 var refExpression = RefExpression();
-                Match(FormulaLexer.CLOSE_BRACE);
+                Match(Token.CLOSE_BRACE);
                 return refExpression;
 
             // cell_reference has been inlined into this switch
 
             // local_cell_reference
-            case FormulaLexer.A1_REFERENCE:
+            case Token.A1_REFERENCE:
                 var referenceToken = GetCurrentToken();
                 var cellArea = TokenParser.ParseA1Reference(referenceToken);
                 var localCellReferenceNode = _factory.LocalCellReference(referenceToken, cellArea);
@@ -370,7 +370,7 @@ public class FormulaParser<TScalarValue, TNode>
             // external_cell_reference
             // case FormulaLexer.BANG_REFERENCE: Formula shouldn't contain BANG_REFERENCE, see grammar
             // external_cell_reference
-            case FormulaLexer.SHEET_RANGE_PREFIX:
+            case Token.SHEET_RANGE_PREFIX:
                 {
                     var startIndex = _tokenSource.StartIndex;
                     var sheetRangePrefixToken = GetCurrentToken();
@@ -378,7 +378,7 @@ public class FormulaParser<TScalarValue, TNode>
                         out var secondName);
                     Consume();
                     var a1ReferenceToken = GetCurrentToken();
-                    Match(FormulaLexer.A1_REFERENCE);
+                    Match(Token.A1_REFERENCE);
                     var sheetRangeSpan = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
                     var localReference = TokenParser.ParseA1Reference(a1ReferenceToken);
                     var reference3D = new CellArea(firstName, secondName, localReference.First, localReference.Last);
@@ -388,18 +388,18 @@ public class FormulaParser<TScalarValue, TNode>
                 }
 
             // ref_function_call
-            case FormulaLexer.REF_FUNCTION_LIST:
+            case Token.REF_FUNCTION_LIST:
                 return LocalFunctionCall();
 
             // name_reference | structure_reference - all variants are expanded from the grammar.
 
             // Either defined name or table name for a structure reference
-            case FormulaLexer.NAME:
+            case Token.NAME:
                 {
                     var startIndex = _tokenSource.StartIndex;
                     var localName = GetCurrentToken();
                     Consume();
-                    if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
+                    if (_la == Token.INTRA_TABLE_REFERENCE)
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
@@ -411,14 +411,14 @@ public class FormulaParser<TScalarValue, TNode>
                 }
 
             // reference to another workbook
-            case FormulaLexer.BOOK_PREFIX:
+            case Token.BOOK_PREFIX:
                 {
                     var startIndex = _tokenSource.StartIndex;
                     var bookPrefix = TokenParser.ParseBookPrefix(GetCurrentToken());
                     Consume();
                     var externalName = GetCurrentToken();
-                    Match(FormulaLexer.NAME);
-                    if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
+                    Match(Token.NAME);
+                    if (_la == Token.INTRA_TABLE_REFERENCE)
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
@@ -430,13 +430,13 @@ public class FormulaParser<TScalarValue, TNode>
                 }
             // name_reference: SINGLE_SHEET_PREFIX NAME
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)
-            case FormulaLexer.SINGLE_SHEET_PREFIX:
+            case Token.SINGLE_SHEET_PREFIX:
                 {
                     var startIdx = _tokenSource.StartIndex;
                     var sheetPrefix = GetCurrentToken();
                     TokenParser.ParseSingleSheetPrefix(sheetPrefix, out var wbIdx, out var sheetName);
                     Consume();
-                    if (_la == FormulaLexer.A1_REFERENCE)
+                    if (_la == Token.A1_REFERENCE)
                     {
                         var localReferenceToken = GetCurrentToken();
                         var localReference = TokenParser.ParseA1Reference(localReferenceToken);
@@ -447,7 +447,7 @@ public class FormulaParser<TScalarValue, TNode>
                             : _factory.ExternalCellReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
                     }
 
-                    if (_la == FormulaLexer.REF_CONSTANT)
+                    if (_la == Token.REF_CONSTANT)
                     {
                         var errorReference = _factory.ErrorNode(GetCurrentToken()); // Sheet1!#REF! is a valid
                         Consume();
@@ -456,12 +456,12 @@ public class FormulaParser<TScalarValue, TNode>
 
                     // name_reference
                     var name = GetCurrentToken();
-                    Match(FormulaLexer.NAME);
+                    Match(Token.NAME);
                     return _factory.LocalNameReference(sheetPrefix, name);
                 }
 
             // structure_reference - only for formulas directly in the table, e.g. totals row.
-            case FormulaLexer.INTRA_TABLE_REFERENCE:
+            case Token.INTRA_TABLE_REFERENCE:
                 {
                     var localTableReference = GetCurrentToken();
                     TokenParser.ParseIntraTableReference(localTableReference, out var specifics, out var firstColumn, out var lastColumn);
@@ -487,28 +487,28 @@ public class FormulaParser<TScalarValue, TNode>
     {
         switch (_la)
         {
-            case FormulaLexer.NONREF_ERRORS:
+            case Token.NONREF_ERRORS:
                 return ErrorNode();
 
-            case FormulaLexer.LOGICAL_CONSTANT:
+            case Token.LOGICAL_CONSTANT:
                 var logicalNode = ConvertLogical();
                 Consume();
                 return logicalNode;
 
-            case FormulaLexer.NUMERICAL_CONSTANT:
+            case Token.NUMERICAL_CONSTANT:
                 var numberNode = ConvertNumber();
                 Consume();
                 return numberNode;
 
-            case FormulaLexer.STRING_CONSTANT:
+            case Token.STRING_CONSTANT:
                 var textNode = ConvertText();
                 Consume();
                 return textNode;
 
-            case FormulaLexer.OPEN_CURLY:
+            case Token.OPEN_CURLY:
                 Consume();
                 var arrayElements = ConstantListRows(out var rows, out var columns);
-                Match(FormulaLexer.CLOSE_CURLY);
+                Match(Token.CLOSE_CURLY);
                 return _factory.ArrayNode(rows, columns, arrayElements);
 
             default:
@@ -522,7 +522,7 @@ public class FormulaParser<TScalarValue, TNode>
         var elements = new List<TScalarValue>();
         var rowSize = ConstantListRow(elements);
         var height = 1;
-        while (_la == FormulaLexer.SEMICOLON)
+        while (_la == Token.SEMICOLON)
         {
             Consume();
             var nextRowSize = ConstantListRow(elements);
@@ -542,7 +542,7 @@ public class FormulaParser<TScalarValue, TNode>
         var origSize = arrayElements.Count;
         var arrayElement = ArrayConstant();
         arrayElements.Add(arrayElement);
-        while (_la == FormulaLexer.COMMA)
+        while (_la == Token.COMMA)
         {
             Consume();
             var nextElement = ArrayConstant();
@@ -557,28 +557,28 @@ public class FormulaParser<TScalarValue, TNode>
         TScalarValue value;
         switch (_la)
         {
-            case FormulaLexer.REF_CONSTANT:
-            case FormulaLexer.NONREF_ERRORS:
+            case Token.REF_CONSTANT:
+            case Token.NONREF_ERRORS:
                 // Convert to upper case on stack, because length of an error is limited to ~20
                 var errorToken = GetCurrentToken();
                 Span<char> normalizedError = stackalloc char[errorToken.Length];
                 errorToken.ToUpperInvariant(normalizedError);
                 value = _factory.ErrorValue(normalizedError);
                 break;
-            case FormulaLexer.LOGICAL_CONSTANT:
+            case Token.LOGICAL_CONSTANT:
                 value = _factory.LogicalValue(GetTokenLogicalValue());
                 break;
-            case FormulaLexer.MINUS:
+            case Token.MINUS:
                 Consume();
-                if (_la != FormulaLexer.NUMERICAL_CONSTANT)
-                    throw UnexpectedTokenError(FormulaLexer.NUMERICAL_CONSTANT);
+                if (_la != Token.NUMERICAL_CONSTANT)
+                    throw UnexpectedTokenError(Token.NUMERICAL_CONSTANT);
 
                 value = _factory.NumberValue(-ParseNumber(GetCurrentToken()));
                 break;
-            case FormulaLexer.NUMERICAL_CONSTANT:
+            case Token.NUMERICAL_CONSTANT:
                 value = _factory.NumberValue(ParseNumber(GetCurrentToken()));
                 break;
-            case FormulaLexer.STRING_CONSTANT:
+            case Token.STRING_CONSTANT:
                 value = ConvertTextValue();
                 break;
             default:
@@ -592,7 +592,7 @@ public class FormulaParser<TScalarValue, TNode>
     private IReadOnlyList<TNode> ArgumentList()
     {
         // A special case, there are no arguments
-        if (_la == FormulaLexer.CLOSE_BRACE)
+        if (_la == Token.CLOSE_BRACE)
         {
             Consume();
             return Array.Empty<TNode>();
@@ -603,14 +603,14 @@ public class FormulaParser<TScalarValue, TNode>
         {
             // At the start of the loop, previous argument
             // should have been consumed with a comma.
-            if (_la == FormulaLexer.COMMA)
+            if (_la == Token.COMMA)
             {
                 // If there is a comma, it means there are
                 // two commas in a row and thus a blank argument.
                 args.Add(_factory.BlankNode());
                 Consume();
             }
-            else if (_la == FormulaLexer.CLOSE_BRACE)
+            else if (_la == Token.CLOSE_BRACE)
             {
                 // if there is a brace, it means the previous
                 // comma is immediately followed by a brace `,)`
@@ -624,14 +624,14 @@ public class FormulaParser<TScalarValue, TNode>
                 // Path for a non-blank argument.
                 var arg = Expression(true, out _);
                 args.Add(arg);
-                if (_la == FormulaLexer.CLOSE_BRACE)
+                if (_la == Token.CLOSE_BRACE)
                 {
                     Consume();
                     return args;
                 }
 
                 // Each argument must be followed by a comma. 
-                Match(FormulaLexer.COMMA);
+                Match(Token.COMMA);
             }
         }
     }
@@ -653,7 +653,7 @@ public class FormulaParser<TScalarValue, TNode>
     private int LL(int lookAhead)
     {
         var idx = _tokenIndex + lookAhead;
-        return idx < _tokens.Count ? _tokens[idx].SymbolId : FormulaLexer.Eof;
+        return idx < _tokens.Count ? _tokens[idx].SymbolId : Token.EofSymbolId;
     }
 
     private static double ParseNumber(ReadOnlySpan<char> number)
@@ -761,7 +761,7 @@ public class FormulaParser<TScalarValue, TNode>
         return _input.AsSpan(_tokenSource.StartIndex, _tokenSource.Length);
     }
 
-    private string GetTokenName(int tokenType) => Enum.GetName(typeof(Tokens), tokenType) ?? throw new ArgumentOutOfRangeException();
+    private static string GetTokenName(int tokenType) => Token.GetSymbolName(tokenType);
 
     private string GetLaTokenName() => GetTokenName(_la);
 }

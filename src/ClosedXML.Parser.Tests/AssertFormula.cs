@@ -78,7 +78,7 @@ internal static class AssertFormula
             return tokensWithError;
         }
 
-        tokens.Add(Token.Eof(formula.Length));
+        tokens.Add(Token.EofSymbol(formula.Length));
         return tokens;
     }
 
