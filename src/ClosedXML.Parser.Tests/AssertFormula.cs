@@ -53,18 +53,42 @@ internal static class AssertFormula
 
         var res = parser.formula();
 
-        Assert.True(listener.Errors is null, $"{formula}  {listener.Errors}");
+        Assert.True(listener.ErrorStartIndex is null, $"{formula}  {listener.ErrorStartIndex}");
         Assert.True(res.exception is null, $"{formula} {res.exception}");
+    }
+
+    /// <summary>
+    /// Get tokens from ANTLR lexer. If there is an error in the <paramref name="formula"/>, insert error token.
+    /// </summary>
+    public static IReadOnlyList<Token> GetAntlrTokens(string formula)
+    {
+        var lexer = new FormulaLexer(new CodePointCharStream(formula), TextWriter.Null, TextWriter.Null);
+        var listener = new LexerErrorListener();
+        lexer.RemoveErrorListeners();
+        lexer.AddErrorListener(listener);
+        var tokens = lexer.GetAllTokens().Select(x => new Token(x.Type, x.StartIndex, x.StopIndex - x.StartIndex + 1)).ToList();
+        if (listener.ErrorStartIndex is not null)
+        {
+            // Lexer tries to recover. That is good in most cases, but in our case, it's not very
+            // compatible with Rolex lexer. Remove the tokens after recovery.
+            var errorStartIndex = listener.ErrorStartIndex.Value;
+            var tokensWithError = tokens
+                .Where(t => t.StartIndex < errorStartIndex)
+                .Append(new Token(Token.ErrorSymbolId, errorStartIndex, 0)).ToList();
+            return tokensWithError;
+        }
+
+        return tokens;
     }
 
     private class LexerErrorListener : IAntlrErrorListener<int>
     {
-        internal string? Errors { get; private set; }
+        internal int? ErrorStartIndex { get; private set; }
 
         public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            var error = $"line {line}:{charPositionInLine} {msg}";
-            Errors = Errors is null ? error : Errors + "\n" + error;
+            // Params don't provide access to the stream char index property directly, so pass it through 
+            ErrorStartIndex ??= ((Lexer)recognizer).TokenStartCharIndex;
         }
     }
 }

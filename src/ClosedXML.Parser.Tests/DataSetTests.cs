@@ -1,11 +1,4 @@
 ﻿using System.Diagnostics;
-using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.Configuration.Attributes;
-using System.Globalization;
-using JetBrains.Annotations;
-using Antlr4.Runtime;
-using Xunit;
 
 namespace ClosedXML.Parser.Tests;
 
@@ -39,11 +32,11 @@ public class DataSetTests
     {
         var badFormulas = new HashSet<string>();
         foreach (var badFormulaPath in badFormulaPaths)
-            badFormulas.UnionWith(Read(badFormulaPath));
+            badFormulas.UnionWith(DataSets.ReadCsv(badFormulaPath));
 
         var sw = Stopwatch.StartNew();
         var formulaCount = 0;
-        foreach (var formula in Read(input))
+        foreach (var formula in DataSets.ReadCsv(input))
         {
             formulaCount++;
             try
@@ -61,17 +54,4 @@ public class DataSetTests
         sw.Stop();
         Console.WriteLine($"Parsed {formulaCount} formulas in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula)");
     }
-
-    private IEnumerable<string> Read(string filename)
-    {
-        var config = new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false };
-        using var reader = new StreamReader(filename);
-        using var csv = new CsvReader(reader, config);
-        var formulas = csv.GetRecords<Formula>();
-        foreach (var formula in formulas)
-            yield return formula.Text;
-    }
-
-    [UsedImplicitly]
-    private record Formula([Index(0)] string Text);
 }
