@@ -68,7 +68,6 @@ public class ScalarValueTests
 
     private static AstNode ParseText(string formula, IAstFactory<ScalarValue, AstNode> factory)
     {
-        var parser = new FormulaParser<ScalarValue, AstNode>(formula, factory);
-        return parser.Formula();
+        return FormulaParser<ScalarValue, AstNode>.FormulaA1(formula, factory);
     }
 }

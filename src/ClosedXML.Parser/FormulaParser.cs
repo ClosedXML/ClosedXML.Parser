@@ -26,7 +26,7 @@ public class FormulaParser<TScalarValue, TNode>
     // Current lookahead token index
     private int _la;
 
-    public FormulaParser(string input, IAstFactory<TScalarValue, TNode> factory)
+    private FormulaParser(string input, IAstFactory<TScalarValue, TNode> factory)
     {
         // Trim the end, so ref_intersection_expression that tried to parse SPACE as an operator
         // doesn't recognize spaces at the end of formula as operators. The control tokens of
@@ -43,7 +43,13 @@ public class FormulaParser<TScalarValue, TNode>
     /// <summary>
     /// Parse a formula.
     /// </summary>
-    public TNode Formula()
+    public static TNode FormulaA1(string text, IAstFactory<TScalarValue, TNode> factory)
+    {
+        var parser = new FormulaParser<TScalarValue, TNode>(text, factory);
+        return parser.Formula();
+    }
+
+    private TNode Formula()
     {
         if (_tokens[_tokens.Count - 1].SymbolId == Token.ErrorSymbolId)
             throw new ParsingException($"Unable to determine token for '{_input}' at index {_tokens[_tokens.Count - 1].StartIndex}.");
