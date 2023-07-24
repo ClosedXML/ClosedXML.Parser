@@ -7,10 +7,10 @@ namespace ClosedXML.Parser.Rolex;
 internal class RolexLexer
 {
     /// <summary>
-    /// Get all tokens for a formula. Use A1 semantic. If there is an error, add token with an error symbol at the end.
+    /// Get all tokens for a formula. Use A1 semantic. If there is an error, add token with an error symbol at the end or EOF token at the end.
     /// </summary>
     /// <param name="formula">Formula to parse.</param>
-    public static IReadOnlyList<Token> GetTokensA1(ReadOnlySpan<char> formula)
+    public static List<Token> GetTokensA1(ReadOnlySpan<char> formula)
     {
         var tokens = new List<Token>();
         for (var i = 0; i < formula.Length;)
@@ -25,6 +25,7 @@ internal class RolexLexer
             i += length;
         }
 
+        tokens.Add(Token.Eof(formula.Length));
         return tokens;
     }
 
@@ -44,13 +45,12 @@ internal class RolexLexer
         return c;
     }
 
-    internal static (int SymbolId, int Length) GetToken(ReadOnlySpan<char> input, int startIdx, DfaEntry[] dfaTable)
+    private static (int SymbolId, int Length) GetToken(ReadOnlySpan<char> input, int startIdx, DfaEntry[] dfaTable)
     {
         int dfaState = 0;
 
         // Best token and its length found so far
-        const int errorSymbolId = -2;
-        var symbolId = errorSymbolId;
+        var symbolId = Token.ErrorSymbolId;
         var symbolEndIndex = 0;
 
         for (var idx = startIdx; idx < input.Length;)
@@ -90,7 +90,7 @@ internal class RolexLexer
             {
                 // Return best symbolId. If nothing was yet found, it returns -2 as an error.
                 if (symbolId < 0)
-                    return (-1, 0); // Ensure that length is 0
+                    return (Token.ErrorSymbolId, 0);
 
                 // Adjust symbol because ANTLR and Rolex are 1 off
                 return (symbolId + 1, symbolEndIndex - startIdx);
@@ -115,7 +115,9 @@ internal class RolexLexer
             return (symbolId + 1, symbolEndIndex - startIdx);
         }
 
-        // Otherwise, end of stream
-        return (-1, 0);
+        // Otherwise, end of stream, but the only way we could got here is if there has been a half-inserted
+        // symbol, e.g. `"Text ` without the ending. This method is not called when lexer is at the end of
+        // a stream, thus it has to be an error.
+        return (Token.ErrorSymbolId, 0);
     }
 }

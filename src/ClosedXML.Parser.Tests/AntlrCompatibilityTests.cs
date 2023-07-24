@@ -14,8 +14,9 @@ public class AntlrCompatibilityTests
     {
         foreach (var formula in DataSets.ReadCsv(dataSetFile))
         {
-            var rolexTokens = RolexLexer.GetTokensA1(formula.AsSpan());
             var antlrTokens = AssertFormula.GetAntlrTokens(formula);
+            var rolexTokens = RolexLexer.GetTokensA1(formula.AsSpan());
+
             Assert.Equal(antlrTokens, rolexTokens);
         }
     }

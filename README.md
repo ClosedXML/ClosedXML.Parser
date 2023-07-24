@@ -57,7 +57,7 @@ Use [vscode-antlr4](https://github.com/mike-lischke/vscode-antlr4/blob/master/do
 Rolex is a DFA based lexer released under MIT license (see [Rolex: Unicode Enabled Lexer Generator in C#
 ](https://www.codeproject.com/Articles/5257489/Rolex-Unicode-Enabled-Lexer-Generator-in-Csharp)). ANTLR is still the source of truth, but it is used to generate Rolex grammar and then DFA for a lexer.
 
-It is pretty complicated, but four times faster than ANTLR lexer (800 ms vs 3200 ms for lexing).
+It is rather complicated, but two times faster than ANTLR lexer (1.9 us vs 3.676 us per formula).
 
 How to generate a new version of a lexer.
 

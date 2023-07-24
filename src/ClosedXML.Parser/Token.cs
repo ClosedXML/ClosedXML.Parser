@@ -6,9 +6,14 @@
 internal readonly struct Token
 {
     /// <summary>
+    /// An symbol id for end of file. Mostly for compatibility with ANTLR.
+    /// </summary>
+    public const int EofSymbolId = -1;
+
+    /// <summary>
     /// An error symbol id.
     /// </summary>
-    public const int ErrorSymbolId = -1;
+    public const int ErrorSymbolId = -2;
 
     /// <summary>
     /// A token ID or TokenType. Non-negative integer. The values are from Antlr grammar, starting with 1.
@@ -34,6 +39,10 @@ internal readonly struct Token
         Length = length;
     }
 
+    public static Token Error(int index) => new(ErrorSymbolId, index, 0);
+
+    public static Token Eof(int index) => new(EofSymbolId, index, 0);
+
     public bool Equals(Token other)
     {
         return SymbolId == other.SymbolId && StartIndex == other.StartIndex && Length == other.Length;
@@ -54,4 +63,6 @@ internal readonly struct Token
             return hashCode;
         }
     }
+
+    public override string ToString() => $"Symbol: {SymbolId}; StartIdx: {StartIndex}; Len: {Length}";
 }

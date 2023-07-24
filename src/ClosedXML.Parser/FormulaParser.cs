@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using Antlr4.Runtime;
+using ClosedXML.Parser.Rolex;
 
 namespace ClosedXML.Parser;
 
@@ -18,12 +17,10 @@ namespace ClosedXML.Parser;
 public class FormulaParser<TScalarValue, TNode>
     where TNode : class
 {
-    // TODO: Replace with something more sensible
-    private readonly IVocabulary _vocabulary;
     private readonly string _input;
-    private readonly List<(int Type, int StartIndex, int CharIndexStopIndex)> _tokens;
+    private readonly List<Token> _tokens;
     private readonly IAstFactory<TScalarValue, TNode> _factory;
-    private (int Type, int TokenStartCharIndex, int CharIndex) _tokenSource;
+    private Token _tokenSource;
     private int _tokenIndex = -1;
 
     // Current lookahead token index
@@ -36,10 +33,9 @@ public class FormulaParser<TScalarValue, TNode>
         // the formula have whitespaces around them (unlike params), so the whitespaces should
         // be consumed by control tokens (e.g. ` IF ( A1 ) ` will be split into `IF ( `, `A1` and ` ) `)
         // but to avoid the whitespace at the end, trim it.
-        var lexer = new FormulaLexer(new CodePointCharStream(input.TrimEnd()), TextWriter.Null, TextWriter.Null);
+        var trimmedInput = input.AsSpan().TrimEnd();
         _input = input;
-        _vocabulary = lexer.Vocabulary;
-        _tokens = lexer.GetAllTokens().Select(x => (x.Type, x.StartIndex, x.StopIndex + 1)).Append(new(-1, input.Length, input.Length)).ToList();
+        _tokens = RolexLexer.GetTokensA1(trimmedInput);
         _factory = factory;
         Consume();
     }
@@ -49,6 +45,9 @@ public class FormulaParser<TScalarValue, TNode>
     /// </summary>
     public TNode Formula()
     {
+        if (_tokens[_tokens.Count - 1].SymbolId == Token.ErrorSymbolId)
+            throw new ParsingException($"Unable to determine token for '{_input}' at index {_tokens[_tokens.Count - 1].StartIndex}.");
+
         if (_la == FormulaLexer.SPACE)
             Consume();
         var expression = Expression(false, out _);
@@ -373,14 +372,14 @@ public class FormulaParser<TScalarValue, TNode>
             // external_cell_reference
             case FormulaLexer.SHEET_RANGE_PREFIX:
                 {
-                    var startIndex = _tokenSource.TokenStartCharIndex;
+                    var startIndex = _tokenSource.StartIndex;
                     var sheetRangePrefixToken = GetCurrentToken();
                     TokenParser.ParseSheetRangePrefix(sheetRangePrefixToken, out var wbIdx, out var firstName,
                         out var secondName);
                     Consume();
                     var a1ReferenceToken = GetCurrentToken();
                     Match(FormulaLexer.A1_REFERENCE);
-                    var sheetRangeSpan = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
+                    var sheetRangeSpan = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
                     var localReference = TokenParser.ParseA1Reference(a1ReferenceToken);
                     var reference3D = new CellArea(firstName, secondName, localReference.First, localReference.Last);
                     return wbIdx is not null
@@ -397,14 +396,14 @@ public class FormulaParser<TScalarValue, TNode>
             // Either defined name or table name for a structure reference
             case FormulaLexer.NAME:
                 {
-                    var startIndex = _tokenSource.TokenStartCharIndex;
+                    var startIndex = _tokenSource.StartIndex;
                     var localName = GetCurrentToken();
                     Consume();
                     if (_la == FormulaLexer.INTRA_TABLE_REFERENCE)
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
-                        var text = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
+                        var text = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
                         return _factory.StructureReference(text, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
@@ -414,7 +413,7 @@ public class FormulaParser<TScalarValue, TNode>
             // reference to another workbook
             case FormulaLexer.BOOK_PREFIX:
                 {
-                    var startIndex = _tokenSource.TokenStartCharIndex;
+                    var startIndex = _tokenSource.StartIndex;
                     var bookPrefix = TokenParser.ParseBookPrefix(GetCurrentToken());
                     Consume();
                     var externalName = GetCurrentToken();
@@ -423,7 +422,7 @@ public class FormulaParser<TScalarValue, TNode>
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
-                        var text = _input.AsSpan(startIndex, _tokenSource.TokenStartCharIndex - startIndex);
+                        var text = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
                         return _factory.ExternalStructureReference(text, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
@@ -433,7 +432,7 @@ public class FormulaParser<TScalarValue, TNode>
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)
             case FormulaLexer.SINGLE_SHEET_PREFIX:
                 {
-                    var startIdx = _tokenSource.TokenStartCharIndex;
+                    var startIdx = _tokenSource.StartIndex;
                     var sheetPrefix = GetCurrentToken();
                     TokenParser.ParseSingleSheetPrefix(sheetPrefix, out var wbIdx, out var sheetName);
                     Consume();
@@ -442,7 +441,7 @@ public class FormulaParser<TScalarValue, TNode>
                         var localReferenceToken = GetCurrentToken();
                         var localReference = TokenParser.ParseA1Reference(localReferenceToken);
                         Consume();
-                        var nodeText = _input.AsSpan(startIdx, _tokenSource.TokenStartCharIndex - startIdx);
+                        var nodeText = _input.AsSpan(startIdx, _tokenSource.StartIndex - startIdx);
                         return wbIdx is null
                             ? _factory.LocalCellReference(nodeText, localReference)
                             : _factory.ExternalCellReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
@@ -648,13 +647,13 @@ public class FormulaParser<TScalarValue, TNode>
     private void Consume()
     {
         _tokenSource = _tokens[++_tokenIndex];
-        _la = _tokenSource.Type;
+        _la = _tokenSource.SymbolId;
     }
 
     private int LL(int lookAhead)
     {
         var idx = _tokenIndex + lookAhead;
-        return idx < _tokens.Count ? _tokens[idx].Type : FormulaLexer.Eof;
+        return idx < _tokens.Count ? _tokens[idx].SymbolId : FormulaLexer.Eof;
     }
 
     private static double ParseNumber(ReadOnlySpan<char> number)
@@ -676,7 +675,7 @@ public class FormulaParser<TScalarValue, TNode>
 
     private bool GetTokenLogicalValue()
     {
-        return _input[_tokenSource.TokenStartCharIndex] is 'T' or 't';
+        return _input[_tokenSource.StartIndex] is 'T' or 't';
     }
 
     private TNode ConvertNumber()
@@ -754,15 +753,15 @@ public class FormulaParser<TScalarValue, TNode>
 
     private Exception Error(string message)
     {
-        return new ParsingException($"Error at char {_tokenSource.TokenStartCharIndex} of '{_input}': {message}");
+        return new ParsingException($"Error at char {_tokenSource.StartIndex} of '{_input}': {message}");
     }
 
     private ReadOnlySpan<char> GetCurrentToken()
     {
-        return _input.AsSpan(_tokenSource.TokenStartCharIndex, _tokenSource.CharIndex - _tokenSource.TokenStartCharIndex);
+        return _input.AsSpan(_tokenSource.StartIndex, _tokenSource.Length);
     }
 
-    private string GetTokenName(int tokenType) => _vocabulary.GetSymbolicName(tokenType);
+    private string GetTokenName(int tokenType) => Enum.GetName(typeof(Tokens), tokenType) ?? throw new ArgumentOutOfRangeException();
 
     private string GetLaTokenName() => GetTokenName(_la);
 }
