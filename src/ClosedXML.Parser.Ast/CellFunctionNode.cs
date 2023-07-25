@@ -1,3 +1,3 @@
-﻿namespace ClosedXML.Parser.Ast;
+﻿namespace ClosedXML.Parser;
 
 public record CellFunctionNode(CellReference Cell) : AstNode;

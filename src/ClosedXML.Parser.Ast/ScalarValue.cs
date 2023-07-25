@@ -1,4 +1,4 @@
-﻿namespace ClosedXML.Parser.Ast;
+﻿namespace ClosedXML.Parser;
 
 public readonly record struct ScalarValue(string Type, object Value)
 {

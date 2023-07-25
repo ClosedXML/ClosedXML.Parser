@@ -1,4 +1,4 @@
-﻿namespace ClosedXML.Parser.Ast;
+﻿namespace ClosedXML.Parser;
 
 #nullable disable
 
@@ -49,7 +49,7 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new ValueNode("Text", text.ToString());
     }
 
-    public AstNode ArrayNode(int rows, int columns, IReadOnlyList<ScalarValue> array)
+    public AstNode ArrayNode(NodeRange range, int rows, int columns, IReadOnlyList<ScalarValue> array)
     {
         return new ArrayNode(rows, columns, array);
     }

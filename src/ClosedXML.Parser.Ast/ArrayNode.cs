@@ -1,4 +1,4 @@
-﻿namespace ClosedXML.Parser.Ast;
+﻿namespace ClosedXML.Parser;
 
 public record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elements) : AstNode
 {

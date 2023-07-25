@@ -1,4 +1,4 @@
-﻿namespace ClosedXML.Parser.Ast;
+﻿namespace ClosedXML.Parser;
 
 public record ValueNode(string Type, object Value) : AstNode
 {

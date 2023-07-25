@@ -1,6 +1,4 @@
-﻿using ClosedXML.Parser.Ast;
-
-namespace ClosedXML.Parser.Web.Models;
+﻿namespace ClosedXML.Parser.Web.Models;
 
 public class FormulaModel
 {
