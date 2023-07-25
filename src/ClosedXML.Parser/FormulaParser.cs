@@ -43,6 +43,7 @@ public class FormulaParser<TScalarValue, TNode>
     /// <summary>
     /// Parse a formula.
     /// </summary>
+    /// <exception cref="ParsingException">If the formula doesn't satisfy the grammar.</exception>
     public static TNode FormulaA1(string text, IAstFactory<TScalarValue, TNode> factory)
     {
         var parser = new FormulaParser<TScalarValue, TNode>(text, factory);

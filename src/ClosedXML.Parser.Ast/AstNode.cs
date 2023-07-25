@@ -2,7 +2,7 @@
 
 public record AstNode
 {
-    internal AstNode[] Children { get; init; } = Array.Empty<AstNode>();
+    public AstNode[] Children { get; init; } = Array.Empty<AstNode>();
 
     public virtual bool Equals(AstNode? other) => other is not null && Children.SequenceEqual(other.Children);
 

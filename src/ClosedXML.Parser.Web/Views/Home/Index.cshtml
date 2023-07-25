@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">ClosedParser</h1>
+    <p>ClosedParser is a sub-project of a ClosedXML library dedicated to parsing a formula into an abstract syntax tree.</p>
+
+    <form>
+        <input type="text" id="formula" value="SUM(B5,2)" />
+        <button id="parse" type="button">Parse</button>
+    </form>
+
+    <div id="svg-container">
+    </div>
+</div>
+
+@section Scripts {
+    <script src="js/site.js"></script>
+}
