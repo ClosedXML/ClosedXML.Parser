@@ -85,7 +85,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="input">The token text of a reference.</param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="area">The referenced cells.</param>
-    TNode ExternalCellReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area);
+    TNode ExternalReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area);
 
     /// <summary>
     /// Create a node for a function.

@@ -59,7 +59,7 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new ReferenceNode(area);
     }
 
-    public AstNode ExternalCellReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area)
+    public AstNode ExternalReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area)
     {
         return new ExternalReferenceNode(workbookIndex, area);
     }
