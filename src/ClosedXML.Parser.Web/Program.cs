@@ -8,6 +8,7 @@ builder.Services
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.MaxDepth = 128; // Some trees can be rather deep
         options.JsonSerializerOptions.Converters.Add(new AstNodeConverter());
     });
 
