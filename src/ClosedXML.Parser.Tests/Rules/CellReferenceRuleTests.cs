@@ -20,7 +20,7 @@ public class CellReferenceRuleTests
             yield return new object[]
             {
                 "Z5",
-                new LocalReferenceNode(new CellArea(26, 5))
+                new ReferenceNode(new CellArea(26, 5))
             };
 
             // "MS-XLSX 2.2.2.1: The formula MUST NOT use the bang-reference or bang-name.

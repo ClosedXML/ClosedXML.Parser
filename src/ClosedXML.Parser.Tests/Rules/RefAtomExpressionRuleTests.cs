@@ -17,7 +17,7 @@ public class RefAtomExpressionRuleTests
     [Fact]
     public void Cell_reference()
     {
-        VerifyNode("A1", new LocalReferenceNode(new CellArea(1, 1)));
+        VerifyNode("A1", new ReferenceNode(new CellArea(1, 1)));
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class RefAtomExpressionRuleTests
             Children = new AstNode[]
             {
                 new ValueNode(true),
-                new LocalReferenceNode(new CellArea(1,1))
+                new ReferenceNode(new CellArea(1,1))
             }
         });
     }

@@ -22,7 +22,7 @@ public class ArgumentListRuleTests
                 new ValueNode(1),
                 new BinaryNode(
                     BinaryOperation.Union,
-                    new LocalReferenceNode(new CellArea(1,1)),
+                    new ReferenceNode(new CellArea(1,1)),
                     new NameNode("two")),
                 new ValueNode(3)
             }

@@ -1,6 +1,6 @@
 ﻿namespace ClosedXML.Parser;
 
-public record LocalReferenceNode(CellArea Reference) : AstNode
+public record ReferenceNode(CellArea Reference) : AstNode
 {
     public override string GetDisplayString()
     {

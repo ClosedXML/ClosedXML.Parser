@@ -17,12 +17,12 @@ public class RefExpressionRuleTests
                 BinaryOperation.Union,
                 new BinaryNode(
                     BinaryOperation.Intersection,
-                    new LocalReferenceNode(new CellArea(1, 1)),
-                    new LocalReferenceNode(new CellArea(1, 2))),
+                    new ReferenceNode(new CellArea(1, 1)),
+                    new ReferenceNode(new CellArea(1, 2))),
                 new BinaryNode(
                     BinaryOperation.Intersection,
-                    new LocalReferenceNode(new CellArea(1, 3)),
-                    new LocalReferenceNode(new CellArea(1, 4))));
+                    new ReferenceNode(new CellArea(1, 3)),
+                    new ReferenceNode(new CellArea(1, 4))));
         AssertFormula.SingleNodeParsed("A1 A2,A3 A4", expectedNode);
     }
 
@@ -32,7 +32,7 @@ public class RefExpressionRuleTests
         var expectedNode = new BinaryNode(
             BinaryOperation.Union,
             new NameNode("some_name"),
-            new LocalReferenceNode(new CellArea(1, 2)));
+            new ReferenceNode(new CellArea(1, 2)));
         AssertFormula.SingleNodeParsed(" some_name , A2 ", expectedNode);
     }
 
@@ -44,7 +44,7 @@ public class RefExpressionRuleTests
             yield return new object[]
             {
                 "A1",
-                new LocalReferenceNode(new CellArea(1,1))
+                new ReferenceNode(new CellArea(1,1))
             };
 
             // ref_expression : ref_intersection_expression COMMA ref_intersection_expression
@@ -53,8 +53,8 @@ public class RefExpressionRuleTests
                 "A1,A2",
                 new BinaryNode(
                     BinaryOperation.Union,
-                    new LocalReferenceNode(new CellArea(1,1)),
-                    new LocalReferenceNode(new CellArea(1,2)))
+                    new ReferenceNode(new CellArea(1,1)),
+                    new ReferenceNode(new CellArea(1,2)))
             };
 
             // ref_expression : ref_intersection_expression COMMA ref_intersection_expression
@@ -64,9 +64,9 @@ public class RefExpressionRuleTests
                 new BinaryNode(
                     BinaryOperation.Union,
                     new BinaryNode(BinaryOperation.Union,
-                        new LocalReferenceNode(new CellArea(1,1)),
+                        new ReferenceNode(new CellArea(1,1)),
                         new ValueNode("Error", "#REF!")),
-                    new LocalReferenceNode(new CellArea(1,2)))
+                    new ReferenceNode(new CellArea(1,2)))
             };
         }
     }

@@ -77,7 +77,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// </summary>
     /// <param name="input">The token text of a reference.</param>
     /// <param name="area">The referenced cells.</param>
-    TNode LocalCellReference(ReadOnlySpan<char> input, CellArea area);
+    TNode Reference(ReadOnlySpan<char> input, CellArea area);
 
     /// <summary>
     /// Create a node for a reference to cells in a different worksheet.

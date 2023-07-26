@@ -370,7 +370,7 @@ public class FormulaParser<TScalarValue, TNode>
             case Token.A1_REFERENCE:
                 var referenceToken = GetCurrentToken();
                 var cellArea = TokenParser.ParseA1Reference(referenceToken);
-                var localCellReferenceNode = _factory.LocalCellReference(referenceToken, cellArea);
+                var localCellReferenceNode = _factory.Reference(referenceToken, cellArea);
                 Consume();
                 return localCellReferenceNode;
 
@@ -391,7 +391,7 @@ public class FormulaParser<TScalarValue, TNode>
                     var reference3D = new CellArea(firstName, secondName, localReference.First, localReference.Last);
                     return wbIdx is not null
                         ? _factory.ExternalCellReference(sheetRangeSpan, wbIdx.Value, reference3D)
-                        : _factory.LocalCellReference(sheetRangeSpan, reference3D);
+                        : _factory.Reference(sheetRangeSpan, reference3D);
                 }
 
             // ref_function_call
@@ -450,7 +450,7 @@ public class FormulaParser<TScalarValue, TNode>
                         Consume();
                         var nodeText = _input.AsSpan(startIdx, _tokenSource.StartIndex - startIdx);
                         return wbIdx is null
-                            ? _factory.LocalCellReference(nodeText, new CellArea(sheetName, localReference.First, localReference.Last))
+                            ? _factory.Reference(nodeText, new CellArea(sheetName, localReference.First, localReference.Last))
                             : _factory.ExternalCellReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
                     }
 
