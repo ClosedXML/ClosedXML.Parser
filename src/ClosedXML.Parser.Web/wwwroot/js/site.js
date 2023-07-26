@@ -58,7 +58,7 @@ function renderAst(ast) {
         .append("text")
         .attr("dy", -15)
         .attr("text-anchor", "middle")
-        .text(d => d.data.name);
+        .text(d => d.data.content + ' ' + d.data.type);
 }
 function renderError(formula, error) {
     clearContainer();
@@ -94,16 +94,19 @@ document
     });
 
 const defaultFormulaAst = {
-    "name": "FunctionNode",
+    "type": "Function",
+    "content": "SUM",
     "children": [
-        {
-            "name": "LocalReferenceNode",
-            "children": []
-        },
-        {
-            "name": "ValueNode",
-            "children": []
-        }
+      {
+        "type": "LocalReference",
+        "content": "B5",
+        "children": []
+      },
+      {
+        "type": "Value",
+        "content": "2",
+        "children": []
+      }
     ]
-};
+  };
 renderAst(defaultFormulaAst);

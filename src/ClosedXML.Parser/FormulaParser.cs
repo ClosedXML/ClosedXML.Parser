@@ -450,7 +450,7 @@ public class FormulaParser<TScalarValue, TNode>
                         Consume();
                         var nodeText = _input.AsSpan(startIdx, _tokenSource.StartIndex - startIdx);
                         return wbIdx is null
-                            ? _factory.LocalCellReference(nodeText, localReference)
+                            ? _factory.LocalCellReference(nodeText, new CellArea(sheetName, localReference.First, localReference.Last))
                             : _factory.ExternalCellReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
                     }
 

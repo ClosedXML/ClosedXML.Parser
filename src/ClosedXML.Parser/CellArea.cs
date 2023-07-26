@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser;
+﻿using System.Text;
+
+namespace ClosedXML.Parser;
 
 public readonly struct CellArea
 {
@@ -67,5 +69,29 @@ public readonly struct CellArea
     /// </summary>
     public CellArea(int column, int row) : this(new CellReference(false, column, false, row))
     {
+    }
+
+    public string GetDisplayString()
+    {
+        var sb = new StringBuilder();
+        if (StartSheet is not null)
+            sb.Append(StartSheet);
+        if (EndSheet is not null)
+        {
+            sb.Append(':');
+            sb.Append(EndSheet is not null);
+        }
+
+        if (sb.Length > 0)
+            sb.Append('!');
+
+        sb.Append(First.GetDisplayString());
+        if (!First.Equals(Last))
+        {
+            sb.Append(':');
+            sb.Append(Last.GetDisplayString());
+        }
+
+        return sb.ToString();
     }
 }

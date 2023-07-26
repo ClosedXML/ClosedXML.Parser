@@ -1,7 +1,31 @@
-﻿namespace ClosedXML.Parser;
+﻿using System.Text;
+
+namespace ClosedXML.Parser;
 
 public record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elements) : AstNode
 {
+    public override string GetDisplayString()
+    {
+        var sb = new StringBuilder();
+
+        var idx = 0;
+        sb.Append('{');
+        sb.Append(Elements[idx++].GetDisplayString());
+        for (var col = 1; col < Columns; ++col)
+            sb.Append(',').Append(Elements[idx++].GetDisplayString());
+
+        for (var row = 1; row < Rows; ++row)
+        {
+            sb.Append(';');
+            sb.Append(Elements[idx++].GetDisplayString());
+            for (var col = 1; col < Columns; ++col)
+                sb.Append(',').Append(Elements[idx++].GetDisplayString());
+        }
+        sb.Append('}');
+        
+        return sb.ToString();
+    }
+
     public virtual bool Equals(ArrayNode? other)
     {
         if (ReferenceEquals(null, other))

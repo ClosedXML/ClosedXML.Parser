@@ -18,8 +18,12 @@ public class AstNodeConverter : JsonConverter<AstNode>
     private static void WriteNode(Utf8JsonWriter writer, AstNode value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        WritePropertyName("name");
-        writer.WriteStringValue(value.GetType().Name);
+        WritePropertyName("type");
+        var nodeType = value.GetType().Name[..^4]; // Strip Node suffix
+        writer.WriteStringValue(nodeType);
+
+        WritePropertyName("content");
+        writer.WriteStringValue(value.GetDisplayString());
 
         WritePropertyName("children");
         writer.WriteStartArray();
