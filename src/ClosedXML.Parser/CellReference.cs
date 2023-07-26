@@ -26,7 +26,7 @@ public readonly struct CellReference
         var sb = new StringBuilder();
         if (ColumnAbs)
             sb.Append('$');
-        AppendA1Reference(sb);
+        sb.Append(GetA1Reference());
 
         if (RowAbs)
             sb.Append('$');
@@ -34,27 +34,19 @@ public readonly struct CellReference
         return sb.ToString();
     }
 
-    private void AppendA1Reference(StringBuilder sb)
+    private string GetA1Reference()
     {
-        var columnIndex = Column - 1;
-        const int aaIndex = 26 * 26;
-        if (columnIndex >= aaIndex)
+        var columnIndex = Column;
+        var column = string.Empty;
+        do
         {
-            var thirdIndex = columnIndex / aaIndex;
-            var thirdLetter = (char)('A' + thirdIndex);
-            sb.Append(thirdLetter);
-            columnIndex -= thirdLetter * aaIndex;
-        }
+            columnIndex -= 1;
+            var index = columnIndex % 26;
+            columnIndex -= index;
+            columnIndex /= 26;
+            column = (char)('A' + index) + column;
+        } while (columnIndex > 0);
 
-        const int aIndex = 26;
-        if (columnIndex >= aIndex)
-        {
-            var secondIndex = columnIndex / aIndex;
-            var secondLetter = (char)('A' + secondIndex);
-            sb.Append(secondLetter);
-            columnIndex -= secondLetter * aIndex;
-        }
-
-        sb.Append((char)('A' + columnIndex));
+        return column;
     }
 }
