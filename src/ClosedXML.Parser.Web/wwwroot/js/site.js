@@ -67,7 +67,9 @@ function renderAst(ast) {
         .attr("fill", "none")
         .attr("stroke", "black");
 
-    // Create nodes as circles with text
+    // Create nodes as squares with text
+    const boxWidth = 150;
+    const boxHeight = 45;
     const nodes = rootNode.descendants();
     treeGroup.selectAll(".node")
         .data(nodes)
@@ -75,21 +77,28 @@ function renderAst(ast) {
         .append("g")
         .attr("class", "node")
         .attr("transform", d => `translate(${d.x},${d.y})`)
-        .append("circle")
-        .attr("r", 5);
+        .append("rect")
+        .attr("x", -(boxWidth/2))
+        .attr("y", -(boxHeight/2))
+        .attr("width", boxWidth)
+        .attr("height", boxHeight);
 
-    // Add text labels to the nodes
+    // Add text labels to the nodes        
     treeGroup.selectAll(".node")
         .append("text")
-        .attr("dy", -15)
+        .attr("class", "display")
+        .attr("dy", -3)
         .attr("text-anchor", "middle")
-        .text(d => d.data.content + ' ' + d.data.type);
+        .text(d => d.data.content);
 
-//    var svgEl = document.getElementById("a"),
-//    bb = svgEl.getBoundingClientRect();
-//    svgEl.style.height = bb.y + bb.height;
-//    svgEl.style.width = bb.x + bb.width;
+    treeGroup.selectAll(".node")
+        .append("text")
+        .attr("class", "type")
+        .attr("dy", +18)
+        .attr("text-anchor", "middle")
+        .text(d => "[" + d.data.type + "]");
 }
+
 function renderError(formula, error) {
     clearContainer();
     d3.select("#svg-container")

@@ -20,3 +20,21 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.node .display {
+    font-weight: bold
+}
+
+.node .type {
+    -ms-transform: scale(0.8);
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    color: #808080;
+    font-style: italic;
+}
+
+.node rect {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1px;
+}
