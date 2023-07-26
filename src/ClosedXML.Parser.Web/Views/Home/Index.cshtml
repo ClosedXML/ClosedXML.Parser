@@ -7,7 +7,8 @@
     <p>ClosedParser is a sub-project of a ClosedXML library dedicated to parsing a formula into an abstract syntax tree.</p>
 
     <form>
-        <input type="text" id="formula" value="SUM(B5,2)" />
+        <button type="button" onclick="document.getElementById('formula').value = ''">Clear</button>
+        <input type="text" id="formula" value="SUM(B5,2)" size="60" />
         <button id="parse" type="button">Parse</button>
     </form>
 
