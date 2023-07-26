@@ -8,7 +8,7 @@ public record BinaryNode(BinaryOperation Operation) : AstNode
         { BinaryOperation.GreaterOrEqualThan, ">=" },
         { BinaryOperation.LessOrEqualThan, "<=" },
         { BinaryOperation.LessThan, "<" },
-        { BinaryOperation.GreaterThan, ">=" },
+        { BinaryOperation.GreaterThan, ">" },
         { BinaryOperation.NotEqual, "!=" },
         { BinaryOperation.Equal, "=" },
         { BinaryOperation.Plus, "+" },
