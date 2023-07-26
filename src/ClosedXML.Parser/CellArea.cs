@@ -79,7 +79,7 @@ public readonly struct CellArea
         if (EndSheet is not null)
         {
             sb.Append(':');
-            sb.Append(EndSheet is not null);
+            sb.Append(EndSheet);
         }
 
         if (sb.Length > 0)
