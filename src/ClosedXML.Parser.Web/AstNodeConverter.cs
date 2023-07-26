@@ -19,8 +19,7 @@ public class AstNodeConverter : JsonConverter<AstNode>
     {
         writer.WriteStartObject();
         WritePropertyName("type");
-        var nodeType = value.GetType().Name[..^4]; // Strip Node suffix
-        writer.WriteStringValue(nodeType);
+        writer.WriteStringValue(value.GetTypeString());
 
         WritePropertyName("content");
         writer.WriteStringValue(value.GetDisplayString());

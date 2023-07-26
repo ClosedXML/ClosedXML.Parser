@@ -142,7 +142,7 @@ const defaultFormulaAst = {
         "children": []
       },
       {
-        "type": "Value",
+        "type": "Number",
         "content": "2",
         "children": []
       }
