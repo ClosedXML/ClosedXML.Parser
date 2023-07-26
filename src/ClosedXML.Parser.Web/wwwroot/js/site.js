@@ -3,28 +3,53 @@
 function renderAst(ast) {
     clearContainer();
 
-    // Create SVG in the container
-    const svg = d3.select("#svg-container")
-        .append("svg")
-        .attr("version", 1.1)
-        .attr("xmlns", "http://www.w3.org/2000/svg")
-        .attr("width", 600)
-        .attr("height", 400);
-
-    // Create a group element for the tree
-    const treeGroup = svg
-        .append("g")
-        .attr("transform", "translate(100, 50)")
-        ;
 
     // Create a hierarchy from the data
     const rootNode = d3.hierarchy(ast);
 
     // Set up the tree layout, size is in pixels
-    const treeLayout = d3.tree().size([400, 300]);
+    const nodeWidth = 160;
+    const nodeHeight = 120;
+    const treeLayout = d3.tree()
+        .nodeSize([nodeWidth, nodeHeight])
+        //.size([200, 300])
+    ;
 
     // Compute the layout of the tree
     treeLayout(rootNode);
+
+    // Determine size of SVG based on the position of nodes
+    let left = rootNode;
+    let right = rootNode;
+    let top = rootNode;
+    let bottom = rootNode;
+    rootNode.eachBefore(node => {
+      if (node.x < left.x) left = node;
+      if (node.x > right.x) right = node;
+      if (node.y < top.y) top = node;
+      if (node.y > bottom.y) bottom = node;
+    });
+
+    // Determine size of SVG element to display
+    const width = right.x - left.x + nodeWidth;
+    const height = bottom.y - top.y + nodeHeight;
+
+    // Create SVG in the container
+    const svg = d3.select("#svg-container")
+        .append("svg")
+        .attr("version", 1.1)
+        .attr("id", "a")
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .attr("width", width)
+        .attr("height", height)
+        ;
+
+    // Create a group element for the tree
+    const treeGroup = svg
+        .append("g")
+        .attr("transform", "translate(" + (-left.x + nodeWidth/2) + ", 50)")
+        ;
+
 
     const diagonal = d3.linkVertical()
         .x(function (d) { return d.x; })
@@ -59,6 +84,11 @@ function renderAst(ast) {
         .attr("dy", -15)
         .attr("text-anchor", "middle")
         .text(d => d.data.content + ' ' + d.data.type);
+
+//    var svgEl = document.getElementById("a"),
+//    bb = svgEl.getBoundingClientRect();
+//    svgEl.style.height = bb.y + bb.height;
+//    svgEl.style.width = bb.x + bb.width;
 }
 function renderError(formula, error) {
     clearContainer();
