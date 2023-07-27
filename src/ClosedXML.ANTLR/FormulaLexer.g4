@@ -301,6 +301,83 @@ fragment A1_ABSOLUTE_ROW
         : '$' A1_RELATIVE_ROW
         ;
 
+/* -------------------------- Local R1C1 References -------------------------- */
+/*
+A1_REFERENCE
+        : R1C1_COLUMN ':' R1C1_COLUMN
+        | R1C1_ROW ':' R1C1_ROW
+        | A1_CELL
+        | R1C1_AREA
+        ;
+
+fragment A1_CELL
+        : R1C1_COLUMN R1C1_ROW
+        ;
+
+fragment R1C1_AREA
+        : A1_CELL ':' A1_CELL
+        ;
+
+fragment R1C1_COLUMN
+        : R1C1_RELATIVE_COLUMN | R1C1_ABSOLUTE_COLUMN
+        ;
+
+fragment R1C1_RELATIVE_COLUMN
+        : 'C[' ('-')? COLUMN_RELATIVE_DIGIT_SEQUENCE ']'
+        ;
+
+fragment R1C1_ABSOLUTE_COLUMN
+        : 'C' COLUMN_DIGIT_SEQUENCE
+        ;
+
+fragment R1C1_ROW
+        : R1C1_RELATIVE_ROW
+        | R1C1_ABSOLUTE_ROW
+        ;
+
+fragment R1C1_RELATIVE_ROW
+        : 'R[' ('-')? ROW_DIGIT_SEQUENCE ']'
+        ;
+
+fragment R1C1_ABSOLUTE_ROW
+        : 'R' ROW_DIGIT_SEQUENCE
+        ;
+
+fragment ROW_DIGIT_SEQUENCE
+        : ROW_RELATIVE_DIGIT_SEQUENCE
+        | '1048576'
+        ;
+
+fragment ROW_RELATIVE_DIGIT_SEQUENCE
+        : NONZERO_DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | '10' [0-3] DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | '104' [0-7] DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | '1048' [0-4] DECIMAL_DIGIT DECIMAL_DIGIT
+        | '10485' [0-6] DECIMAL_DIGIT
+        | '104857' [0-5]
+        ;
+
+fragment COLUMN_DIGIT_SEQUENCE
+        : COLUMN_RELATIVE_DIGIT_SEQUENCE
+        | '16384'
+        ;
+
+fragment COLUMN_RELATIVE_DIGIT_SEQUENCE
+        : NONZERO_DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | '1' [0-5]  DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
+        | '16' [0-2]  DECIMAL_DIGIT DECIMAL_DIGIT
+        | '163' [0-7]  DECIMAL_DIGIT
+        | '1638' [0-3]
+        ;
+*/
 /* ------------------------------ Functions -------------------------------- */
 
 // Ref must be before function to keep priority
