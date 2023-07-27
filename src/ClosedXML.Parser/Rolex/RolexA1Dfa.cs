@@ -9663,44 +9663,5 @@ namespace ClosedXML.Parser.Rolex {
                                         58,
                                         58}, 3)}, 37),
                 new DfaEntry(new DfaTransitionEntry[0], 28)};
-
-        public const int REF_CONSTANT = 0;
-        public const int NONREF_ERRORS = 1;
-        public const int LOGICAL_CONSTANT = 2;
-        public const int NUMERICAL_CONSTANT = 3;
-        public const int STRING_CONSTANT = 4;
-        public const int POW = 5;
-        public const int MULT = 6;
-        public const int DIV = 7;
-        public const int PLUS = 8;
-        public const int MINUS = 9;
-        public const int CONCAT = 10;
-        public const int EQUAL = 11;
-        public const int NOT_EQUAL = 12;
-        public const int LESS_OR_EQUAL_THAN = 13;
-        public const int LESS_THAN = 14;
-        public const int GREATER_OR_EQUAL_THAN = 15;
-        public const int GREATER_THAN = 16;
-        public const int PERCENT = 17;
-        public const int SEMICOLON = 18;
-        public const int COLON = 19;
-        public const int OPEN_BRACE = 20;
-        public const int CLOSE_BRACE = 21;
-        public const int OPEN_CURLY = 22;
-        public const int CLOSE_CURLY = 23;
-        public const int COMMA = 24;
-        public const int SPACE = 25;
-        public const int OPEN_SQUARE = 26;
-        public const int CLOSE_SQUARE = 27;
-        public const int BOOK_PREFIX = 28;
-        public const int BANG_REFERENCE = 29;
-        public const int SHEET_RANGE_PREFIX = 30;
-        public const int SINGLE_SHEET_PREFIX = 31;
-        public const int A1_REFERENCE = 32;
-        public const int REF_FUNCTION_LIST = 33;
-        public const int CELL_FUNCTION_LIST = 34;
-        public const int USER_DEFINED_FUNCTION_NAME = 35;
-        public const int NAME = 36;
-        public const int INTRA_TABLE_REFERENCE = 37;
     }
 }
