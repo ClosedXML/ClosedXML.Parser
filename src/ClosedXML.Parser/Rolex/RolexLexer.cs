@@ -12,10 +12,24 @@ internal class RolexLexer
     /// <param name="formula">Formula to parse.</param>
     public static List<Token> GetTokensA1(ReadOnlySpan<char> formula)
     {
+        return GetTokens(formula, RolexA1Dfa.DfaTable);
+    }
+
+    /// <summary>
+    /// Get all tokens for a formula. Use R1C1 semantic. If there is an error, add token with an error symbol at the end or EOF token at the end.
+    /// </summary>
+    /// <param name="formula">Formula to parse.</param>
+    public static List<Token> GetTokensR1C1(ReadOnlySpan<char> formula)
+    {
+        return GetTokens(formula, RolexR1C1Dfa.DfaTable);
+    }
+
+    private static List<Token> GetTokens(ReadOnlySpan<char> formula, DfaEntry[] lexerDfa)
+    {
         var tokens = new List<Token>();
         for (var i = 0; i < formula.Length;)
         {
-            var (symbolId, length) = GetToken(formula, i, RolexA1Dfa.DfaTable);
+            var (symbolId, length) = GetToken(formula, i, lexerDfa);
             tokens.Add(new Token(symbolId, i, length));
             if (symbolId < 0)
             {

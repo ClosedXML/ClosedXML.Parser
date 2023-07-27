@@ -310,8 +310,11 @@ A1_REFERENCE
         | R1C1_AREA
         ;
 
+// Cell function can accept even things like R(1) or C(5) and it references the A1_CELL, therefore the alternates are valid
 fragment A1_CELL
         : R1C1_ROW R1C1_COLUMN
+        | R1C1_ROW
+        | R1C1_COLUMN
         ;
 
 fragment R1C1_AREA
@@ -323,11 +326,11 @@ fragment R1C1_COLUMN
         ;
 
 fragment R1C1_RELATIVE_COLUMN
-        : 'C[' ('-')? COLUMN_RELATIVE_DIGIT_SEQUENCE ']'
+        : C ('[' ('-')? COLUMN_RELATIVE_DIGIT_SEQUENCE ']')? // If the relative digits is omitted, it is same as C[0]
         ;
 
 fragment R1C1_ABSOLUTE_COLUMN
-        : 'C' COLUMN_DIGIT_SEQUENCE
+        : C COLUMN_ABSOLUTE_DIGIT_SEQUENCE
         ;
 
 fragment R1C1_ROW
@@ -336,19 +339,24 @@ fragment R1C1_ROW
         ;
 
 fragment R1C1_RELATIVE_ROW
-        : 'R[' ('-')? ROW_RELATIVE_DIGIT_SEQUENCE ']'
+        : R ('[' ('-')? ROW_RELATIVE_DIGIT_SEQUENCE ']')? // If the relative digits is omitted, it is same as R[0]
         ;
 
 fragment R1C1_ABSOLUTE_ROW
-        : 'R' ROW_DIGIT_SEQUENCE
+        : R ROW_ABSOLUTE_DIGIT_SEQUENCE
         ;
 
-fragment ROW_DIGIT_SEQUENCE
-        : ROW_RELATIVE_DIGIT_SEQUENCE
+fragment ROW_ABSOLUTE_DIGIT_SEQUENCE
+        : ROW_BASE_DIGIT_SEQUENCE
         | '1048576'
         ;
 
 fragment ROW_RELATIVE_DIGIT_SEQUENCE
+        : ROW_BASE_DIGIT_SEQUENCE
+        | '0'
+        ;
+
+fragment ROW_BASE_DIGIT_SEQUENCE
         : NONZERO_DECIMAL_DIGIT
         | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT
         | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
@@ -362,12 +370,17 @@ fragment ROW_RELATIVE_DIGIT_SEQUENCE
         | '104857' [0-5]
         ;
 
-fragment COLUMN_DIGIT_SEQUENCE
+fragment COLUMN_ABSOLUTE_DIGIT_SEQUENCE
         : COLUMN_RELATIVE_DIGIT_SEQUENCE
         | '16384'
         ;
 
 fragment COLUMN_RELATIVE_DIGIT_SEQUENCE
+        : COLUMN_BASE_DIGIT_SEQUENCE
+        | '0'
+        ;
+
+fragment COLUMN_BASE_DIGIT_SEQUENCE
         : NONZERO_DECIMAL_DIGIT
         | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT
         | NONZERO_DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT
