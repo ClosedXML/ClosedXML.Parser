@@ -311,7 +311,7 @@ A1_REFERENCE
         ;
 
 fragment A1_CELL
-        : R1C1_COLUMN R1C1_ROW
+        : R1C1_ROW R1C1_COLUMN
         ;
 
 fragment R1C1_AREA
@@ -336,7 +336,7 @@ fragment R1C1_ROW
         ;
 
 fragment R1C1_RELATIVE_ROW
-        : 'R[' ('-')? ROW_DIGIT_SEQUENCE ']'
+        : 'R[' ('-')? ROW_RELATIVE_DIGIT_SEQUENCE ']'
         ;
 
 fragment R1C1_ABSOLUTE_ROW
@@ -377,7 +377,7 @@ fragment COLUMN_RELATIVE_DIGIT_SEQUENCE
         | '163' [0-7]  DECIMAL_DIGIT
         | '1638' [0-3]
         ;
-*/
+
 /* ------------------------------ Functions -------------------------------- */
 
 // Ref must be before function to keep priority
