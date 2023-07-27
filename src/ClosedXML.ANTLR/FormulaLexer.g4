@@ -270,10 +270,6 @@ fragment COLUMN_LETTER
         : [A-Za-z]
         ;
 
-fragment LETTER
-        : [a-zA-Z]
-        ;
-
 fragment A1_ABSOLUTE_COLUMN
         : '$' A1_RELATIVE_COLUMN
         ;
@@ -379,6 +375,10 @@ fragment UNDERSCORE
 
 fragment BACKSLASH
         : '\\'
+        ;
+
+fragment LETTER
+        : [a-zA-Z]
         ;
 
 /*
