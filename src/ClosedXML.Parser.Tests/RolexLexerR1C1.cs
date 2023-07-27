@@ -43,4 +43,12 @@ public class RolexLexerR1C1
         var tokens = RolexLexer.GetTokensR1C1(formula);
         Assert.Equal(expectedSymbols, tokens.Select(x => x.SymbolId));
     }
+
+    [Fact]
+    public void Astral_code_points_are_valid_strings()
+    {
+        // Grinning face code point U+1F600
+        var tokens = RolexLexer.GetTokensR1C1("\"\uD83D\uDE00\"");
+        Assert.Equal(new[] {Token.STRING_CONSTANT, Token.EofSymbolId}, tokens.Select(x => x.SymbolId));
+    }
 }

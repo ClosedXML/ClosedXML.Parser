@@ -51,8 +51,9 @@ internal class RolexLexer
             if (index >= input.Length)
                 throw new IOException("Unexpected end of input while looking for Unicode low surrogate.");
 
+            var lowSurrogate = input[index + 1];
             index += 2;
-            return char.ConvertToUtf32(c, input[index + 1]);
+            return char.ConvertToUtf32(c, lowSurrogate);
         }
 
         ++index;
