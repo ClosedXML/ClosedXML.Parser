@@ -194,7 +194,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// </summary>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="name">Name from a workbook. It can be defined name or a name of a table.</param>
-    TNode ExternalNameReference(int workbookIndex, ReadOnlySpan<char> name);
+    TNode ExternalName(int workbookIndex, ReadOnlySpan<char> name);
 
     /// <summary>
     /// Create a node that performs a binary operation on values from another nodes.

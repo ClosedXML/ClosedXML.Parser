@@ -449,7 +449,7 @@ public class FormulaParser<TScalarValue, TNode>
                         return _factory.ExternalStructureReference(text, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
-                    return _factory.ExternalNameReference(bookPrefix, externalName);
+                    return _factory.ExternalName(bookPrefix, externalName);
                 }
             // name_reference: SINGLE_SHEET_PREFIX NAME
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)

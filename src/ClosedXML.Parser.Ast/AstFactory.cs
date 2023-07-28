@@ -138,9 +138,9 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return default;
     }
 
-    public AstNode ExternalNameReference(int workbookIndex, ReadOnlySpan<char> name)
+    public AstNode ExternalName(int workbookIndex, ReadOnlySpan<char> name)
     {
-        return default;
+        return new ExternalNameNode(workbookIndex, name.ToString());
     }
 
     public AstNode BinaryNode(BinaryOperation operation, AstNode leftNode, AstNode rightNode)
