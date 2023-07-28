@@ -419,15 +419,13 @@ public class FormulaParser<TScalarValue, TNode>
             // Either defined name or table name for a structure reference
             case Token.NAME:
                 {
-                    var startIndex = _tokenSource.StartIndex;
                     var localName = GetCurrentToken();
                     Consume();
                     if (_la == Token.INTRA_TABLE_REFERENCE)
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
-                        var text = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
-                        return _factory.StructureReference(text, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
+                        return _factory.StructureReference(localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
                     return _factory.Name(localName);
@@ -436,7 +434,6 @@ public class FormulaParser<TScalarValue, TNode>
             // reference to another workbook
             case Token.BOOK_PREFIX:
                 {
-                    var startIndex = _tokenSource.StartIndex;
                     var bookPrefix = TokenParser.ParseBookPrefix(GetCurrentToken());
                     Consume();
                     var externalName = GetCurrentToken();
@@ -445,8 +442,7 @@ public class FormulaParser<TScalarValue, TNode>
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
-                        var text = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
-                        return _factory.ExternalStructureReference(text, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
+                        return _factory.ExternalStructureReference(bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
                     return _factory.ExternalName(bookPrefix, externalName);
@@ -488,7 +484,7 @@ public class FormulaParser<TScalarValue, TNode>
                     var localTableReference = GetCurrentToken();
                     TokenParser.ParseIntraTableReference(localTableReference, out var specifics, out var firstColumn, out var lastColumn);
                     Consume();
-                    return _factory.StructureReference(localTableReference, specifics, firstColumn, lastColumn ?? firstColumn);
+                    return _factory.StructureReference(specifics, firstColumn, lastColumn ?? firstColumn);
                 }
         }
 

@@ -141,32 +141,29 @@ public interface IAstFactory<TScalarValue, TNode>
     /// Create a node to represent a structure reference without a table to a range of columns.
     /// Such reference is only allowed in the table (e.g. total formulas).
     /// </summary>
-    /// <param name="text">The token text.</param>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode StructureReference(ReadOnlySpan<char> text, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
+    TNode StructureReference(StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node to represent a structure reference to a table.
     /// </summary>
-    /// <param name="text">The token text.</param>
     /// <param name="table">A name of a table.</param>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode StructureReference(ReadOnlySpan<char> text, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
+    TNode StructureReference(string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node to represent a structure reference to a table in some other workbook.
     /// </summary>
-    /// <param name="text">The token text.</param>
     /// <param name="workbookIndex">Id of external workbook.</param>
     /// <param name="table">A name of a table.</param>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
+    TNode ExternalStructureReference(int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a name defined in a workbook.
