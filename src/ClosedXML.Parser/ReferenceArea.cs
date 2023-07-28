@@ -56,6 +56,11 @@ public readonly struct ReferenceArea
     {
     }
 
+    /// <summary>
+    /// Render area in A1 notation. The content must be a valid content
+    /// from A1 token. If both references are same, only one is converted
+    /// to display string.
+    /// </summary>
     public string GetDisplayStringA1()
     {
         if (First == Second)
@@ -65,6 +70,23 @@ public readonly struct ReferenceArea
             .Append(First.GetDisplayStringA1())
             .Append(':')
             .Append(Second.GetDisplayStringA1())
+            .ToString();
+    }
+
+    /// <summary>
+    /// Render area in R1C1 notation. The content must be a valid content
+    /// from R1C1 token. If both references are same, only one is converted
+    /// to display string.
+    /// </summary>
+    public string GetDisplayStringR1C1()
+    {
+        if (First == Second)
+            return First.GetDisplayStringR1C1();
+
+        return new StringBuilder()
+            .Append(First.GetDisplayStringR1C1())
+            .Append(':')
+            .Append(Second.GetDisplayStringR1C1())
             .ToString();
     }
 }

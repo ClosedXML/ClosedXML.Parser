@@ -102,6 +102,39 @@ public readonly struct Reference : IEquatable<Reference>
         return sb.ToString();
     }
 
+    public string GetDisplayStringR1C1()
+    {
+        var sb = new StringBuilder();
+
+        AppendAxis(sb, 'R', RowType, RowValue);
+        AppendAxis(sb, 'C', ColumnType, ColumnValue);
+        return sb.ToString();
+
+        static void AppendAxis(StringBuilder sb, char axis, ReferenceAxisType type, int position)
+        {
+            switch (type)
+            {
+                case ReferenceAxisType.Absolute:
+                    sb.Append(axis).Append(position);
+                    break;
+
+                case ReferenceAxisType.Relative when position != 0:
+                    sb.Append(axis).Append('[').Append(position).Append(']');
+                    break;
+
+                case ReferenceAxisType.Relative when position == 0:
+                    sb.Append(axis);
+                    break;
+
+                case ReferenceAxisType.None:
+                    break;
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+    }
+
     private string GetA1Reference()
     {
         var columnIndex = ColumnValue;
