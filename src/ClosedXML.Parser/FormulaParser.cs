@@ -20,7 +20,7 @@ public class FormulaParser<TScalarValue, TNode>
     private readonly string _input;
     private readonly List<Token> _tokens;
     private readonly IAstFactory<TScalarValue, TNode> _factory;
-    
+
     /// <summary>
     /// Is parser in A1 mode (true) or R1C1 mode (false)?
     /// </summary>
@@ -386,11 +386,12 @@ public class FormulaParser<TScalarValue, TNode>
 
             // local_cell_reference
             case Token.A1_REFERENCE:
-                var referenceToken = GetCurrentToken();
-                var cellArea = TokenParser.ParseA1Reference(referenceToken);
-                var localCellReferenceNode = _factory.Reference(referenceToken, cellArea);
-                Consume();
-                return localCellReferenceNode;
+                {
+                    var area = TokenParser.ParseA1Reference(GetCurrentToken());
+                    var reference = _factory.Reference(area);
+                    Consume();
+                    return reference;
+                }
 
             // external_cell_reference
             // case FormulaLexer.BANG_REFERENCE: Formula shouldn't contain BANG_REFERENCE, see grammar
@@ -403,8 +404,7 @@ public class FormulaParser<TScalarValue, TNode>
                     Consume();
                     var a1ReferenceToken = GetCurrentToken();
                     Match(Token.A1_REFERENCE);
-                    var localReference = TokenParser.ParseA1Reference(a1ReferenceToken);
-                    var area = new ReferenceArea(localReference.First, localReference.Last);
+                    var area = TokenParser.ParseA1Reference(a1ReferenceToken);
                     return wbIdx is not null
                         ? _factory.ExternalReference3D(wbIdx.Value, firstName, secondName, area)
                         : _factory.Reference3D(firstName, secondName, area);
@@ -461,12 +461,12 @@ public class FormulaParser<TScalarValue, TNode>
                     Consume();
                     if (_la == Token.A1_REFERENCE)
                     {
-                        var localReference = TokenParser.ParseA1Reference(GetCurrentToken());
+                        var area = TokenParser.ParseA1Reference(GetCurrentToken());
                         Consume();
                         var nodeText = _input.AsSpan(startIdx, _tokenSource.StartIndex - startIdx);
                         return wbIdx is null
-                            ? _factory.SheetReference(sheetName, new ReferenceArea(localReference.First, localReference.Last))
-                            : _factory.ExternalReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
+                            ? _factory.SheetReference(sheetName, area)
+                            : _factory.ExternalReference(nodeText, wbIdx.Value, new CellArea(sheetName, area.First, area.Second));
                     }
 
                     if (_la == Token.REF_CONSTANT)

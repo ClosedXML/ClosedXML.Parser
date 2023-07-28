@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser.Tests.Rules;
+﻿using static ClosedXML.Parser.ReferenceAxisType;
+
+namespace ClosedXML.Parser.Tests.Rules;
 
 public class RefAtomExpressionRuleTests
 {
@@ -17,18 +19,18 @@ public class RefAtomExpressionRuleTests
     [Fact]
     public void Cell_reference()
     {
-        VerifyNode("A1", new ReferenceNode(new CellArea(1, 1)));
+        VerifyNode("A1", new ReferenceNode(new ReferenceArea(1, 1)));
     }
 
     [Fact]
     public void Ref_function_call()
     {
-        VerifyNode("IF(TRUE,A1)", new FunctionNode("IF")
+        VerifyNode("IF(TRUE,B5)", new FunctionNode("IF")
         {
             Children = new AstNode[]
             {
                 new ValueNode(true),
-                new ReferenceNode(new CellArea(1,1))
+                new ReferenceNode(new ReferenceArea(2, 5))
             }
         });
     }

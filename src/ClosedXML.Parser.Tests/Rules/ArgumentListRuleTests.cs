@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser.Tests.Rules;
+﻿using static ClosedXML.Parser.ReferenceAxisType;
+
+namespace ClosedXML.Parser.Tests.Rules;
 
 public class ArgumentListRuleTests
 {
@@ -22,7 +24,7 @@ public class ArgumentListRuleTests
                 new ValueNode(1),
                 new BinaryNode(
                     BinaryOperation.Union,
-                    new ReferenceNode(new CellArea(1,1)),
+                    new ReferenceNode(new ReferenceArea(Relative, 1,Relative, 1)),
                     new NameNode("two")),
                 new ValueNode(3)
             }

@@ -17,7 +17,7 @@ public class RefRangeExpressionRuleTests
             yield return new object[]
             {
                 "A1",
-                new ReferenceNode(new CellArea(1, 1))
+                new ReferenceNode(new ReferenceArea(1, 1))
             };
 
             // ref_range_expression : ref_atom_expression COLON ref_atom_expression
@@ -40,7 +40,7 @@ public class RefRangeExpressionRuleTests
                     new BinaryNode(
                         BinaryOperation.Range,
                         new ValueNode("Error", "#REF!"),
-                        new ReferenceNode(new CellArea(2, 1))),
+                        new ReferenceNode(new ReferenceArea(2, 1))),
                     new NameNode("last"))
             };
         }

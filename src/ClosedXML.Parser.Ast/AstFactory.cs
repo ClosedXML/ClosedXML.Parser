@@ -54,7 +54,7 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new ArrayNode(rows, columns, array);
     }
 
-    public AstNode Reference(ReadOnlySpan<char> input, CellArea area)
+    public AstNode Reference(ReferenceArea area)
     {
         return new ReferenceNode(area);
     }

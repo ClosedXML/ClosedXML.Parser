@@ -227,7 +227,7 @@ internal static class TokenParser
     /// <summary>
     /// Extract info about cell reference from a <c>A1_REFERENCE</c> token.
     /// </summary>
-    internal static CellArea ParseA1Reference(ReadOnlySpan<char> input)
+    internal static ReferenceArea ParseA1Reference(ReadOnlySpan<char> input)
     {
         // The point of this method is to be fast, not pretty. It assumes that input has
         // already been checked by lexer and thus will never be incorrect.
@@ -247,7 +247,7 @@ internal static class TokenParser
                 i++; // Skip '$'
 
             var row2 = ReadRow(input, ref i);
-            return new CellArea(
+            return new ReferenceArea(
                 new Reference(true, 1, abs1, row1), 
                 new Reference(true, MaxCol, absRow2, row2));
         }
@@ -262,7 +262,7 @@ internal static class TokenParser
                 i++;
 
             var col2 = ReadColumn(input, ref i);
-            return new CellArea(
+            return new ReferenceArea(
                 new Reference(abs1, col, true, 1), 
                 new Reference(absCol2, col2, true, MaxRow));
         }
@@ -281,13 +281,13 @@ internal static class TokenParser
         if (i == input.Length)
         {
             // A1_CELL
-            return new CellArea(cell, cell);
+            return new ReferenceArea(cell, cell);
         }
 
         // A1_AREA
         i++; // Skip ':'
         var secondCell = ReadCell(input, ref i);
-        return new CellArea(cell, secondCell);
+        return new ReferenceArea(cell, secondCell);
     }
 
     private static Reference ReadCell(ReadOnlySpan<char> input, ref int i)

@@ -25,6 +25,37 @@ public readonly struct ReferenceArea
         Second = second;
     }
 
+    /// <summary>
+    /// Create an area for a single reference.
+    /// </summary>
+    public ReferenceArea(Reference reference)
+    {
+        First = reference;
+        Second = reference;
+    }
+
+    /// <summary>
+    /// Create a new area from a single <see cref="Reference"/>.
+    /// </summary>
+    /// <param name="columnType">Column axis type of a reference.</param>
+    /// <param name="columnPosition">Column position.</param>
+    /// <param name="rowType">Row axis type of a reference.</param>
+    /// <param name="rowPosition">Row position.</param>
+    public ReferenceArea(ReferenceAxisType columnType, int columnPosition, ReferenceAxisType rowType, int rowPosition)
+        : this(new Reference(columnType, columnPosition, rowType, rowPosition))
+    {
+    }
+
+    /// <summary>
+    /// Create a new area from a single row/column intersection.
+    /// </summary>
+    /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
+    /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
+    public ReferenceArea(int columnPosition, int rowPosition)
+        : this(new Reference(ReferenceAxisType.Relative, columnPosition, ReferenceAxisType.Relative, rowPosition))
+    {
+    }
+
     public string GetDisplayString()
     {
         var sb = new StringBuilder();
