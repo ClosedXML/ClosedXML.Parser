@@ -32,13 +32,13 @@ ANTLR lexer takes up about 3.2 seconds for Enron dataset. With ANTLR parsing, it
 
 ## Current state
 
-ENRON dataset parsing RDS + ANTLR lexer
+ENRON dataset parsing RDS + Rolex lexer (Release mode)
 
 * Total: *946320*
-* Elapsed: *2964 ms*
-* Per formula: *3.132 μs*
+* Elapsed: *1838 ms*
+* Per formula: *1.942 μs*
 
-3μs per formula should be something like 9000 instructions (under unrealistic assumption 1 instruction per 1 Hz), so not much space to improve.
+2μs per formula should be something like 2000 instructions (under unrealistic assumption 1 instruction per 1 Hz), so not much space to improve.
 
 Bad ones fail on external workbook name reference that uses apostrophe (e.g `[1]!'Some name in external wb'`), otherwise they are parsed.
 

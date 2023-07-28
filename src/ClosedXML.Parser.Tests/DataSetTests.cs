@@ -1,9 +1,17 @@
 ﻿using System.Diagnostics;
+using Xunit.Abstractions;
 
 namespace ClosedXML.Parser.Tests;
 
 public class DataSetTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public DataSetTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     [Fact]
     public void Enron_data_set_is_parseable()
     {
@@ -34,9 +42,10 @@ public class DataSetTests
         foreach (var badFormulaPath in badFormulaPaths)
             badFormulas.UnionWith(DataSets.ReadCsv(badFormulaPath));
 
+        var formulas = DataSets.ReadCsv(input);
         var sw = Stopwatch.StartNew();
         var formulaCount = 0;
-        foreach (var formula in DataSets.ReadCsv(input))
+        foreach (var formula in formulas)
         {
             formulaCount++;
             try
@@ -51,6 +60,6 @@ public class DataSetTests
         }
 
         sw.Stop();
-        Console.WriteLine($"Parsed {formulaCount} formulas in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula)");
+        _output.WriteLine($"Parsed {formulaCount} formulas in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula)");
     }
 }
