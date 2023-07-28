@@ -69,9 +69,9 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new Reference3DNode(firstSheet, lastSheet, area);
     }
 
-    public AstNode ExternalReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area)
+    public AstNode ExternalSheetReference(int workbookIndex, string sheet, ReferenceArea area)
     {
-        return new ExternalReferenceNode(workbookIndex, area);
+        return new ExternalSheetReferenceNode(workbookIndex, sheet, area);
     }
 
     public AstNode ExternalReference3D(int workbookIndex, string firstSheet, string lastSheet, ReferenceArea area)

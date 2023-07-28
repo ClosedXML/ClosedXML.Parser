@@ -82,7 +82,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// Create a node for a reference in a specific sheet.
     /// </summary>
     /// <param name="sheet">Name of a sheet (unescaped) of the <paramref name="area"/>.</param>
-    /// <param name="area">Area in all sheets of 3D reference.</param>
+    /// <param name="area">Area in the sheet.</param>
     TNode SheetReference(string sheet, ReferenceArea area);
 
     /// <summary>
@@ -94,12 +94,12 @@ public interface IAstFactory<TScalarValue, TNode>
     TNode Reference3D(string firstSheet, string lastSheet, ReferenceArea area);
 
     /// <summary>
-    /// Create a node for a reference to cells in a different worksheet.
+    /// Create a node for a reference to cells of a specific sheet in a different worksheet.
     /// </summary>
-    /// <param name="input">The token text of a reference.</param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
-    /// <param name="area">The referenced cells.</param>
-    TNode ExternalReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area);
+    /// <param name="sheet">Name of a sheet (unescaped) of the <paramref name="area"/>.</param>
+    /// <param name="area">Area the external sheet.</param>
+    TNode ExternalSheetReference(int workbookIndex, string sheet, ReferenceArea area);
 
     /// <summary>
     /// Create a node for a 3D reference in a different workbook.

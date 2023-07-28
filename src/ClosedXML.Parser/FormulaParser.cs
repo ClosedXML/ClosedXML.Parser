@@ -455,18 +455,16 @@ public class FormulaParser<TScalarValue, TNode>
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)
             case Token.SINGLE_SHEET_PREFIX:
                 {
-                    var startIdx = _tokenSource.StartIndex;
                     var sheetPrefix = GetCurrentToken();
-                    TokenParser.ParseSingleSheetPrefix(sheetPrefix, out var wbIdx, out var sheetName);
+                    TokenParser.ParseSingleSheetPrefix(sheetPrefix, out var wbIdx, out string sheetName);
                     Consume();
                     if (_la == Token.A1_REFERENCE)
                     {
                         var area = TokenParser.ParseA1Reference(GetCurrentToken());
                         Consume();
-                        var nodeText = _input.AsSpan(startIdx, _tokenSource.StartIndex - startIdx);
                         return wbIdx is null
                             ? _factory.SheetReference(sheetName, area)
-                            : _factory.ExternalReference(nodeText, wbIdx.Value, new CellArea(sheetName, area.First, area.Second));
+                            : _factory.ExternalSheetReference(wbIdx.Value, sheetName, area);
                     }
 
                     if (_la == Token.REF_CONSTANT)
