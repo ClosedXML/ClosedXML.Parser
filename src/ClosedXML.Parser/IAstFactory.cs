@@ -96,6 +96,15 @@ public interface IAstFactory<TScalarValue, TNode>
     TNode ExternalReference(ReadOnlySpan<char> input, int workbookIndex, CellArea area);
 
     /// <summary>
+    /// Create a node for a 3D reference in a different workbook.
+    /// </summary>
+    /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
+    /// <param name="firstSheet">First sheet of 3D reference.</param>
+    /// <param name="lastSheet">Last sheet of 3D reference.</param>
+    /// <param name="area">Area in all sheets of 3D reference.</param>
+    TNode ExternalReference3D(int workbookIndex, string firstSheet, string lastSheet, ReferenceArea area);
+
+    /// <summary>
     /// Create a node for a function.
     /// </summary>
     /// <param name="name">Name of a function.</param>

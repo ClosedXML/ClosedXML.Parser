@@ -397,19 +397,17 @@ public class FormulaParser<TScalarValue, TNode>
             // external_cell_reference
             case Token.SHEET_RANGE_PREFIX:
                 {
-                    var startIndex = _tokenSource.StartIndex;
                     var sheetRangePrefixToken = GetCurrentToken();
                     TokenParser.ParseSheetRangePrefix(sheetRangePrefixToken, out var wbIdx, out var firstName,
                         out var secondName);
                     Consume();
                     var a1ReferenceToken = GetCurrentToken();
                     Match(Token.A1_REFERENCE);
-                    var sheetRangeSpan = _input.AsSpan(startIndex, _tokenSource.StartIndex - startIndex);
                     var localReference = TokenParser.ParseA1Reference(a1ReferenceToken);
-                    var reference3D = new CellArea(firstName, secondName, localReference.First, localReference.Last);
+                    var area = new ReferenceArea(localReference.First, localReference.Last);
                     return wbIdx is not null
-                        ? _factory.ExternalReference(sheetRangeSpan, wbIdx.Value, reference3D)
-                        : _factory.Reference3D(firstName, secondName, new ReferenceArea(localReference.First, localReference.Last));
+                        ? _factory.ExternalReference3D(wbIdx.Value, firstName, secondName, area)
+                        : _factory.Reference3D(firstName, secondName, area);
                 }
 
             // ref_function_call
