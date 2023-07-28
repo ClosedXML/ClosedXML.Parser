@@ -38,11 +38,10 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <summary>
     /// Create an array for scalar values.
     /// </summary>
-    /// <param name="range">Range of characters in the input that were used to parse the value.</param>
     /// <param name="rows">Number of rows of an array. At least 1.</param>
     /// <param name="columns">Number of column of an array. At least 1.</param>
     /// <param name="elements">Elements of an array, row by row. The number of elements is <paramref name="rows"/>*<paramref name="columns"/>.</param>
-    TNode ArrayNode(NodeRange range, int rows, int columns, IReadOnlyList<TScalarValue> elements);
+    TNode ArrayNode(int rows, int columns, IReadOnlyList<TScalarValue> elements);
 
     /// <summary>
     /// Create a blank node. In most cases, a blank argument of a function, e.g. <c>IF(TRUE,,)</c>.

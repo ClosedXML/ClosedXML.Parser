@@ -524,12 +524,10 @@ public class FormulaParser<TScalarValue, TNode>
                 return textNode;
 
             case Token.OPEN_CURLY:
-                var startIndex = _tokenSource.StartIndex;
                 Consume();
                 var arrayElements = ConstantListRows(out var rows, out var columns);
                 Match(Token.CLOSE_CURLY);
-                var length = _tokenSource.StartIndex - startIndex;
-                return _factory.ArrayNode(new NodeRange(startIndex, length), rows, columns, arrayElements);
+                return _factory.ArrayNode(rows, columns, arrayElements);
 
             default:
                 throw UnexpectedTokenError();
