@@ -166,7 +166,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceArea area, string firstColumn, string lastColumn);
+    TNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a name defined in a workbook.
