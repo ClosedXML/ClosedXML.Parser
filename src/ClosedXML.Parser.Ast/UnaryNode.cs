@@ -2,7 +2,7 @@
 
 public record UnaryNode(UnaryOperation Operation) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
         return Operation switch
         {

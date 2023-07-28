@@ -2,8 +2,8 @@
 
 public record Reference3DNode(string FirstSheet, string LastSheet, ReferenceArea Area) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
-        return $"{FirstSheet}:{LastSheet}!{Area.GetDisplayString()}";
+        return $"{FirstSheet}:{LastSheet}!{Area.GetDisplayString(style)}";
     }
 }

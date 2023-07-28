@@ -2,8 +2,8 @@
 
 public record SheetReferenceNode(string Sheet, ReferenceArea Area) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
-        return $"{Sheet}!{Area.GetDisplayString()}";
+        return $"{Sheet}!{Area.GetDisplayString(style)}";
     }
 }

@@ -9,7 +9,7 @@ public record ExternalStructureReferenceNode(
     string? FirstColumn,
     string? LastColumn) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
         var sb = new StringBuilder();
         sb.AppendFormat($"[{WorkbookIndex}]");

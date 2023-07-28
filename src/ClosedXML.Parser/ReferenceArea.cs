@@ -56,17 +56,15 @@ public readonly struct ReferenceArea
     {
     }
 
-    public string GetDisplayString()
+    public string GetDisplayStringA1()
     {
-        var sb = new StringBuilder();
-        sb.Append(First.GetDisplayString());
         if (First == Second)
-            return First.GetDisplayString();
+            return First.GetDisplayStringA1();
 
         return new StringBuilder()
-            .Append(First.GetDisplayString())
+            .Append(First.GetDisplayStringA1())
             .Append(':')
-            .Append(Second.GetDisplayString())
+            .Append(Second.GetDisplayStringA1())
             .ToString();
     }
 }

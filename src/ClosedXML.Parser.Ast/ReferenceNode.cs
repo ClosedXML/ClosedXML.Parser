@@ -2,8 +2,8 @@
 
 public record ReferenceNode(ReferenceArea Area) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
-        return Area.GetDisplayString();
+        return Area.GetDisplayString(style);
     }
 }

@@ -118,7 +118,7 @@ document
     .addEventListener("click", async function (event) {
         const formula = d3.select('#formula').node().value;
         const mode = d3.select('#mode').node().value;
-        const url = '/Home/Parse?mode=' + mode + '&formula=' + encodeURIComponent(formula);
+        const url = '/Home/Parse?style=' + mode + '&formula=' + encodeURIComponent(formula);
         try {
             var response = await fetch(url);
             var json = await response.json();

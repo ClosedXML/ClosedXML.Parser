@@ -4,7 +4,10 @@ using System.Text;
 namespace ClosedXML.Parser;
 
 /// <summary>
-/// A reference to a sheet defined by row and column axis.
+/// A reference to a sheet defined by row and column axis. Not all combinations are
+/// valid and the content of the reference corresponds to a valid token in expected
+/// reference style (e.g. in R1C1, <c>R</c> is a valid standalone reference, but
+/// there is no such possibility for A1).
 /// </summary>
 public readonly struct Reference : IEquatable<Reference>
 {
@@ -55,16 +58,47 @@ public readonly struct Reference : IEquatable<Reference>
 
     public static bool operator !=(Reference lhs, Reference rhs) => !(lhs == rhs);
 
-    public string GetDisplayString()
+    /// <summary>
+    /// Get a reference in A1 notation. The content must have been created from A1
+    /// token, otherwise the output won't be correct.
+    /// </summary>
+    public string GetDisplayStringA1()
     {
         var sb = new StringBuilder();
-        if (ColumnType == ReferenceAxisType.Absolute)
-            sb.Append('$');
-        sb.Append(GetA1Reference());
+        switch (ColumnType)
+        {
+            case ReferenceAxisType.Absolute:
+                sb.Append('$').Append(GetA1Reference());
+                break;
 
-        if (RowType == ReferenceAxisType.Absolute)
-            sb.Append('$');
-        sb.Append(RowValue);
+            case ReferenceAxisType.Relative:
+                sb.Append(GetA1Reference());
+                break;
+
+            case ReferenceAxisType.None:
+                break;
+
+            default:
+                throw new NotSupportedException();
+        }
+
+        switch (RowType)
+        {
+            case ReferenceAxisType.Absolute:
+                sb.Append('$').Append(RowValue);
+                break;
+
+            case ReferenceAxisType.Relative:
+                sb.Append(RowValue);
+                break;
+
+            case ReferenceAxisType.None:
+                break;
+
+            default:
+                throw new NotSupportedException();
+        }
+
         return sb.ToString();
     }
 

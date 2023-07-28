@@ -24,7 +24,7 @@ public class ArgumentListRuleTests
                 new ValueNode(1),
                 new BinaryNode(
                     BinaryOperation.Union,
-                    new ReferenceNode(new ReferenceArea(Relative, 1,Relative, 1)),
+                    new ReferenceNode(new ReferenceArea(Relative, 1, Relative, 1)),
                     new NameNode("two")),
                 new ValueNode(3)
             }

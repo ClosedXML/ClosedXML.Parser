@@ -4,7 +4,7 @@ namespace ClosedXML.Parser;
 
 public record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elements) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
         var sb = new StringBuilder();
 
@@ -42,12 +42,6 @@ public record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elemen
 
     public override int GetHashCode()
     {
-        unchecked
-        {
-            int hashCode = base.GetHashCode();
-            hashCode = (hashCode * 397) ^ Rows;
-            hashCode = (hashCode * 397) ^ Columns;
-            return hashCode;
-        }
+        return HashCode.Combine(Rows, Columns);
     }
 }

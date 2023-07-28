@@ -5,7 +5,7 @@ public class FormulaModel
     /// <summary>
     /// Style of cell references in formula. Either <c>A1</c> or <c>R1C1</c>.
     /// </summary>
-    public string Mode { get; set; }
+    public ReferenceStyle Style { get; set; }
 
     /// <summary>
     /// Text of parsed formula.

@@ -2,7 +2,7 @@
 
 public record NameNode(string Name) : AstNode
 {
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
         return Name;
     }

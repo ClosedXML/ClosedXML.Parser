@@ -1,16 +1,10 @@
-using ClosedXML.Parser.Web;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services
-    .AddControllersWithViews()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.WriteIndented = true;
-        options.JsonSerializerOptions.MaxDepth = 128; // Some trees can be rather deep
-        options.JsonSerializerOptions.Converters.Add(new AstNodeConverter());
-    });
+builder.Services.AddControllersWithViews().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.WriteIndented = true;
+});
 
 var app = builder.Build();
 

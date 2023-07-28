@@ -7,7 +7,7 @@ public record ValueNode(string Type, object Value) : AstNode
 
     public override string GetTypeString() => Type;
 
-    public override string GetDisplayString()
+    public override string GetDisplayString(ReferenceStyle style)
     {
         return Value?.ToString() ?? "BLANK";
     }
