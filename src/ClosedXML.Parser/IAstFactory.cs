@@ -219,4 +219,12 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="operation">Unary operation.</param>
     /// <param name="node">Node that should be evaluated for a value.</param>
     TNode Unary(UnaryOperation operation, TNode node);
+
+    /// <summary>
+    /// This factory method is called for nested expression in braces (<c>(1+2)/4</c>). The problem isn't that
+    /// it would be evaluated incorrectly, but it is to preserve braces during A1 to R1C1 transformation.
+    /// </summary>
+    /// <remarks>Simplest implementation returns the same node and avoids extra nodes.</remarks>
+    /// <param name="node">The node representing expression in braces.</param>
+    TNode Nested(TNode node);
 }

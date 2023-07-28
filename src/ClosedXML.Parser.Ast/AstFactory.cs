@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser;
+﻿using System.Xml.Linq;
+
+namespace ClosedXML.Parser;
 
 public class F : IAstFactory<ScalarValue, AstNode>
 {
@@ -154,5 +156,11 @@ public class F : IAstFactory<ScalarValue, AstNode>
     public AstNode Unary(UnaryOperation operation, AstNode node)
     {
         return new UnaryNode(operation) { Children = new[] { node } };
+    }
+
+    public AstNode Nested(AstNode node)
+    {
+        // AST is mostly there for testing and visualization, so omit the unnecessary nodes in a tree.
+        return node;
     }
 }

@@ -248,7 +248,7 @@ public class FormulaParser<TScalarValue, TNode>
             // '(' expression ')'
             case Token.OPEN_BRACE:
                 Consume();
-                var nestedNode = Expression(false, out isPureRef);
+                var nestedNode = _factory.Nested(Expression(false, out isPureRef));
                 Match(Token.CLOSE_BRACE);
 
                 // This is the point of an ambiguity. Atom should be a value, but it can
@@ -378,7 +378,7 @@ public class FormulaParser<TScalarValue, TNode>
 
             case Token.OPEN_BRACE:
                 Consume();
-                var refExpression = RefExpression();
+                var refExpression = _factory.Nested(RefExpression());
                 Match(Token.CLOSE_BRACE);
                 return refExpression;
 
