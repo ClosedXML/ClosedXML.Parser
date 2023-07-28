@@ -145,7 +145,7 @@ internal static class TokenParser
         var i = 0;
         var ref1 = ParseR1C1Reference(token, ref i);
         if (i == token.Length)
-            return new ReferenceArea(ref1, Reference.Missing);
+            return new ReferenceArea(ref1, ref1);
 
         if (token[i++] != ':')
             throw Bug();

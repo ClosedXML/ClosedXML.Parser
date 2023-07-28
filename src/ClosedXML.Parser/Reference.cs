@@ -12,11 +12,6 @@ namespace ClosedXML.Parser;
 public readonly struct Reference : IEquatable<Reference>
 {
     /// <summary>
-    /// An unspeciied reference. Used for areas, when only one corner is specified.
-    /// </summary>
-    public static readonly Reference Missing = new(ReferenceAxisType.None, 0, ReferenceAxisType.None, 0);
-
-    /// <summary>
     /// How to interpret the <see cref="ColumnValue"/> value.
     /// </summary>
     public readonly ReferenceAxisType ColumnType;
@@ -38,6 +33,9 @@ public readonly struct Reference : IEquatable<Reference>
 
     public Reference(ReferenceAxisType columnType, int columnValue, ReferenceAxisType rowType, int rowValue)
     {
+        if (columnType == ReferenceAxisType.None && rowType == ReferenceAxisType.None)
+            throw new ArgumentException($"At least one of axis must be non-none.");
+
         ColumnType = columnType;
         ColumnValue = columnValue;
         RowType = rowType;

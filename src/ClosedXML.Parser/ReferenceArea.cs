@@ -16,6 +16,7 @@ public readonly struct ReferenceArea
 
     /// <summary>
     /// Second reference. Second in terms of position in formula, not position in sheet.
+    /// If area was specified using only one corner, the value is same as <see cref="First"/>.
     /// </summary>
     public readonly Reference Second;
 

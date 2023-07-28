@@ -22,56 +22,56 @@ public class R1C1ReferenceTokenTests
             yield return new object[]
             {
                 "C",
-                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 0, ReferenceAxisType.None, 0), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 0, ReferenceAxisType.None, 0))
             };
 
             yield return new object[]
             {
                 "C[-14]",
-                new ReferenceArea(new Reference(ReferenceAxisType.Relative, -14, ReferenceAxisType.None, 0), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.Relative, -14, ReferenceAxisType.None, 0))
             };
 
             yield return new object[]
             {
                 "C75",
-                new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 75, ReferenceAxisType.None, 0), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 75, ReferenceAxisType.None, 0))
             };
 
             // The `R` is a shortcut for `R[0]`
             yield return new object[]
             {
                 "R",
-                new ReferenceArea(new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, 0), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, 0))
             };
 
             yield return new object[]
             {
                 "R[-14]",
-                new ReferenceArea(new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, -14), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, -14))
             };
 
             yield return new object[]
             {
                 "R75",
-                new ReferenceArea(new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Absolute, 75), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Absolute, 75))
             };
 
             yield return new object[]
             {
                 "RC",
-                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 0, ReferenceAxisType.Relative, 0), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 0, ReferenceAxisType.Relative, 0))
             };
 
             yield return new object[]
             {
                 "R[7]C2",
-                new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 2, ReferenceAxisType.Relative, 7), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 2, ReferenceAxisType.Relative, 7))
             };
 
             yield return new object[]
             {
                 "R812C[7]",
-                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 7, ReferenceAxisType.Absolute, 812), Reference.Missing)
+                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 7, ReferenceAxisType.Absolute, 812))
             };
         }
     }

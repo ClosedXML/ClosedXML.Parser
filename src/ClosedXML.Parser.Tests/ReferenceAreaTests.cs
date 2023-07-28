@@ -51,6 +51,6 @@ public class ReferenceAreaTests
                 new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7), new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, 0)),
                 "R7C1:R"
             };
-        }
+       }
     }
 }

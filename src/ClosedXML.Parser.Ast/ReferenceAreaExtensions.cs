@@ -7,7 +7,7 @@ internal static class ReferenceAreaExtensions
         return style switch
         {
             ReferenceStyle.A1 => area.GetDisplayStringA1(),
-            ReferenceStyle.R1C1 => throw new NotImplementedException(),
+            ReferenceStyle.R1C1 => area.GetDisplayStringR1C1(),
             _ => throw new NotSupportedException()
         };
     }
