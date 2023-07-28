@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser;
+﻿using System.Text;
+
+namespace ClosedXML.Parser;
 
 /// <summary>
 /// Due to frequency of an area in formulas, the grammar has a token that represents
@@ -21,5 +23,19 @@ public readonly struct ReferenceArea
     {
         First = first;
         Second = second;
+    }
+
+    public string GetDisplayString()
+    {
+        var sb = new StringBuilder();
+        sb.Append(First.GetDisplayString());
+        if (First == Second)
+            return First.GetDisplayString();
+
+        return new StringBuilder()
+            .Append(First.GetDisplayString())
+            .Append(':')
+            .Append(Second.GetDisplayString())
+            .ToString();
     }
 }

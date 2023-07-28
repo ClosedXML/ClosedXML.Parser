@@ -409,7 +409,7 @@ public class FormulaParser<TScalarValue, TNode>
                     var reference3D = new CellArea(firstName, secondName, localReference.First, localReference.Last);
                     return wbIdx is not null
                         ? _factory.ExternalReference(sheetRangeSpan, wbIdx.Value, reference3D)
-                        : _factory.Reference(sheetRangeSpan, reference3D);
+                        : _factory.Reference3D(firstName, secondName, new ReferenceArea(localReference.First, localReference.Last));
                 }
 
             // ref_function_call

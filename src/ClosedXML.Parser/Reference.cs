@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace ClosedXML.Parser;
 
 /// <summary>
 /// A reference to a sheet defined by row and column axis.
 /// </summary>
-public readonly struct Reference
+public readonly struct Reference : IEquatable<Reference>
 {
     /// <summary>
     /// An unspeciied reference. Used for areas, when only one corner is specified.
@@ -50,6 +51,10 @@ public readonly struct Reference
     {
     }
 
+    public static bool operator ==(Reference lhs, Reference rhs) => lhs.Equals(rhs);
+
+    public static bool operator !=(Reference lhs, Reference rhs) => !(lhs == rhs);
+
     public string GetDisplayString()
     {
         var sb = new StringBuilder();
@@ -78,4 +83,30 @@ public readonly struct Reference
 
         return column;
     }
+
+    public override bool Equals(object obj)
+    {
+        return obj is Reference other && Equals(other);
+    }
+
+    public bool Equals(Reference other)
+    {
+        return ColumnType == other.ColumnType &&
+               ColumnValue == other.ColumnValue &&
+               RowType == other.RowType &&
+               RowValue == other.RowValue;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = (int)ColumnType;
+            hashCode = (hashCode * 397) ^ ColumnValue;
+            hashCode = (hashCode * 397) ^ (int)RowType;
+            hashCode = (hashCode * 397) ^ RowValue;
+            return hashCode;
+        }
+    }
+
 }
