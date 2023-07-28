@@ -131,11 +131,16 @@ internal static class TokenParser
         return functionName;
     }
 
+    internal static ReferenceArea ParseReference(ReadOnlySpan<char> input, bool isA1)
+    {
+        return isA1 ? ParseA1Reference(input) : ParseR1C1Reference(input);
+    }
+
     /// <summary>
     /// Parse <c>A1_REFERENCE</c> token in R1C1 mode.
     /// </summary>
     /// <param name="token">The span of a token.</param>
-    internal static ReferenceArea ParseR1C1Reference(ReadOnlySpan<char> token)
+    private static ReferenceArea ParseR1C1Reference(ReadOnlySpan<char> token)
     {
         var i = 0;
         var ref1 = ParseR1C1Reference(token, ref i);
@@ -227,7 +232,7 @@ internal static class TokenParser
     /// <summary>
     /// Extract info about cell reference from a <c>A1_REFERENCE</c> token.
     /// </summary>
-    internal static ReferenceArea ParseA1Reference(ReadOnlySpan<char> input)
+    private static ReferenceArea ParseA1Reference(ReadOnlySpan<char> input)
     {
         // The point of this method is to be fast, not pretty. It assumes that input has
         // already been checked by lexer and thus will never be incorrect.

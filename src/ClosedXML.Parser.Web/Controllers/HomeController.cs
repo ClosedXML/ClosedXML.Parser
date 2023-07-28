@@ -18,16 +18,19 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public IActionResult Parse([FromQuery] string formula)
+    public IActionResult Parse([FromQuery] string formula, [FromQuery] string mode)
     {
-        const string referenceStyle = "A1";
+        var isA1 = mode is "A1" or not "R1C1";
+        var sanitizedMode = isA1 ? "A1" : "R1C1";
         try
         {
-            var nodes = FormulaParser<ScalarValue, AstNode>.FormulaA1(formula, new F());
+            var nodes = isA1 
+                ? FormulaParser<ScalarValue, AstNode>.FormulaA1(formula, new F())
+                : FormulaParser<ScalarValue, AstNode>.FormulaR1C1(formula, new F());
             return Json(new FormulaModel
             {
                 Formula = formula,
-                ReferenceStyle = referenceStyle,
+                Mode = sanitizedMode,
                 Ast = nodes
             });
         }
@@ -36,7 +39,7 @@ public class HomeController : Controller
             return UnprocessableEntity(new FormulaModel
             {
                 Formula = formula,
-                ReferenceStyle = referenceStyle,
+                Mode = sanitizedMode,
                 Error = e.Message
             });
         }

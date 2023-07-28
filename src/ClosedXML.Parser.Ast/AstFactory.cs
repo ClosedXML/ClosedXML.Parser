@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace ClosedXML.Parser;
+﻿namespace ClosedXML.Parser;
 
 public class F : IAstFactory<ScalarValue, AstNode>
 {
