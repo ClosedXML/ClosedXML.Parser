@@ -461,12 +461,11 @@ public class FormulaParser<TScalarValue, TNode>
                     Consume();
                     if (_la == Token.A1_REFERENCE)
                     {
-                        var localReferenceToken = GetCurrentToken();
-                        var localReference = TokenParser.ParseA1Reference(localReferenceToken);
+                        var localReference = TokenParser.ParseA1Reference(GetCurrentToken());
                         Consume();
                         var nodeText = _input.AsSpan(startIdx, _tokenSource.StartIndex - startIdx);
                         return wbIdx is null
-                            ? _factory.Reference(nodeText, new CellArea(sheetName, localReference.First, localReference.Last))
+                            ? _factory.SheetReference(sheetName, new ReferenceArea(localReference.First, localReference.Last))
                             : _factory.ExternalReference(nodeText, wbIdx.Value, new CellArea(sheetName, localReference.First, localReference.Last));
                     }
 

@@ -80,6 +80,13 @@ public interface IAstFactory<TScalarValue, TNode>
     TNode Reference(ReadOnlySpan<char> input, CellArea area);
 
     /// <summary>
+    /// Create a node for a reference in a specific sheet.
+    /// </summary>
+    /// <param name="sheet">Name of a sheet (unescaped) of the <paramref name="area"/>.</param>
+    /// <param name="area">Area in all sheets of 3D reference.</param>
+    TNode SheetReference(string sheet, ReferenceArea area);
+
+    /// <summary>
     /// Create a node for a 3D reference.
     /// </summary>
     /// <param name="firstSheet">First sheet of 3D reference.</param>

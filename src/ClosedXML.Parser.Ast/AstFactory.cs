@@ -59,6 +59,11 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new ReferenceNode(area);
     }
 
+    public AstNode SheetReference(string sheet, ReferenceArea area)
+    {
+        return new SheetReferenceNode(sheet, area);
+    }
+
     public AstNode Reference3D(string firstSheet, string lastSheet, ReferenceArea area)
     {
         return new Reference3DNode(firstSheet, lastSheet, area);

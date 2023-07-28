@@ -35,11 +35,11 @@ public class CellReferenceRuleTests
             yield return new object[]
             {
                 "[2]First:Second!B3:D5",
-                new ExternalReferenceNode(
+                new ExternalReference3DNode(
                     2,
-                    new CellArea(
-                        "First",
-                        "Second",
+                    "First",
+                    "Second",
+                    new ReferenceArea(
                         new Reference(2, 3),
                         new Reference(4, 5)))
             };
