@@ -430,7 +430,7 @@ public class FormulaParser<TScalarValue, TNode>
                         return _factory.StructureReference(text, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
-                    return _factory.LocalNameReference(localName);
+                    return _factory.Name(localName);
                 }
 
             // reference to another workbook
@@ -477,7 +477,9 @@ public class FormulaParser<TScalarValue, TNode>
                     // name_reference
                     var name = GetCurrentToken();
                     Match(Token.NAME);
-                    return _factory.LocalNameReference(sheetPrefix, name);
+                    return wbIdx is null 
+                        ? _factory.SheetName(sheetName, name)
+                        : _factory.ExternalSheetName(wbIdx.Value, sheetName, name);
                 }
 
             // structure_reference - only for formulas directly in the table, e.g. totals row.

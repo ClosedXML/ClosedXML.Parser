@@ -169,25 +169,25 @@ public interface IAstFactory<TScalarValue, TNode>
     TNode ExternalStructureReference(ReadOnlySpan<char> text, int workbookIndex, string table, StructuredReferenceArea area, string firstColumn, string lastColumn);
 
     /// <summary>
-    /// Create a node that should evaluate to a value of a defined name without a worksheet.
+    /// Create a node that should evaluate to a value of a name defined in a workbook.
     /// </summary>
     /// <remarks>
     /// Name can be any formula, though in most cases, it is a cell reference. Also note that
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="name">The defined name.</param>
-    TNode LocalNameReference(ReadOnlySpan<char> name);
+    TNode Name(ReadOnlySpan<char> name);
 
     /// <summary>
-    /// Create a node that should evaluate to a value of a defined name in a worksheet.
+    /// Create a node that should evaluate to a value of a name defined in a worksheet.
     /// </summary>
     /// <remarks>
     /// Name can be any formula, though in most cases, it is a cell reference. Also note that
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
-    /// <param name="sheet">Name of a sheet.</param>
+    /// <param name="sheet">Name of a sheet, unescaped.</param>
     /// <param name="name">The defined name.</param>
-    TNode LocalNameReference(ReadOnlySpan<char> sheet, ReadOnlySpan<char> name);
+    TNode SheetName(string sheet, ReadOnlySpan<char> name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a defined name in a different workbook.
@@ -195,6 +195,18 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="name">Name from a workbook. It can be defined name or a name of a table.</param>
     TNode ExternalName(int workbookIndex, ReadOnlySpan<char> name);
+
+    /// <summary>
+    /// Create a node that should evaluate to a value of a defined name in a worksheet of a different workbook.
+    /// </summary>
+    /// <remarks>
+    /// Name can be any formula, though in most cases, it is a cell reference. Also note that
+    /// names can be global (usable in a whole workbook) or local (only for one worksheet).
+    /// </remarks>
+    /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
+    /// <param name="sheet">Name of a sheet in the external workbook, unescaped.</param>
+    /// <param name="name">The defined name.</param>
+    TNode ExternalSheetName(int workbookIndex, string sheet, ReadOnlySpan<char> name);
 
     /// <summary>
     /// Create a node that performs a binary operation on values from another nodes.
