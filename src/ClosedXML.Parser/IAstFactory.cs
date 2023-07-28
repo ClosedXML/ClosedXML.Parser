@@ -112,7 +112,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <remarks>Cell functions are not yet supported by Excel, but are part of a grammar.</remarks>
     /// <param name="cell">A reference to a cell with a LAMBDA.</param>
     /// <param name="args">Arguments to pass to a LAMBDA.</param>
-    TNode CellFunction(CellReference cell, IReadOnlyList<TNode> args);
+    TNode CellFunction(Reference cell, IReadOnlyList<TNode> args);
 
     /// <summary>
     /// Create a node to represent a structure reference without a table to a range of columns.

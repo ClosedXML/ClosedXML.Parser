@@ -9,7 +9,7 @@ internal static class TokenParser
     private const int MaxRow = 1048576;
 
     /// <summary>
-    /// Parse <see cref="FormulaLexer.SINGLE_SHEET_PREFIX"/> token.
+    /// Parse <see cref="Token.SINGLE_SHEET_PREFIX"/> token.
     /// </summary>
     internal static void ParseSingleSheetPrefix(ReadOnlySpan<char> input, out int? index, out string sheetName)
     {
@@ -34,7 +34,7 @@ internal static class TokenParser
     }
 
     /// <summary>
-    /// Parse token <see cref="FormulaLexer.SHEET_RANGE_PREFIX"/>
+    /// Parse token <see cref="Token.SHEET_RANGE_PREFIX"/>
     /// </summary>
     internal static void ParseSheetRangePrefix(ReadOnlySpan<char> input, out int? index, out string firstSheetName, out string secondSheetName)
     {
@@ -115,7 +115,7 @@ internal static class TokenParser
         return buffer.Slice(0, bufferIdx).ToString();
     }
 
-    internal static CellReference ExtractCellFunction(ReadOnlySpan<char> cellFunctionToken)
+    internal static Reference ExtractCellFunction(ReadOnlySpan<char> cellFunctionToken)
     {
         var i = 0;
         return ReadCell(cellFunctionToken, ref i);
@@ -129,6 +129,99 @@ internal static class TokenParser
             : functionNameWithBrace.LastIndexOf('(');
         var functionName = functionNameWithBrace.Slice(0, endPosition);
         return functionName;
+    }
+
+    /// <summary>
+    /// Parse <c>A1_REFERENCE</c> token in R1C1 mode.
+    /// </summary>
+    /// <param name="token">The span of a token.</param>
+    internal static ReferenceArea ParseR1C1Reference(ReadOnlySpan<char> token)
+    {
+        var i = 0;
+        var ref1 = ParseR1C1Reference(token, ref i);
+        if (i == token.Length)
+            return new ReferenceArea(ref1, Reference.Missing);
+
+        if (token[i++] != ':')
+            throw Bug();
+
+        var ref2 = ParseR1C1Reference(token, ref i);
+        return new ReferenceArea(ref1, ref2);
+    }
+
+    private static Reference ParseR1C1Reference(ReadOnlySpan<char> token, ref int i)
+    {
+        if (token[i] is 'C' or 'c')
+        {
+            // Token is COLUMN. ROW must be after column, so there can't be one.
+            var loneCol = ReadR1C1Axis(token, ref i);
+            return new Reference(loneCol.Type, loneCol.Value, ReferenceAxisType.None, 0);
+        }
+
+        // It must be a row.
+        if (token[i] is not ('R' or 'r'))
+            throw Bug();
+
+        var row = ReadR1C1Axis(token, ref i);
+
+        // Token is ROW. Either it has ended or it is followed by :
+        if (i == token.Length || token[i] is not ('C' or 'c'))
+            return new Reference(ReferenceAxisType.None, 0, row.Type, row.Value);
+
+        // Token is ROW COLUMN
+        var col = ReadR1C1Axis(token, ref i);
+        return new Reference(col.Type, col.Value, row.Type, row.Value);
+    }
+
+    /// <summary>
+    /// Read the axis value. Can work for row or column.
+    /// </summary>
+    /// <param name="token">The span of a token.</param>
+    /// <param name="currentIdx">Index where is <c>C</c>/<c>R</c>.</param>
+    private static (ReferenceAxisType Type, int Value) ReadR1C1Axis(ReadOnlySpan<char> token, ref int currentIdx)
+    {
+        // There are three possibilities: C only, C[-14] and C123
+        var i = currentIdx + 1;
+        if (token.Length == i)
+        {
+            // We are at the end of a formula and the only thing that was left was C/R, an alias for C[0]/R[0]
+            currentIdx = i;
+            return (ReferenceAxisType.Relative, 0);
+        }
+
+        if (token[i] == '[')
+        {
+            // Axis is relative
+            ++i;
+            var isNegative = token[i] == '-';
+            if (isNegative)
+                ++i; // Skip sign character
+
+            // Axis is relative and thus must have a position. No need to check
+            // length in the loop, because corresponding there must be ]
+            var position = 0;
+            do
+            {
+                position = position * 10 + (token[i++] - '0');
+            } while (token[i] >= '0' && token[i] <= '9');
+
+            // Index is at the last character that has to be ']'
+            currentIdx = ++i;
+            return (ReferenceAxisType.Relative, isNegative ? -position : position);
+        }
+
+        // Axis is absolute or relative [0] without explicit number.
+        var absoluteNumber = 0;
+        while (i < token.Length && token[i] >= '0' && token[i] <= '9')
+            absoluteNumber = absoluteNumber * 10 + (token[i++] - '0');
+
+        currentIdx = i;
+
+        // There is no number after 'C'/'R' => it's a shorthand for `C[0]`/`R[0]`
+        if (absoluteNumber == 0)
+            return (ReferenceAxisType.Relative, 0);
+
+        return (ReferenceAxisType.Absolute, absoluteNumber);
     }
 
     /// <summary>
@@ -154,7 +247,9 @@ internal static class TokenParser
                 i++; // Skip '$'
 
             var row2 = ReadRow(input, ref i);
-            return new CellArea(new CellReference(true, 1, abs1, row1), new CellReference(true, MaxCol, absRow2, row2));
+            return new CellArea(
+                new Reference(true, 1, abs1, row1), 
+                new Reference(true, MaxCol, absRow2, row2));
         }
 
         var col = ReadColumn(input, ref i);
@@ -167,21 +262,22 @@ internal static class TokenParser
                 i++;
 
             var col2 = ReadColumn(input, ref i);
-            return new CellArea(new CellReference(abs1, col, true, 1),
-                new CellReference(absCol2, col2, true, MaxRow));
+            return new CellArea(
+                new Reference(abs1, col, true, 1), 
+                new Reference(absCol2, col2, true, MaxRow));
         }
 
-        var secondAbsolute = false;
-        if (IsAbsolute(input, i))
+        var secondAbsolute = IsAbsolute(input, i);
+        if (secondAbsolute)
         {
-            secondAbsolute = true;
+            // Skip $
             i++;
         }
 
         // A1_CELL | A1_AREA : A1_CELL ':' A1_CELL
         var row = ReadRow(input, ref i);
 
-        var cell = new CellReference(abs1, col, secondAbsolute, row);
+        var cell = new Reference(abs1, col, secondAbsolute, row);
         if (i == input.Length)
         {
             // A1_CELL
@@ -194,7 +290,7 @@ internal static class TokenParser
         return new CellArea(cell, secondCell);
     }
 
-    private static CellReference ReadCell(ReadOnlySpan<char> input, ref int i)
+    private static Reference ReadCell(ReadOnlySpan<char> input, ref int i)
     {
         var colAbs = IsAbsolute(input, i);
         if (colAbs)
@@ -206,7 +302,7 @@ internal static class TokenParser
             i++;
 
         var row = ReadRow(input, ref i);
-        return new CellReference(colAbs, col, rowAbs, row);
+        return new Reference(colAbs, col, rowAbs, row);
     }
 
     private static bool IsAbsolute(ReadOnlySpan<char> input, int startIdx) => input[startIdx] == '$';
@@ -413,4 +509,9 @@ internal static class TokenParser
     }
 
     private static bool IsLetter(char c) => (c is >= 'A' and <= 'Z') || (c is >= 'a' and <= 'z');
+
+    private static Exception Bug()
+    {
+        throw new InvalidOperationException("Bug in token parser. Token doesn't have expected format.");
+    }
 }

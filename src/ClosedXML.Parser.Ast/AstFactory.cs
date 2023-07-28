@@ -105,7 +105,7 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new ExternalStructureReferenceNode(workbookIndex, table, area, firstColumn, lastColumn);
     }
 
-    public AstNode CellFunction(CellReference cell, IReadOnlyList<AstNode> args)
+    public AstNode CellFunction(Reference cell, IReadOnlyList<AstNode> args)
     {
         return new CellFunctionNode(cell)
         {

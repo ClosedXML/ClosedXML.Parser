@@ -20,33 +20,51 @@ public class FormulaParser<TScalarValue, TNode>
     private readonly string _input;
     private readonly List<Token> _tokens;
     private readonly IAstFactory<TScalarValue, TNode> _factory;
+    
+    /// <summary>
+    /// Is parser in A1 mode (true) or R1C1 mode (false)?
+    /// </summary>
+    private readonly bool _a1Mode;
     private Token _tokenSource;
     private int _tokenIndex = -1;
 
     // Current lookahead token index
     private int _la;
 
-    private FormulaParser(string input, IAstFactory<TScalarValue, TNode> factory)
+    private FormulaParser(string formula, IAstFactory<TScalarValue, TNode> factory, bool a1Mode)
     {
         // Trim the end, so ref_intersection_expression that tried to parse SPACE as an operator
         // doesn't recognize spaces at the end of formula as operators. The control tokens of
         // the formula have whitespaces around them (unlike params), so the whitespaces should
         // be consumed by control tokens (e.g. ` IF ( A1 ) ` will be split into `IF ( `, `A1` and ` ) `)
         // but to avoid the whitespace at the end, trim it.
-        var trimmedInput = input.AsSpan().TrimEnd();
-        _input = input;
-        _tokens = RolexLexer.GetTokensA1(trimmedInput);
+        var trimmedFormula = formula.AsSpan().TrimEnd();
+        _input = formula;
+        _tokens = a1Mode
+            ? RolexLexer.GetTokensA1(trimmedFormula)
+            : RolexLexer.GetTokensR1C1(trimmedFormula);
         _factory = factory;
+        _a1Mode = a1Mode;
         Consume();
     }
 
     /// <summary>
-    /// Parse a formula.
+    /// Parse a formula using A1 semantic for references. 
     /// </summary>
     /// <exception cref="ParsingException">If the formula doesn't satisfy the grammar.</exception>
-    public static TNode FormulaA1(string text, IAstFactory<TScalarValue, TNode> factory)
+    public static TNode FormulaA1(string formula, IAstFactory<TScalarValue, TNode> factory)
     {
-        var parser = new FormulaParser<TScalarValue, TNode>(text, factory);
+        var parser = new FormulaParser<TScalarValue, TNode>(formula, factory, true);
+        return parser.Formula();
+    }
+
+    /// <summary>
+    /// Parse a formula using R1C1 semantic for references. 
+    /// </summary>
+    /// <exception cref="ParsingException">If the formula doesn't satisfy the grammar.</exception>
+    public static TNode FormulaR1C1(string formula, IAstFactory<TScalarValue, TNode> factory)
+    {
+        var parser = new FormulaParser<TScalarValue, TNode>(formula, factory, false);
         return parser.Formula();
     }
 

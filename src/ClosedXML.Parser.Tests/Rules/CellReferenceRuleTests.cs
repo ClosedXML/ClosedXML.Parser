@@ -6,13 +6,13 @@
 public class CellReferenceRuleTests
 {
     [Theory]
-    [MemberData(nameof(TokenCombinations))]
-    public void Possible_token_combinations_are_converted_to_node(string formula, AstNode expectedNode)
+    [MemberData(nameof(TokenCombinationsA1))]
+    public void A1_possible_token_combinations_are_converted_to_node(string formula, AstNode expectedNode)
     {
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
-    public static IEnumerable<object[]> TokenCombinations
+    public static IEnumerable<object[]> TokenCombinationsA1
     {
         get
         {
@@ -40,8 +40,8 @@ public class CellReferenceRuleTests
                     new CellArea(
                         "First",
                         "Second",
-                        new CellReference(2, 3),
-                        new CellReference(4, 5)))
+                        new Reference(2, 3),
+                        new Reference(4, 5)))
             };
 
             // cell_reference: SINGLE_SHEET_PREFIX A1_REFERENCE
@@ -52,8 +52,8 @@ public class CellReferenceRuleTests
                     2,
                     new CellArea(
                         "First",
-                        new CellReference(2, 3),
-                        new CellReference(4, 5)))
+                        new Reference(2, 3),
+                        new Reference(4, 5)))
             };
 
             // cell_reference: SINGLE_SHEET_PREFIX REF_CONSTANT

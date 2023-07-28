@@ -17,17 +17,17 @@ public readonly struct CellArea
     /// <summary>
     /// Top left corner of a reference.
     /// </summary>
-    public readonly CellReference First;
+    public readonly Reference First;
 
     /// <summary>
     /// Right bottom corner of a reference. If reference is a single cell, the value is same as the <see cref="First"/>.
     /// </summary>
-    public readonly CellReference Last;
+    public readonly Reference Last;
 
     /// <summary>
     /// Ctor for 3D references.
     /// </summary>
-    public CellArea(string startSheet, string endSheet, CellReference first, CellReference last)
+    public CellArea(string startSheet, string endSheet, Reference first, Reference last)
     {
         StartSheet = startSheet;
         EndSheet = endSheet;
@@ -38,7 +38,7 @@ public readonly struct CellArea
     /// <summary>
     /// Ctor for worksheet references.
     /// </summary>
-    public CellArea(string sheet, CellReference first, CellReference last)
+    public CellArea(string sheet, Reference first, Reference last)
     {
         StartSheet = sheet;
         EndSheet = null;
@@ -49,7 +49,7 @@ public readonly struct CellArea
     /// <summary>
     /// Ctor for current worksheet references.
     /// </summary>
-    public CellArea(CellReference first, CellReference last)
+    public CellArea(Reference first, Reference last)
     {
         StartSheet = null;
         EndSheet = null;
@@ -60,14 +60,14 @@ public readonly struct CellArea
     /// <summary>
     /// Ctor for a reference to a single cell.
     /// </summary>
-    public CellArea(CellReference cell) : this(cell, cell)
+    public CellArea(Reference cell) : this(cell, cell)
     {
     }
 
     /// <summary>
     /// Ctor for a reference to a single cell.
     /// </summary>
-    public CellArea(int column, int row) : this(new CellReference(false, column, false, row))
+    public CellArea(int column, int row) : this(new Reference(ReferenceAxisType.Relative, column, ReferenceAxisType.Relative, row))
     {
     }
 
