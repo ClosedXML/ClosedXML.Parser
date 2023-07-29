@@ -94,6 +94,15 @@ Generate a DFA through Rolex
 * `Rolex.exe ClosedXML.Parser\Rolex\LexerA1.rl /noshared /output ClosedXML.Parser\Rolex\RolexA1Dfa.cs /namespace ClosedXML.Parser.Rolex`
 * `Rolex.exe ClosedXML.Parser\Rolex\LexerR1C1.rl /noshared /output ClosedXML.Parser\Rolex\RolexR1C1Dfa.cs /namespace ClosedXML.Parser.Rolex`
 
+# TODO
+
+* Lexer generation during build
+* Proper CI pipeline.
+  * Azure Function
+  * Web 
+* Fuzzer
+* PR to Rolex to fix unicode bug.
+
 # Resources
 
 * [MS-XML](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/2c5dee00-eff2-4b22-92b6-0738acd4475e)
