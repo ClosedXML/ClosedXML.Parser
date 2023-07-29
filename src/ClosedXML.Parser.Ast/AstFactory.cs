@@ -82,14 +82,14 @@ public class F : IAstFactory<ScalarValue, AstNode>
         return new FunctionNode(null, name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode Function(ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode Function(string sheet, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
-        return new FunctionNode(sheetName.ToString(), name.ToString()) { Children = args.ToArray() };
+        return new FunctionNode(sheet, name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode ExternalFunction(int workbookIndex, string sheet, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
-        return new ExternalFunctionNode(workbookIndex, sheetName.ToString(), name.ToString())
+        return new ExternalFunctionNode(workbookIndex, sheet, name.ToString())
         {
             Children = args.ToArray()
         };

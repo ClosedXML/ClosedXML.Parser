@@ -322,8 +322,8 @@ public class FormulaParser<TScalarValue, TNode>
                     Consume();
                     var args = ArgumentList();
                     return wbIndex is null
-                        ? _factory.Function(sheetName.AsSpan(), functionName, args)
-                        : _factory.ExternalFunction(wbIndex.Value, sheetName.AsSpan(), functionName, args);
+                        ? _factory.Function(sheetName, functionName, args)
+                        : _factory.ExternalFunction(wbIndex.Value, sheetName, functionName, args);
                 }
 
                 // function_call : BOOK_PREFIX USER_DEFINED_FUNCTION_NAME argument_list

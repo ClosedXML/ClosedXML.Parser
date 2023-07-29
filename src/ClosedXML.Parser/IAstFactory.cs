@@ -6,6 +6,12 @@ namespace ClosedXML.Parser;
 /// <summary>
 /// A factory used to create an AST through <see cref="FormulaParser{TScalarValue,TNode}"/>.
 /// </summary>
+/// <remarks>
+/// Sheet names are in most cases strings, while most other texts are <c>ReadOnlySpan&lt;char&gt;</c>.
+/// The reason is that sheet name is always used as-is and in some methods is null, while
+/// other parameters might be processed. E.g. errors are likely to be transformed to enum, function name
+/// might need conversion from text <c>IFS</c> to <c>_xlfn.IFS</c> and so on.
+/// </remarks>
 /// <typeparam name="TScalarValue">Type of a scalar value used across expressions.</typeparam>
 /// <typeparam name="TNode">Type of a node used in the AST.</typeparam>
 public interface IAstFactory<TScalarValue, TNode>
@@ -122,9 +128,9 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="sheetName">Name of a sheet.</param>
     /// <param name="name">Name of a function.</param>
     /// <param name="args">Nodes of argument values.</param>
-    TNode Function(ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+    TNode Function(string sheetName, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
 
-    TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> sheetName, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+    TNode ExternalFunction(int workbookIndex, string sheet, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
 
     TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
 
