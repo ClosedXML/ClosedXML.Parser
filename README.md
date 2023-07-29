@@ -59,14 +59,22 @@ Rolex is a DFA based lexer released under MIT license (see [Rolex: Unicode Enabl
 
 It is rather complicated, but two times faster than ANTLR lexer (1.9 us vs 3.676 us per formula).
 
-How to generate a new version of a lexer.
+## Generate lexer
 
-* Run Antlr2Rolex over FormulaLexer.g4
+Prepare rolex grammars
+* Run Antlr2Rolex over FormulaLexer.g4 with A1 version to *ClosedXML.Parser\Rolex\LexerA1.rl*
+* Add `/*` at the beginning of *Local A1 References* section. It comments out A1_REFERENCE and all its fragments
+* Remove `/*` at the beinning of *Local R1C1 References* section. It contains a different tokens for A1_REFERENCE and its fragments
+* Run Antlr2Rolex over FormulaLexer.g4 with R1C1 version to *ClosedXML.Parser\Rolex\LexerR1C1.rl*
+
+Fix Rolex generator
 * Fix bug in Rolex generator that doesn't recognize property \u1234 (just add `pc.Advance()` to FFA.cs `_ParseEscapePart` and `_ParseRangeEscapePart`]
-* Generate a DFA
-* copy the DFA to `RolexA1Dfa.cs` and remove useless info.
 
-## Resource
+Generate a DFA through Rolex
+* `Rolex.exe ClosedXML.Parser\Rolex\LexerA1.rl /noshared /output ClosedXML.Parser\Rolex\RolexA1Dfa.cs /namespace ClosedXML.Parser.Rolex`
+* `Rolex.exe ClosedXML.Parser\Rolex\LexerR1C1.rl /noshared /output ClosedXML.Parser\Rolex\RolexR1C1Dfa.cs /namespace ClosedXML.Parser.Rolex`
+
+# Resources
 
 * [MS-XML](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/2c5dee00-eff2-4b22-92b6-0738acd4475e)
 * [Simplified XLParser grammar](https://github.com/spreadsheetlab/XLParser/blob/master/doc/ebnf.pdf) and [tokens](https://github.com/spreadsheetlab/XLParser/blob/master/doc/tokens.pdf).

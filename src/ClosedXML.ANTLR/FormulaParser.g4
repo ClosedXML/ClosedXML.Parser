@@ -42,7 +42,7 @@ percent_expression
         ;
 
 prefix_atom_expression
-        : (PLUS | MINUS) prefix_atom_expression
+        : (PLUS | MINUS | INTERSECT) prefix_atom_expression
         | atom_expression
         ;
 
@@ -73,7 +73,11 @@ ref_intersection_expression
         ;
 
 ref_range_expression
-        : ref_atom_expression (COLON ref_atom_expression)*
+        : ref_prefix_atom_expression (COLON ref_prefix_atom_expression)*
+        ;
+
+ref_prefix_atom_expression
+        : ref_atom_expression SPILL?
         ;
 
 /*
@@ -163,7 +167,7 @@ arg_percent_expression
         ;
 
 arg_prefix_atom_expression
-        : (PLUS | MINUS) arg_prefix_atom_expression
+        : (PLUS | MINUS | INTERSECT) arg_prefix_atom_expression
         | arg_atom_expression
         ;
 

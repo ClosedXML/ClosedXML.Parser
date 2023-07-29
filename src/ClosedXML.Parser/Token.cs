@@ -52,8 +52,8 @@ internal readonly struct Token
     public const int CLOSE_CURLY = 24;
     public const int COMMA = 25;
     public const int SPACE = 26;
-    public const int OPEN_SQUARE = 27;
-    public const int CLOSE_SQUARE = 28;
+    public const int INTERSECT = 27;
+    public const int SPILL = 28;
     public const int BOOK_PREFIX = 29;
     public const int BANG_REFERENCE = 30;
     public const int SHEET_RANGE_PREFIX = 31;

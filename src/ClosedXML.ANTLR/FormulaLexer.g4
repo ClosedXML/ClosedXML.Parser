@@ -136,8 +136,10 @@ OPEN_CURLY: WHITESPACES '{' WHITESPACES;
 CLOSE_CURLY: WHITESPACES '}' WHITESPACES;
 COMMA : WHITESPACES ',' WHITESPACES;
 SPACE: WHITESPACES ' ' WHITESPACES;
-OPEN_SQUARE: WHITESPACES '[' WHITESPACES;
-CLOSE_SQUARE: WHITESPACES ']' WHITESPACES;
+INTERSECT: WHITESPACES '@' WHITESPACES;
+SPILL: WHITESPACES '#' WHITESPACES;
+fragment OPEN_SQUARE: WHITESPACES '[' WHITESPACES;
+fragment CLOSE_SQUARE: WHITESPACES ']' WHITESPACES;
 
 fragment WHITESPACES : (' ' | '\u000D' | '\u000A')*;
 
@@ -146,6 +148,9 @@ fragment WHITESPACES : (' ' | '\u000D' | '\u000A')*;
 BOOK_PREFIX : WORKBOOK_INDEX '!';
 
 // MS-XLSX 2.2.2.1: The formula MUST NOT use the bang-reference or bang-name.
+// Bang references are used in name formulas and few others, but not classic formulas.
+// In name formulas, they are relative to a cell where formula is entered.
+// E.g. bang reference from a name `!B3` in cell C2 references cell E5.
 BANG_REFERENCE
         : '!' (A1_REFERENCE | REF_CONSTANT)
         ;
