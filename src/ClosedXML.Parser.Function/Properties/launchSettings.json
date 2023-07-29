@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ClosedXML.Parser.Function": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7190",
+      "launchBrowser": false
+    }
+  }
+}
