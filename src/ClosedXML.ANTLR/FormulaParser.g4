@@ -73,10 +73,13 @@ ref_intersection_expression
         ;
 
 ref_range_expression
-        : ref_prefix_atom_expression (COLON ref_prefix_atom_expression)*
+        : ref_spill_expression (COLON ref_spill_expression)*
         ;
 
-ref_prefix_atom_expression
+/*
+ * This is an additional node based on experimentation. MS doesn't publish up-to-date grammar.
+ */
+ref_spill_expression
         : ref_atom_expression SPILL?
         ;
 

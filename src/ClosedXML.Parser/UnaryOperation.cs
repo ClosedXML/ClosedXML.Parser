@@ -1,5 +1,9 @@
 ﻿namespace ClosedXML.Parser;
 
+/// <summary>
+/// Unary operations of a formula.
+/// </summary>
+/// <remarks>Range operations are always after number operations.</remarks>
 public enum UnaryOperation
 {
     /// <summary>Prefix plus operation.</summary>
@@ -9,5 +13,11 @@ public enum UnaryOperation
     Minus,
 
     /// <summary>Suffix percent operation.</summary>
-    Percent
+    Percent,
+
+    /// <summary>Prefix range intersection operation.</summary>
+    Intersect,
+
+    /// <summary>Suffix range spill operation.</summary>
+    Spill,
 }

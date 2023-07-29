@@ -210,6 +210,27 @@ public class FormulaParser<TScalarValue, TNode>
         return prefixAtomNode;
     }
 
+    /// <summary>
+    /// Parser for two rules unified into a single method.
+    /// <para>
+    /// <c>
+    /// prefix_atom_expression
+    ///     : (PLUS | MINUS | INTERSECT) prefix_atom_expression
+    ///     | atom_expression
+    ///     ;
+    /// </c>
+    /// 
+    /// <c>
+    /// arg_prefix_atom_expression
+    ///     : (PLUS | MINUS | INTERSECT) arg_prefix_atom_expression
+    ///     | arg_atom_expression
+    ///     ;     
+    /// </c>
+    /// </para>
+    /// </summary>
+    /// <param name="skipRangeUnion">Does the method represent <c>prefix_atom_expression</c> (<c>false</c>) or <c>arg_prefix_atom_expression</c> (<c>true</c>)</param>
+    /// <param name="isPureRef">Is the expression of the node a reference expression?</param>
+    /// <returns></returns>
     private TNode PrefixAtomExpression(bool skipRangeUnion, out bool isPureRef)
     {
         UnaryOperation op;
@@ -220,6 +241,9 @@ public class FormulaParser<TScalarValue, TNode>
                 break;
             case Token.MINUS:
                 op = UnaryOperation.Minus;
+                break;
+            case Token.INTERSECT:
+                op = UnaryOperation.Intersect;
                 break;
             default:
                 return AtomExpression(skipRangeUnion, out isPureRef);
@@ -354,15 +378,35 @@ public class FormulaParser<TScalarValue, TNode>
 
     private TNode RefRangeExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
-        var leftNode = RefAtomExpression(replaceFirstAtom, refAtom);
+        var leftNode = RefSpillExpression(replaceFirstAtom, refAtom);
         while (_la == Token.COLON)
         {
             Consume();
-            var rightNode = RefAtomExpression();
+            var rightNode = RefSpillExpression();
             leftNode = _factory.BinaryNode(BinaryOperation.Range, leftNode, rightNode);
         }
 
         return leftNode;
+    }
+
+    /// <summary>
+    /// Parser of the following node.
+    /// <c>
+    /// ref_spill_expression
+    ///     : ref_atom_expression SPILL?
+    ///     ;
+    /// </c>
+    /// </summary>
+    private TNode RefSpillExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    {
+        var refAtomNode = RefAtomExpression(replaceFirstAtom, refAtom);
+        if (_la == Token.SPILL)
+        {
+            Consume();
+            return _factory.Unary(UnaryOperation.Spill, refAtomNode);
+        }
+
+        return refAtomNode;
     }
 
     private TNode RefAtomExpression(bool replaceFirstAtom = false, TNode? refAtom = null)

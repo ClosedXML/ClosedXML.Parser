@@ -9,6 +9,27 @@ public class RefRangeExpressionRuleTests
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
+    [Fact]
+    public void Spill_has_higher_priority_than_range()
+    {
+        var expectedNode = new BinaryNode(BinaryOperation.Range)
+        {
+            Children = new AstNode[]
+            {
+                new ReferenceNode(new ReferenceArea(1, 5)),
+                new UnaryNode(UnaryOperation.Spill)
+                {
+                    Children = new AstNode[]
+                    {
+                        new NameNode("Name")
+                    }
+                }
+            }
+        };
+
+        AssertFormula.SingleNodeParsed("A5:Name#", expectedNode);
+    }
+
     public static IEnumerable<object[]> TestData
     {
         get
