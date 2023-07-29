@@ -42,7 +42,8 @@ public class DataSetTests
         foreach (var badFormulaPath in badFormulaPaths)
             badFormulas.UnionWith(DataSets.ReadCsv(badFormulaPath));
 
-        var formulas = DataSets.ReadCsv(input);
+        // Read to memory before the parsing to measure only parsing.
+        var formulas = DataSets.ReadCsv(input).ToList();
         var sw = Stopwatch.StartNew();
         var formulaCount = 0;
         foreach (var formula in formulas)
