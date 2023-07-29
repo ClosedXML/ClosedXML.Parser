@@ -77,7 +77,11 @@ public class FormulaParser<TScalarValue, TNode>
             Consume();
         var expression = Expression(false, out _);
         if (_la != Token.EofSymbolId)
-            throw new ParsingException($"Expression '{_input}' is not completely parsed.");
+        {
+            var parsedPart = _input.Substring(0, _tokenSource.StartIndex);
+            var remainder = _input.Substring(_tokenSource.StartIndex);
+            throw new ParsingException($"The formula `{_input}` wasn't parsed correctly. The expression `{parsedPart}` was parsed, but the rest `{remainder}` wasn't.");
+        }
 
         return expression;
     }
