@@ -25,8 +25,8 @@ namespace ClosedXML.Parser.Function
             try
             {
                 var nodes = refStyle == ReferenceStyle.A1
-                    ? FormulaParser<ScalarValue, AstNode>.FormulaA1(formulaText, new F())
-                    : FormulaParser<ScalarValue, AstNode>.FormulaR1C1(formulaText, new F());
+                    ? FormulaParser<ScalarValue, AstNode>.CellFormulaA1(formulaText, new F())
+                    : FormulaParser<ScalarValue, AstNode>.CellFormulaR1C1(formulaText, new F());
                 return Task.FromResult<IActionResult>(new JsonResult(new
                 {
                     formula = formulaText,

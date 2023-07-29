@@ -52,7 +52,7 @@ public class FormulaParser<TScalarValue, TNode>
     /// Parse a formula using A1 semantic for references. 
     /// </summary>
     /// <exception cref="ParsingException">If the formula doesn't satisfy the grammar.</exception>
-    public static TNode FormulaA1(string formula, IAstFactory<TScalarValue, TNode> factory)
+    public static TNode CellFormulaA1(string formula, IAstFactory<TScalarValue, TNode> factory)
     {
         var parser = new FormulaParser<TScalarValue, TNode>(formula, factory, true);
         return parser.Formula();
@@ -62,7 +62,7 @@ public class FormulaParser<TScalarValue, TNode>
     /// Parse a formula using R1C1 semantic for references. 
     /// </summary>
     /// <exception cref="ParsingException">If the formula doesn't satisfy the grammar.</exception>
-    public static TNode FormulaR1C1(string formula, IAstFactory<TScalarValue, TNode> factory)
+    public static TNode CellFormulaR1C1(string formula, IAstFactory<TScalarValue, TNode> factory)
     {
         var parser = new FormulaParser<TScalarValue, TNode>(formula, factory, false);
         return parser.Formula();
