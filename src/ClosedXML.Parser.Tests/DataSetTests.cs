@@ -61,6 +61,7 @@ public class DataSetTests
         }
 
         sw.Stop();
-        _output.WriteLine($"Parsed {formulaCount} formulas in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula)");
+        var averageLength = formulas.Sum(x => x.Length) / (double)formulas.Count;
+        _output.WriteLine($"Parsed {formulaCount} formulas (Average length {averageLength:F1}) in {sw.ElapsedMilliseconds}ms ({sw.ElapsedMilliseconds * 1000d / formulaCount:N3}μs/formula).");
     }
 }

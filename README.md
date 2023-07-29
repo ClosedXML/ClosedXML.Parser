@@ -4,6 +4,13 @@ ClosedParser is a project to parse OOXML grammar to create an abstract syntax tr
 
 Official source for the grammar is [MS-XML](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/2c5dee00-eff2-4b22-92b6-0738acd4475e), chapter 2.2.2 Formulas. The provided grammar is not usable for parser generators, it's full of ambiguities and the rules don't take into account operator precedence.
 
+# How to use
+
+* Implement `IAstFactory` interface.
+* Call parsing methods
+  * `FormulaParser<TScalarValue, TNode>.CellFormulaA1("Sum(A1, 2)", astFactory)`
+  * `FormulaParser<TScalarValue, TNode>.CellFormulaR1C1("Sum(R1C1, 2)", astFactory)`
+
 # Goals
 
 * __Performance__ - ClosedXML needs to parse formula really fast. Limit allocation and so on.
@@ -17,6 +24,26 @@ ANTLR4 one of few maintained parser generators with C# target.
 
 The project has a low priority, XLParser mostly works, but in the long term, replacement is likely.
 
+## Current performance
+
+ENRON dataset parsed using recursive descent parser and DFA lexer in Release mode:
+
+* Total: *946320*
+* Elapsed: *1838 ms*
+* Per formula: *1.942 μs*
+
+2μs per formula should be something like 6000 instructions (under unrealistic assumption 1 instruction per 1 Hz), so basically fast enough.
+
+## Limitations
+
+The primary goal is to parse formulas stored in file, not user supplied formulas. The formulas displayed in the GUI is not the same as formula stored in the file. Several examples:
+* The IFS function is a part of future functions. In the file, it is stored as `_xlfn.IFS`, but user sees `IFS`
+* In the structured references, user sees @ as an indication that structured references this row, but in reality it is a specifier `[#This Row]`
+
+Therefore:
+* External references are accepted only in form of an index to an external file (e.g. `[5]`)
+* There are several formula implementations out there with slighly different grammar incompatible with OOXML formulas (`[1]!'Some name in external wb'`). They are out of scope of the project.
+
 # Why not use XLParser
 
 ClosedXML is currently using [XLParser](https://github.com/spreadsheetlab/XLParser) and transforming the concrete syntax tree to abstract syntax tree.
@@ -29,18 +56,6 @@ ClosedXML is currently using [XLParser](https://github.com/spreadsheetlab/XLPars
 * Doesn't have support for lambdas and R1C1 style.
 
 ANTLR lexer takes up about 3.2 seconds for Enron dataset. With ANTLR parsing, it takes up 11 seconds. I want that 7+ seconds in performance and no allocation, so RDS that takes up 700 ms.
-
-## Current state
-
-ENRON dataset parsing RDS + Rolex lexer (Release mode)
-
-* Total: *946320*
-* Elapsed: *1838 ms*
-* Per formula: *1.942 μs*
-
-2μs per formula should be something like 2000 instructions (under unrealistic assumption 1 instruction per 1 Hz), so not much space to improve.
-
-Bad ones fail on external workbook name reference that uses apostrophe (e.g `[1]!'Some name in external wb'`), otherwise they are parsed.
 
 ## Debugging
 
