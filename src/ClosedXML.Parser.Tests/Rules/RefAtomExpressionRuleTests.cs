@@ -50,13 +50,13 @@ public class RefAtomExpressionRuleTests
     [Fact]
     public void Nested_cant_be_non_ref()
     {
-        AssertFormula.CheckParsingErrorContains("(1),#REF!", "not completely parsed");
+        AssertFormula.CheckParsingErrorContains("(1),#REF!", "The formula `(1),#REF!` wasn't parsed correctly. The expression `(1)` was parsed, but the rest `,#REF!` wasn't.");
     }
 
     [Fact]
     public void Non_ref_function_cant_be_ref_atom()
     {
-        AssertFormula.CheckParsingErrorContains("FUNC(),#REF!", "not completely parsed");
+        AssertFormula.CheckParsingErrorContains("FUNC(),#REF!", "The formula `FUNC(),#REF!` wasn't parsed correctly. The expression `FUNC()` was parsed, but the rest `,#REF!` wasn't.");
     }
 
     private static void VerifyNode(string formula, AstNode node)
