@@ -199,7 +199,7 @@ fragment SHEET_NAME_CHARACTERS
         : SHEET_NAME_CHARACTER+
         ;
 
-// The original didn't specify that  various chars, like '!', '(', ')', should
+// The original didn't specify that  various chars, like '!', '(', ')', '{', '}' should
 // not be part of sheet name => chars were removed from the fragment.
 // Original comment: Must not be operator, ', [, ], \, or ?
 fragment SHEET_NAME_CHARACTER
@@ -211,7 +211,9 @@ fragment SHEET_NAME_CHARACTER
         | '\u0030' .. '\u0039' // 003A :
         | '\u003B'             // 003C < 003D = 003E > 003F ?
         | '\u0040' .. '\u005A' // 005B [ 005C \ 005D ] 005E ^
-        | '\u005F' .. '\uD7FF'
+        | '\u005F' .. '\u007A' // 007B {
+        | '\u007C'             // 007D }
+        | '\u007E' .. '\uD7FF'
         | '\uE000' .. '\uFFFD'
         | '\u{10000}' .. '\u{10FFFF}'
         ;

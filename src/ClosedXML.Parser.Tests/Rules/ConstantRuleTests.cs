@@ -69,6 +69,20 @@ public class ConstantRuleTests
         AssertFormula.SingleNodeParsed("{+3}", new ArrayNode(1, 1, new[] { new ScalarValue(3) }));
     }
 
+    [Theory]
+    [InlineData("#REF!")]
+    [InlineData("#DIV/0!")]
+    [InlineData("#N/A")]
+    [InlineData("#NAME?")]
+    [InlineData("#NULL!")]
+    [InlineData("#NUM!")]
+    [InlineData("#VALUE!")]
+    [InlineData("#GETTING_DATA")]
+    public void Array_can_contain_errors(string error)
+    {
+        AssertFormula.SingleNodeParsed($"{{{error}}}", new ArrayNode(1, 1, new[] { new ScalarValue("Error", error) }));
+    }
+
     [Fact]
     public void Array_cant_contain_blanks()
     {
