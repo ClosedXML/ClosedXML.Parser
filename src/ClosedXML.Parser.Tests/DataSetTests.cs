@@ -20,7 +20,8 @@ public class DataSetTests
             new[]
             {
                 "./data/enron/invalid-external-cell-reference.csv",
-                "./data/enron/known-fails.csv"
+                "./data/enron/known-fails.csv",
+                "./data/enron/bugs.csv",
             });
     }
 
@@ -32,7 +33,8 @@ public class DataSetTests
             new[]
             {
                 "./data/euses/invalid-external-cell-reference.csv",
-                "./data/euses/known-fails.csv"
+                "./data/euses/known-fails.csv",
+                "./data/euses/bugs.csv",
             });
     }
 

@@ -10,6 +10,30 @@ public class RefRangeExpressionRuleTests
     }
 
     [Fact]
+    public void Cell_are_not_mistakenly_recognized_as_3d_reference()
+    {
+        var formula = "A1:Sheet1!B2";
+        var expectedNode = new BinaryNode(BinaryOperation.Range)
+        {
+            Children = new AstNode[]
+            {
+                new ReferenceNode(new ReferenceArea(1, 1)),
+                new SheetReferenceNode("Sheet1", new ReferenceArea(2, 2))
+            }
+        };
+        AssertFormula.SingleNodeParsed(formula, expectedNode);
+    }
+
+    [Fact(Skip = "Bug to be solved")]
+    public void Columns_can_be_sheet_names_for_3d_reference()
+    {
+        // JAN and DEC are columns in A1 notation
+        var formula = "JAN:DEC!B2";
+        var expectedNode = new Reference3DNode("JAN", "DEC", new ReferenceArea(2, 2));
+        AssertFormula.SingleNodeParsed(formula, expectedNode);
+    }
+
+    [Fact]
     public void Spill_has_higher_priority_than_range()
     {
         var expectedNode = new BinaryNode(BinaryOperation.Range)

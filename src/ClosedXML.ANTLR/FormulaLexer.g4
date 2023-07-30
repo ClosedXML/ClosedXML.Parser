@@ -171,8 +171,13 @@ fragment SINGLE_SHEET
                 | TICK (WORKBOOK_INDEX)? (SHEET_NAME_SPECIAL | SHEET_NAME) TICK
                 ;
 
+/*
+ * Due to problems with 3D reference, the original
+ * WORKBOOK_INDEX? SHEET_NAME ':' SHEET_NAME was replaced
+ * with required index, so A1:Sheet!A1 is not detected as 3D reference
+ */
 fragment SHEET_RANGE
-                : WORKBOOK_INDEX? SHEET_NAME ':' SHEET_NAME
+                : WORKBOOK_INDEX SHEET_NAME ':' SHEET_NAME
                 | TICK WORKBOOK_INDEX? SHEET_NAME_SPECIAL ':' SHEET_NAME_SPECIAL TICK
                 ;
 

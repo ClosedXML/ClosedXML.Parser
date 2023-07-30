@@ -1,6 +1,4 @@
-﻿using static ClosedXML.Parser.ReferenceAxisType;
-
-namespace ClosedXML.Parser.Tests.Rules;
+﻿namespace ClosedXML.Parser.Tests.Rules;
 
 public class RefAtomExpressionRuleTests
 {
@@ -39,6 +37,12 @@ public class RefAtomExpressionRuleTests
     public void Name_reference()
     {
         VerifyNode("some_name", new NameNode("some_name"));
+    }
+
+    [Fact]
+    public void Name_reference_starts_3D_reference()
+    {
+        VerifyNode("Sheet1:Sheet3!A1", new Reference3DNode("Sheet1", "Sheet3", new ReferenceArea(1, 1)));
     }
 
     [Fact]

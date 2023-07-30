@@ -20,8 +20,7 @@ public class SheetRangePrefixTokenTests
         get
         {
             yield return new object?[] { "[1]first:second!", 1, "first", "second" };
-            yield return new object?[] { "first:second!", null, "first", "second" };
-
+            
             // No escape, but enclosed in tick
             yield return new object?[] { "'[1]first:second'!", 1, "first", "second" };
             yield return new object?[] { "'first:second'!", null, "first", "second" };

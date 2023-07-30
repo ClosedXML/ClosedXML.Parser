@@ -484,6 +484,23 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         return _factory.StructureReference(_context, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
+                    // 3D reference
+                    if (_la == Token.COLON && LL(1) == Token.SINGLE_SHEET_PREFIX && LL(2) == Token.A1_REFERENCE)
+                    {
+                        var firstSheetName = localName.ToString();
+                        Consume();
+
+                        // TODO: Decouple book prefix from single sheet prefix
+                        TokenParser.ParseSingleSheetPrefix(GetCurrentToken(), out var wbIdx, out string lastSheetName);
+                        if (wbIdx is not null)
+                            throw Error("External workbook not expected.");
+
+                        Consume();
+                        var reference = TokenParser.ParseReference(GetCurrentToken(), _a1Mode);
+                        Consume();
+                        return _factory.Reference3D(_context, firstSheetName, lastSheetName, reference);
+                    }
+
                     return _factory.Name(_context, localName.ToString());
                 }
 
@@ -529,7 +546,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     // name_reference
                     var name = GetCurrentToken();
                     Match(Token.NAME);
-                    return wbIdx is null 
+                    return wbIdx is null
                         ? _factory.SheetName(_context, sheetName, name.ToString())
                         : _factory.ExternalSheetName(_context, wbIdx.Value, sheetName, name.ToString());
                 }
