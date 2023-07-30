@@ -51,7 +51,7 @@ public class DataSetTests
             formulaCount++;
             try
             {
-                _ = FormulaParser<ScalarValue, AstNode>.CellFormulaA1(formula, new F());
+                _ = FormulaParser<ScalarValue, AstNode, Ctx>.CellFormulaA1(formula, new Ctx(), new F());
                 Assert.False(badFormulas.Contains(formula), formula);
             }
             catch (Exception e)

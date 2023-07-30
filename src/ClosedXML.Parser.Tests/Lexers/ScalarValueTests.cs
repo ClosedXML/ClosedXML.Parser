@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace ClosedXML.Parser.Tests.Lexers;
+﻿namespace ClosedXML.Parser.Tests.Lexers;
 
 public class ScalarValueTests
 {
@@ -66,8 +64,8 @@ public class ScalarValueTests
         Assert.Equal(expected, node.Value);
     }
 
-    private static AstNode ParseText(string formula, IAstFactory<ScalarValue, AstNode> factory)
+    private static AstNode ParseText(string formula, IAstFactory<ScalarValue, AstNode, Ctx> factory)
     {
-        return FormulaParser<ScalarValue, AstNode>.CellFormulaA1(formula, factory);
+        return FormulaParser<ScalarValue, AstNode, Ctx>.CellFormulaA1(formula, new Ctx(), factory);
     }
 }
