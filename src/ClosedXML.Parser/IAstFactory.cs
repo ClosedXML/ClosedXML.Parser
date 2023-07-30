@@ -37,7 +37,7 @@ public interface IAstFactory<TScalarValue, TNode, TContext>
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
     /// <param name="text">The text. The characters of text are already unescaped.</param>
-    TScalarValue TextValue(TContext context, ReadOnlySpan<char> text);
+    TScalarValue TextValue(TContext context, string text);
 
     /// <summary>
     /// Create an error for an array item.
@@ -87,7 +87,7 @@ public interface IAstFactory<TScalarValue, TNode, TContext>
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
     /// <param name="text">The text. The characters of text are already unescaped.</param>
-    TNode TextNode(TContext context, ReadOnlySpan<char> text);
+    TNode TextNode(TContext context, string text);
 
     /// <summary>
     /// Create a node for a reference to cells without a worksheet.

@@ -14,9 +14,9 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ScalarValue("Number", value);
     }
 
-    public ScalarValue TextValue(Ctx _, ReadOnlySpan<char> input)
+    public ScalarValue TextValue(Ctx _, string input)
     {
-        return new ScalarValue("Text", input.ToString());
+        return new ScalarValue("Text", input);
     }
 
     public ScalarValue ErrorValue(Ctx _, ReadOnlySpan<char> error)
@@ -44,9 +44,9 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ValueNode("Number", value);
     }
 
-    public AstNode TextNode(Ctx _, ReadOnlySpan<char> text)
+    public AstNode TextNode(Ctx _, string text)
     {
-        return new ValueNode("Text", text.ToString());
+        return new ValueNode("Text", text);
     }
 
     public AstNode ArrayNode(Ctx _, int rows, int columns, IReadOnlyList<ScalarValue> array)

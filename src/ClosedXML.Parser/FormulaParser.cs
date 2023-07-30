@@ -764,8 +764,8 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         var token = GetCurrentToken();
         Span<char> buffer = stackalloc char[token.Length];
         return ConvertTextValue(GetCurrentToken(), out var slice, ref buffer)
-            ? _factory.TextNode(_context, slice)
-            : _factory.TextNode(_context, buffer);
+            ? _factory.TextNode(_context, slice.ToString())
+            : _factory.TextNode(_context, buffer.ToString());
     }
 
     private TScalarValue ConvertTextValue()
@@ -773,8 +773,8 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         var token = GetCurrentToken();
         Span<char> buffer = stackalloc char[token.Length];
         return ConvertTextValue(GetCurrentToken(), out var slice, ref buffer)
-            ? _factory.TextValue(_context, slice)
-            : _factory.TextValue(_context, buffer);
+            ? _factory.TextValue(_context, slice.ToString())
+            : _factory.TextValue(_context, buffer.ToString());
     }
 
     private static bool ConvertTextValue(ReadOnlySpan<char> token, out ReadOnlySpan<char> copy, ref Span<char> buffer)
