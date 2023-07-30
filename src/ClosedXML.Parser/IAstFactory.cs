@@ -118,29 +118,29 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <summary>
     /// Create a node for a function.
     /// </summary>
-    /// <param name="name">Name of a function.</param>
-    /// <param name="args">Nodes of argument values.</param>
-    TNode Function(ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+    /// <param name="functionName">Name of a function.</param>
+    /// <param name="arguments">Nodes of argument values.</param>
+    TNode Function(ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a node for a function on a sheet. Might happen for VBA.
     /// </summary>
     /// <param name="sheetName">Name of a sheet.</param>
-    /// <param name="name">Name of a function.</param>
+    /// <param name="functionName">Name of a function.</param>
     /// <param name="args">Nodes of argument values.</param>
-    TNode Function(string sheetName, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+    TNode Function(string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> args);
 
-    TNode ExternalFunction(int workbookIndex, string sheet, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+    TNode ExternalFunction(int workbookIndex, string sheet, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
-    TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<TNode> args);
+    TNode ExternalFunction(int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a cell function. It references another function that should likely contain a LAMBDA value.
     /// </summary>
     /// <remarks>Cell functions are not yet supported by Excel, but are part of a grammar.</remarks>
     /// <param name="cell">A reference to a cell with a LAMBDA.</param>
-    /// <param name="args">Arguments to pass to a LAMBDA.</param>
-    TNode CellFunction(Reference cell, IReadOnlyList<TNode> args);
+    /// <param name="arguments">Arguments to pass to a LAMBDA.</param>
+    TNode CellFunction(Reference cell, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a node to represent a structure reference without a table to a range of columns.
@@ -178,7 +178,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="name">The defined name.</param>
-    TNode Name(ReadOnlySpan<char> name);
+    TNode Name(string name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a name defined in a worksheet.
@@ -189,14 +189,14 @@ public interface IAstFactory<TScalarValue, TNode>
     /// </remarks>
     /// <param name="sheet">Name of a sheet, unescaped.</param>
     /// <param name="name">The defined name.</param>
-    TNode SheetName(string sheet, ReadOnlySpan<char> name);
+    TNode SheetName(string sheet, string name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a defined name in a different workbook.
     /// </summary>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="name">Name from a workbook. It can be defined name or a name of a table.</param>
-    TNode ExternalName(int workbookIndex, ReadOnlySpan<char> name);
+    TNode ExternalName(int workbookIndex, string name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a defined name in a worksheet of a different workbook.
@@ -208,7 +208,7 @@ public interface IAstFactory<TScalarValue, TNode>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="sheet">Name of a sheet in the external workbook, unescaped.</param>
     /// <param name="name">The defined name.</param>
-    TNode ExternalSheetName(int workbookIndex, string sheet, ReadOnlySpan<char> name);
+    TNode ExternalSheetName(int workbookIndex, string sheet, string name);
 
     /// <summary>
     /// Create a node that performs a binary operation on values from another nodes.

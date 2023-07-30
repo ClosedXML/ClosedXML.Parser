@@ -8,6 +8,10 @@ namespace ClosedXML.Parser;
 /// reference token, the vertical range of a formula is always continuous (i.e. no <c>Headers</c> and <c>Totals</c>
 /// together).
 /// </summary>
+/// <remarks>
+/// The documentation calls it *Item specifier* and grammar *keywords*. Both rather unintuitive names, so *area*
+/// is used instead.
+/// </remarks>
 [Flags]
 public enum StructuredReferenceArea
 {

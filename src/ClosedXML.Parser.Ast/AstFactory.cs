@@ -126,24 +126,24 @@ public class F : IAstFactory<ScalarValue, AstNode>
         };
     }
 
-    public AstNode Name(ReadOnlySpan<char> name)
+    public AstNode Name(string name)
     {
-        return new NameNode(name.ToString());
+        return new NameNode(name);
     }
 
-    public AstNode SheetName(string sheet, ReadOnlySpan<char> name)
+    public AstNode SheetName(string sheet, string name)
     {
-        return new SheetNameNode(sheet, name.ToString());
+        return new SheetNameNode(sheet, name);
     }
 
-    public AstNode ExternalName(int workbookIndex, ReadOnlySpan<char> name)
+    public AstNode ExternalName(int workbookIndex, string name)
     {
-        return new ExternalNameNode(workbookIndex, name.ToString());
+        return new ExternalNameNode(workbookIndex, name);
     }
 
-    public AstNode ExternalSheetName(int workbookIndex, string sheet, ReadOnlySpan<char> name)
+    public AstNode ExternalSheetName(int workbookIndex, string sheet, string name)
     {
-        return new ExternalSheetNameNode(workbookIndex, sheet, name.ToString());
+        return new ExternalSheetNameNode(workbookIndex, sheet, name);
     }
 
     public AstNode BinaryNode(BinaryOperation operation, AstNode leftNode, AstNode rightNode)
