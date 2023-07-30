@@ -24,7 +24,7 @@ public class RefRangeExpressionRuleTests
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
-    [Fact(Skip = "Bug to be solved")]
+    [Fact]
     public void Columns_can_be_sheet_names_for_3d_reference()
     {
         // JAN and DEC are columns in A1 notation

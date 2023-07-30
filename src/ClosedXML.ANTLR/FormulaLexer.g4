@@ -178,6 +178,12 @@ fragment SINGLE_SHEET
  */
 fragment SHEET_RANGE
                 : WORKBOOK_INDEX SHEET_NAME ':' SHEET_NAME
+                // A part of 3D-ref alias workaround. The original
+                // `SHEET_NAME ':' SHEET_NAME was too broad (A1:Sheet).
+                // This keeps sheet range starting with columns (e.g. JAN) as a SHEET_RANGE,
+                // but only that. The rest must be handled by
+                // NAME COMMA SINGLE_SHEET_PREFIX A1_REFERENCE path in the parser.
+                | A1_RELATIVE_COLUMN ':' SHEET_NAME
                 | TICK WORKBOOK_INDEX? SHEET_NAME_SPECIAL ':' SHEET_NAME_SPECIAL TICK
                 ;
 

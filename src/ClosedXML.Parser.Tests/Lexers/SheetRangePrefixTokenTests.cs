@@ -19,6 +19,10 @@ public class SheetRangePrefixTokenTests
     {
         get
         {
+            // Special case for sheet range starting with column
+            yield return new object?[] { "JAN:DEC!", null, "JAN", "DEC" };
+            yield return new object?[] { "PGG:EGAS_Ele!", null, "PGG", "EGAS_Ele" };
+
             yield return new object?[] { "[1]first:second!", 1, "first", "second" };
             
             // No escape, but enclosed in tick
