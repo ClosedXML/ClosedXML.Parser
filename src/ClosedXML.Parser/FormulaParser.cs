@@ -212,14 +212,15 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     private TNode PercentExpression(bool skipRangeUnion, out bool isPureRef)
     {
         var prefixAtomNode = PrefixAtomExpression(skipRangeUnion, out isPureRef);
-        if (_la == Token.PERCENT)
+        var percentNode = prefixAtomNode;
+        while (_la == Token.PERCENT)
         {
             Consume();
             isPureRef = false;
-            return _factory.Unary(_context, UnaryOperation.Percent, prefixAtomNode);
+            percentNode = _factory.Unary(_context, UnaryOperation.Percent, percentNode);
         }
 
-        return prefixAtomNode;
+        return percentNode;
     }
 
     /// <summary>

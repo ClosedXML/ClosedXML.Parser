@@ -38,7 +38,7 @@ pow_expression
         ;
 
 percent_expression
-        : prefix_atom_expression PERCENT?
+        : prefix_atom_expression PERCENT*
         ;
 
 prefix_atom_expression
