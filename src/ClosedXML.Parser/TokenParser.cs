@@ -13,6 +13,8 @@ internal static class TokenParser
     /// </summary>
     internal static void ParseSingleSheetPrefix(ReadOnlySpan<char> input, out int? index, out string sheetName)
     {
+        // There can be whitespaces after exclamation mark at the end of a token.
+        input = input.TrimEnd();
         var isEscaped = input[0] == '\'';
         input = isEscaped
             ? input.Slice(1, input.Length - 3) // second sheet name ends with TICK EXCLAMATION_MARK ('!). 

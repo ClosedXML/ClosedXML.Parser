@@ -46,6 +46,12 @@ public class RefAtomExpressionRuleTests
     }
 
     [Fact]
+    public void Sheet_reference_can_have_whitespace_after_exclamation_mark()
+    {
+        VerifyNode("Sheet2!  A1", new SheetReferenceNode("Sheet2", new ReferenceArea(1, 1)));
+    }
+
+    [Fact]
     public void Structure_reference()
     {
         VerifyNode("Table[Column]", new StructureReferenceNode("Table", StructuredReferenceArea.None, "Column", "Column"));

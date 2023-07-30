@@ -160,7 +160,7 @@ SHEET_RANGE_PREFIX
         ;
 
 SINGLE_SHEET_PREFIX
-        : SINGLE_SHEET '!'
+        : SINGLE_SHEET '!' WHITESPACES
         ;
 
 // This rule is not used for cell formulas, but is used for sparklines (possibly others)
@@ -199,14 +199,15 @@ fragment SHEET_NAME_CHARACTERS
         : SHEET_NAME_CHARACTER+
         ;
 
-// The original didn't specify that  various chars, like '!', '(', ')', '{', '}' should
+// The original didn't specify that  various chars, like '!', '(', ')', '{', '}', '#' should
 // not be part of sheet name => chars were removed from the fragment.
 // Original comment: Must not be operator, ', [, ], \, or ?
 fragment SHEET_NAME_CHARACTER
         : '\u0009'
         | '\u000A'
         | '\u000D'
-        | '\u0022' .. '\u0024' // 0020 [space] 0021 ! 0025 % 0026 & 0027 ' 0028 ( 0029 ) 002A * 002B + 002C , 002D -
+        | '\u0022' .. '\u0022' // 0020 [space] 0021 ! 0023 # 0025 % 0026 & 0027 ' 0028 ( 0029 ) 002A * 002B + 002C , 002D -
+        | '\u0024'
         | '\u002E'             // 002F /
         | '\u0030' .. '\u0039' // 003A :
         | '\u003B'             // 003C < 003D = 003E > 003F ?
