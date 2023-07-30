@@ -19,6 +19,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageVersion>1.0.0-beta3</PackageVersion>
   </PropertyGroup>
+  
+  <!-- Include symbols for .snupkg package -->
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
