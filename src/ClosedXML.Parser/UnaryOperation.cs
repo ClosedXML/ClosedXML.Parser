@@ -16,8 +16,8 @@ public enum UnaryOperation
     Percent,
 
     /// <summary>Prefix range intersection operation.</summary>
-    Intersect,
+    ImplicitIntersection,
 
     /// <summary>Suffix range spill operation.</summary>
-    Spill,
+    SpillRange,
 }

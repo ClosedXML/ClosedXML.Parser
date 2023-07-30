@@ -24,19 +24,19 @@ public enum BinaryOperation
     Equal,
 
     /// <summary><c>+</c></summary>
-    Plus,
+    Addition,
 
     /// <summary><c>-</c></summary>
-    Minus,
+    Subtraction,
 
     /// <summary><c>*</c></summary>
-    Mult,
+    Multiplication,
 
     /// <summary><c>/</c></summary>
-    Div,
+    Division,
 
     /// <summary><c>^</c></summary>
-    Pow,
+    Power,
 
     /// <summary><c>,</c></summary>
     Union,

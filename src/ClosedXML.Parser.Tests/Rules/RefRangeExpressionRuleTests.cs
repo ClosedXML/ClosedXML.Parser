@@ -17,7 +17,7 @@ public class RefRangeExpressionRuleTests
             Children = new AstNode[]
             {
                 new ReferenceNode(new ReferenceArea(1, 5)),
-                new UnaryNode(UnaryOperation.Spill)
+                new UnaryNode(UnaryOperation.SpillRange)
                 {
                     Children = new AstNode[]
                     {

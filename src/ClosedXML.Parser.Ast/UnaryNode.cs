@@ -9,8 +9,8 @@ public record UnaryNode(UnaryOperation Operation) : AstNode
             UnaryOperation.Percent => "%",
             UnaryOperation.Minus => "-",
             UnaryOperation.Plus => "+",
-            UnaryOperation.Intersect => "Implicit intersection",
-            UnaryOperation.Spill => "Spill",
+            UnaryOperation.ImplicitIntersection => "Implicit intersection",
+            UnaryOperation.SpillRange => "Spill",
             _ => throw new NotSupportedException()
         };
     }

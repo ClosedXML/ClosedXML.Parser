@@ -146,10 +146,10 @@ public class FormulaParser<TScalarValue, TNode>
             switch (_la)
             {
                 case Token.PLUS:
-                    op = BinaryOperation.Plus;
+                    op = BinaryOperation.Addition;
                     break;
                 case Token.MINUS:
-                    op = BinaryOperation.Minus;
+                    op = BinaryOperation.Subtraction;
                     break;
                 default:
                     return leftNode;
@@ -171,10 +171,10 @@ public class FormulaParser<TScalarValue, TNode>
             switch (_la)
             {
                 case Token.MULT:
-                    op = BinaryOperation.Mult;
+                    op = BinaryOperation.Multiplication;
                     break;
                 case Token.DIV:
-                    op = BinaryOperation.Div;
+                    op = BinaryOperation.Division;
                     break;
                 default:
                     return leftNode;
@@ -195,7 +195,7 @@ public class FormulaParser<TScalarValue, TNode>
             Consume();
             isPureRef = false;
             var rightNode = PercentExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode(BinaryOperation.Pow, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(BinaryOperation.Power, leftNode, rightNode);
         }
 
         return leftNode;
@@ -247,7 +247,7 @@ public class FormulaParser<TScalarValue, TNode>
                 op = UnaryOperation.Minus;
                 break;
             case Token.INTERSECT:
-                op = UnaryOperation.Intersect;
+                op = UnaryOperation.ImplicitIntersection;
                 break;
             default:
                 return AtomExpression(skipRangeUnion, out isPureRef);
@@ -407,7 +407,7 @@ public class FormulaParser<TScalarValue, TNode>
         if (_la == Token.SPILL)
         {
             Consume();
-            return _factory.Unary(UnaryOperation.Spill, refAtomNode);
+            return _factory.Unary(UnaryOperation.SpillRange, refAtomNode);
         }
 
         return refAtomNode;
