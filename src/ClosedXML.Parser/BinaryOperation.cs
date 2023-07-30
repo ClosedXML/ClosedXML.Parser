@@ -2,8 +2,33 @@
 
 public enum BinaryOperation
 {
+    #region Text operators
+    
     /// <summary><c>&amp;</c></summary>
     Concat,
+
+    #endregion
+
+    #region Arithmetic operators
+
+    /// <summary><c>+</c></summary>
+    Addition,
+
+    /// <summary><c>-</c></summary>
+    Subtraction,
+
+    /// <summary><c>*</c></summary>
+    Multiplication,
+
+    /// <summary><c>/</c></summary>
+    Division,
+
+    /// <summary><c>^</c></summary>
+    Power,
+
+    #endregion
+
+    #region Comparison operators
 
     /// <summary><c>&gt;=</c></summary>
     GreaterOrEqualThan,
@@ -23,20 +48,9 @@ public enum BinaryOperation
     /// <summary><c>=</c></summary>
     Equal,
 
-    /// <summary><c>+</c></summary>
-    Addition,
+    #endregion
 
-    /// <summary><c>-</c></summary>
-    Subtraction,
-
-    /// <summary><c>*</c></summary>
-    Multiplication,
-
-    /// <summary><c>/</c></summary>
-    Division,
-
-    /// <summary><c>^</c></summary>
-    Power,
+    #region Range operators
 
     /// <summary><c>,</c></summary>
     Union,
@@ -46,4 +60,6 @@ public enum BinaryOperation
 
     /// <summary><c>:</c></summary>
     Range,
+
+    #endregion
 }
