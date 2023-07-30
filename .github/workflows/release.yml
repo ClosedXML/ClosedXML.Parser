@@ -28,9 +28,20 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
 
+    # Materialize signing from GitHub secrets, so nobody can impersonate us.
+    - name: Materialize Signing Key
+      id: write_sign_key_file
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'MyKeys.snk'
+        encodedString: ${{ secrets.SIGNING_KEY }}    
+
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
     - run: dotnet pack ./src/ClosedXML.Parser/ClosedXML.Parser.csproj --configuration Release --output ${{ env.NuGetDirectory }}
-
+      env:
+        SignAssembly: true
+        AssemblyOriginatorKeyFile: ${{ steps.write_sign_key_file.outputs.filePath }}
+    
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v3
       with:
