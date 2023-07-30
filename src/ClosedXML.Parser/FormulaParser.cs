@@ -666,6 +666,13 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
                 value = _factory.NumberValue(_context, -ParseNumber(GetCurrentToken()));
                 break;
+            case Token.PLUS:
+                Consume();
+                if (_la != Token.NUMERICAL_CONSTANT)
+                    throw UnexpectedTokenError(Token.NUMERICAL_CONSTANT);
+
+                value = _factory.NumberValue(_context, ParseNumber(GetCurrentToken()));
+                break;
             case Token.NUMERICAL_CONSTANT:
                 value = _factory.NumberValue(_context, ParseNumber(GetCurrentToken()));
                 break;

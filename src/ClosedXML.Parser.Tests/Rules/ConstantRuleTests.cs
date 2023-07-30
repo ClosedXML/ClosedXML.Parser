@@ -64,6 +64,12 @@ public class ConstantRuleTests
     }
 
     [Fact]
+    public void Number_in_array_can_have_plus_prefix()
+    {
+        AssertFormula.SingleNodeParsed("{+3}", new ArrayNode(1, 1, new[] { new ScalarValue(3) }));
+    }
+
+    [Fact]
     public void Array_cant_contain_blanks()
     {
         AssertFormula.CheckParsingErrorContains("{1,,}", " Unexpected token COMMA.");

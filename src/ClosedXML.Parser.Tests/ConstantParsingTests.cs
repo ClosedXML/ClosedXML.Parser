@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace ClosedXML.Parser.Tests;
+﻿namespace ClosedXML.Parser.Tests;
 
 public class ConstantParsingTests
 {
