@@ -17,13 +17,18 @@
     <PackageProjectUrl>https://github.com/ClosedXML/ClosedXML.Parser</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ClosedXML/ClosedXML.Parser</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageVersion>1.0.0-beta3</PackageVersion>
+    <PackageVersion>1.0.0-beta4</PackageVersion>
   </PropertyGroup>
   
   <!-- Include symbols for .snupkg package -->
   <PropertyGroup>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../ClosedXML.Parser.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,7 +48,7 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>ClosedXML.Parser.Tests</_Parameter1>
+      <_Parameter1>ClosedXML.Parser.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001001d035fc5043743a168b95446be49a80933b86902fda65095d8c3ee0cc6f97fbf1abbc1ddd0a3f48143e3aa5bc4048779e77f5a0db4612f84ba56edc9582da70fb128fcc6cf9a46e466e6deaafe62dc5dfc1d24691428dadc44d39be63de12b11d8dec4c87a039477f90f8e6da85f382288128200bbff02cf482a41acf249d7b2</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 </Project>
