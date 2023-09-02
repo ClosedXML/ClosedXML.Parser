@@ -20,7 +20,7 @@ public class CellReferenceRuleTests
             yield return new object[]
             {
                 "Z5",
-                new ReferenceNode(new ReferenceArea(26, 5))
+                new ReferenceNode(new ReferenceSymbol(26, 5))
             };
 
             // "MS-XLSX 2.2.2.1: The formula MUST NOT use the bang-reference or bang-name.
@@ -39,7 +39,7 @@ public class CellReferenceRuleTests
                     2,
                     "First",
                     "Second",
-                    new ReferenceArea(
+                    new ReferenceSymbol(
                         new RowCol(2, 3),
                         new RowCol(4, 5)))
             };
@@ -51,7 +51,7 @@ public class CellReferenceRuleTests
                 new ExternalSheetReferenceNode(
                     2,
                     "First",
-                    new ReferenceArea(
+                    new ReferenceSymbol(
                         new RowCol(2, 3),
                         new RowCol(4, 5)))
             };

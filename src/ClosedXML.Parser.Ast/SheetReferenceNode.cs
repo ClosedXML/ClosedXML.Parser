@@ -1,9 +1,9 @@
 ﻿namespace ClosedXML.Parser;
 
-public record SheetReferenceNode(string Sheet, ReferenceArea Area) : AstNode
+public record SheetReferenceNode(string Sheet, ReferenceSymbol Reference) : AstNode
 {
     public override string GetDisplayString(ReferenceStyle style)
     {
-        return $"{Sheet}!{Area.GetDisplayString(style)}";
+        return $"{Sheet}!{Reference.GetDisplayString(style)}";
     }
 }

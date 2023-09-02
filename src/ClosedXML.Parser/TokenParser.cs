@@ -133,7 +133,7 @@ internal static class TokenParser
         return functionName;
     }
 
-    internal static ReferenceArea ParseReference(ReadOnlySpan<char> input, bool isA1)
+    internal static ReferenceSymbol ParseReference(ReadOnlySpan<char> input, bool isA1)
     {
         return isA1 ? ParseA1Reference(input) : ParseR1C1Reference(input);
     }
@@ -142,18 +142,18 @@ internal static class TokenParser
     /// Parse <c>A1_REFERENCE</c> token in R1C1 mode.
     /// </summary>
     /// <param name="token">The span of a token.</param>
-    private static ReferenceArea ParseR1C1Reference(ReadOnlySpan<char> token)
+    private static ReferenceSymbol ParseR1C1Reference(ReadOnlySpan<char> token)
     {
         var i = 0;
-        var ref1 = ParseR1C1Reference(token, ref i);
+        var rowCol1 = ParseR1C1Reference(token, ref i);
         if (i == token.Length)
-            return new ReferenceArea(ref1, ref1);
+            return new ReferenceSymbol(rowCol1, rowCol1);
 
         if (token[i++] != ':')
             throw Bug();
 
-        var ref2 = ParseR1C1Reference(token, ref i);
-        return new ReferenceArea(ref1, ref2);
+        var rowCol2 = ParseR1C1Reference(token, ref i);
+        return new ReferenceSymbol(rowCol1, rowCol2);
     }
 
     private static RowCol ParseR1C1Reference(ReadOnlySpan<char> token, ref int i)
@@ -234,7 +234,7 @@ internal static class TokenParser
     /// <summary>
     /// Extract info about cell reference from a <c>A1_REFERENCE</c> token.
     /// </summary>
-    private static ReferenceArea ParseA1Reference(ReadOnlySpan<char> input)
+    private static ReferenceSymbol ParseA1Reference(ReadOnlySpan<char> input)
     {
         // The point of this method is to be fast, not pretty. It assumes that input has
         // already been checked by lexer and thus will never be incorrect.
@@ -254,7 +254,7 @@ internal static class TokenParser
                 i++; // Skip '$'
 
             var row2 = ReadRow(input, ref i);
-            return new ReferenceArea(
+            return new ReferenceSymbol(
                 new RowCol(true, 1, abs1, row1), 
                 new RowCol(true, MaxCol, absRow2, row2));
         }
@@ -269,7 +269,7 @@ internal static class TokenParser
                 i++;
 
             var col2 = ReadColumn(input, ref i);
-            return new ReferenceArea(
+            return new ReferenceSymbol(
                 new RowCol(abs1, col, true, 1), 
                 new RowCol(absCol2, col2, true, MaxRow));
         }
@@ -288,13 +288,13 @@ internal static class TokenParser
         if (i == input.Length)
         {
             // A1_CELL
-            return new ReferenceArea(cell, cell);
+            return new ReferenceSymbol(cell, cell);
         }
 
         // A1_AREA
         i++; // Skip ':'
         var secondCell = ReadCell(input, ref i);
-        return new ReferenceArea(cell, secondCell);
+        return new ReferenceSymbol(cell, secondCell);
     }
 
     private static RowCol ReadCell(ReadOnlySpan<char> input, ref int i)

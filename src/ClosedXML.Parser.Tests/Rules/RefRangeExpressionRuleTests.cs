@@ -17,8 +17,8 @@ public class RefRangeExpressionRuleTests
         {
             Children = new AstNode[]
             {
-                new ReferenceNode(new ReferenceArea(1, 1)),
-                new SheetReferenceNode("Sheet1", new ReferenceArea(2, 2))
+                new ReferenceNode(new ReferenceSymbol(1, 1)),
+                new SheetReferenceNode("Sheet1", new ReferenceSymbol(2, 2))
             }
         };
         AssertFormula.SingleNodeParsed(formula, expectedNode);
@@ -29,7 +29,7 @@ public class RefRangeExpressionRuleTests
     {
         // JAN and DEC are columns in A1 notation
         var formula = "JAN:DEC!B2";
-        var expectedNode = new Reference3DNode("JAN", "DEC", new ReferenceArea(2, 2));
+        var expectedNode = new Reference3DNode("JAN", "DEC", new ReferenceSymbol(2, 2));
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
@@ -40,7 +40,7 @@ public class RefRangeExpressionRuleTests
         {
             Children = new AstNode[]
             {
-                new ReferenceNode(new ReferenceArea(1, 5)),
+                new ReferenceNode(new ReferenceSymbol(1, 5)),
                 new UnaryNode(UnaryOperation.SpillRange)
                 {
                     Children = new AstNode[]
@@ -62,7 +62,7 @@ public class RefRangeExpressionRuleTests
             yield return new object[]
             {
                 "A1",
-                new ReferenceNode(new ReferenceArea(1, 1))
+                new ReferenceNode(new ReferenceSymbol(1, 1))
             };
 
             // ref_range_expression : ref_atom_expression COLON ref_atom_expression
@@ -85,7 +85,7 @@ public class RefRangeExpressionRuleTests
                     new BinaryNode(
                         BinaryOperation.Range,
                         new ValueNode("Error", "#REF!"),
-                        new ReferenceNode(new ReferenceArea(2, 1))),
+                        new ReferenceNode(new ReferenceSymbol(2, 1))),
                     new NameNode("last"))
             };
         }

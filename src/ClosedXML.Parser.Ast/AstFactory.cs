@@ -54,29 +54,29 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ArrayNode(rows, columns, array);
     }
 
-    public AstNode Reference(Ctx _, ReferenceArea area)
+    public AstNode Reference(Ctx _, ReferenceSymbol reference)
     {
-        return new ReferenceNode(area);
+        return new ReferenceNode(reference);
     }
 
-    public AstNode SheetReference(Ctx _, string sheet, ReferenceArea area)
+    public AstNode SheetReference(Ctx _, string sheet, ReferenceSymbol reference)
     {
-        return new SheetReferenceNode(sheet, area);
+        return new SheetReferenceNode(sheet, reference);
     }
 
-    public AstNode Reference3D(Ctx _, string firstSheet, string lastSheet, ReferenceArea area)
+    public AstNode Reference3D(Ctx _, string firstSheet, string lastSheet, ReferenceSymbol reference)
     {
-        return new Reference3DNode(firstSheet, lastSheet, area);
+        return new Reference3DNode(firstSheet, lastSheet, reference);
     }
 
-    public AstNode ExternalSheetReference(Ctx _, int workbookIndex, string sheet, ReferenceArea area)
+    public AstNode ExternalSheetReference(Ctx _, int workbookIndex, string sheet, ReferenceSymbol reference)
     {
-        return new ExternalSheetReferenceNode(workbookIndex, sheet, area);
+        return new ExternalSheetReferenceNode(workbookIndex, sheet, reference);
     }
 
-    public AstNode ExternalReference3D(Ctx _, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea area)
+    public AstNode ExternalReference3D(Ctx _, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
     {
-        return new ExternalReference3DNode(workbookIndex, firstSheet, lastSheet, area);
+        return new ExternalReference3DNode(workbookIndex, firstSheet, lastSheet, reference);
     }
 
     public AstNode Function(Ctx _, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)

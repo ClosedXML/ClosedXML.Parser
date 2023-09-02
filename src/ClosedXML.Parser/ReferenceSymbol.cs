@@ -7,7 +7,7 @@ namespace ClosedXML.Parser;
 /// an area in a sheet. This is the DTO from parser to engine. Two corners make an area
 /// for A1 notation, but not for R1C1 (has several edge cases).
 /// </summary>
-public readonly struct ReferenceArea
+public readonly struct ReferenceSymbol
 {
     /// <summary>
     /// First reference. First in terms of position in formula, not position in sheet.
@@ -20,7 +20,7 @@ public readonly struct ReferenceArea
     /// </summary>
     public readonly RowCol Second;
 
-    public ReferenceArea(RowCol first, RowCol second)
+    public ReferenceSymbol(RowCol first, RowCol second)
     {
         First = first;
         Second = second;
@@ -29,7 +29,7 @@ public readonly struct ReferenceArea
     /// <summary>
     /// Create an area for a single reference.
     /// </summary>
-    public ReferenceArea(RowCol rowCol)
+    public ReferenceSymbol(RowCol rowCol)
     {
         First = rowCol;
         Second = rowCol;
@@ -42,7 +42,7 @@ public readonly struct ReferenceArea
     /// <param name="columnPosition">Column position.</param>
     /// <param name="rowType">Row axis type of a reference.</param>
     /// <param name="rowPosition">Row position.</param>
-    public ReferenceArea(ReferenceAxisType columnType, int columnPosition, ReferenceAxisType rowType, int rowPosition)
+    public ReferenceSymbol(ReferenceAxisType columnType, int columnPosition, ReferenceAxisType rowType, int rowPosition)
         : this(new RowCol(columnType, columnPosition, rowType, rowPosition))
     {
     }
@@ -52,7 +52,7 @@ public readonly struct ReferenceArea
     /// </summary>
     /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
-    public ReferenceArea(int columnPosition, int rowPosition)
+    public ReferenceSymbol(int columnPosition, int rowPosition)
         : this(new RowCol(ReferenceAxisType.Relative, columnPosition, ReferenceAxisType.Relative, rowPosition))
     {
     }

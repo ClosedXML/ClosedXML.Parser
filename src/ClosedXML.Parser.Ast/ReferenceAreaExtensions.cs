@@ -2,12 +2,12 @@
 
 internal static class ReferenceAreaExtensions
 {
-    public static string GetDisplayString(this ReferenceArea area, ReferenceStyle style)
+    public static string GetDisplayString(this ReferenceSymbol reference, ReferenceStyle style)
     {
         return style switch
         {
-            ReferenceStyle.A1 => area.GetDisplayStringA1(),
-            ReferenceStyle.R1C1 => area.GetDisplayStringR1C1(),
+            ReferenceStyle.A1 => reference.GetDisplayStringA1(),
+            ReferenceStyle.R1C1 => reference.GetDisplayStringR1C1(),
             _ => throw new NotSupportedException()
         };
     }

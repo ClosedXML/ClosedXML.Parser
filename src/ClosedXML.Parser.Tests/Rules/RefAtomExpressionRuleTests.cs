@@ -17,7 +17,7 @@ public class RefAtomExpressionRuleTests
     [Fact]
     public void Cell_reference()
     {
-        VerifyNode("A1", new ReferenceNode(new ReferenceArea(1, 1)));
+        VerifyNode("A1", new ReferenceNode(new ReferenceSymbol(1, 1)));
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class RefAtomExpressionRuleTests
             Children = new AstNode[]
             {
                 new ValueNode(true),
-                new ReferenceNode(new ReferenceArea(2, 5))
+                new ReferenceNode(new ReferenceSymbol(2, 5))
             }
         });
     }
@@ -42,13 +42,13 @@ public class RefAtomExpressionRuleTests
     [Fact]
     public void Name_reference_starts_3D_reference()
     {
-        VerifyNode("Sheet1:Sheet3!A1", new Reference3DNode("Sheet1", "Sheet3", new ReferenceArea(1, 1)));
+        VerifyNode("Sheet1:Sheet3!A1", new Reference3DNode("Sheet1", "Sheet3", new ReferenceSymbol(1, 1)));
     }
 
     [Fact]
     public void Sheet_reference_can_have_whitespace_after_exclamation_mark()
     {
-        VerifyNode("Sheet2!  A1", new SheetReferenceNode("Sheet2", new ReferenceArea(1, 1)));
+        VerifyNode("Sheet2!  A1", new SheetReferenceNode("Sheet2", new ReferenceSymbol(1, 1)));
     }
 
     [Fact]
