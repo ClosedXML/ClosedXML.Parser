@@ -2,12 +2,12 @@
 
 internal static class ReferenceExtensions
 {
-    public static string GetDisplayString(this Reference reference, ReferenceStyle style)
+    public static string GetDisplayString(this RowCol rowCol, ReferenceStyle style)
     {
         return style switch
         {
-            ReferenceStyle.A1 => reference.GetDisplayStringA1(),
-            ReferenceStyle.R1C1 => reference.GetDisplayStringR1C1(),
+            ReferenceStyle.A1 => rowCol.GetDisplayStringA1(),
+            ReferenceStyle.R1C1 => rowCol.GetDisplayStringR1C1(),
             _ => throw new NotSupportedException()
         };
     }

@@ -40,8 +40,8 @@ public class CellReferenceRuleTests
                     "First",
                     "Second",
                     new ReferenceArea(
-                        new Reference(2, 3),
-                        new Reference(4, 5)))
+                        new RowCol(2, 3),
+                        new RowCol(4, 5)))
             };
 
             // cell_reference: SINGLE_SHEET_PREFIX A1_REFERENCE
@@ -52,8 +52,8 @@ public class CellReferenceRuleTests
                     2,
                     "First",
                     new ReferenceArea(
-                        new Reference(2, 3),
-                        new Reference(4, 5)))
+                        new RowCol(2, 3),
+                        new RowCol(4, 5)))
             };
 
             // cell_reference: SINGLE_SHEET_PREFIX REF_CONSTANT

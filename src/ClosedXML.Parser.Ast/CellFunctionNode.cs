@@ -1,6 +1,6 @@
 ﻿namespace ClosedXML.Parser;
 
-public record CellFunctionNode(Reference Reference) : AstNode
+public record CellFunctionNode(RowCol RowCol) : AstNode
 {
-    public override string GetDisplayString(ReferenceStyle style) => Reference.GetDisplayString(style);
+    public override string GetDisplayString(ReferenceStyle style) => RowCol.GetDisplayString(style);
 }

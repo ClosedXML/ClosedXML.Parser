@@ -1,15 +1,35 @@
 ﻿using System;
 using System.Text;
+using static ClosedXML.Parser.ReferenceAxisType;
 
 namespace ClosedXML.Parser;
 
 /// <summary>
-/// A reference to a sheet defined by row and column axis. Not all combinations are
-/// valid and the content of the reference corresponds to a valid token in expected
-/// reference style (e.g. in R1C1, <c>R</c> is a valid standalone reference, but
-/// there is no such possibility for A1).
+/// <para>
+/// One endpoint of a reference defined by row and column axis. It can be
+/// <list type="bullet">
+///   <item>
+///   A single cell that is an intersection of row and a column
+///   </item>
+///   <item>
+///   An entire row, e.g. <c><em>A</em>:B</c> or <c><em>R5</em>:R10</c>.
+///   </item>
+///   <item>
+///   An entire column, e.g. <c><em>7</em>:14</c> or <c><em>C7</em>:C10</c>.
+///   </item>
+/// </list>
+/// The content of values and thus their interpretation depends on the
+/// <see cref="ReferenceArea"/> reference style, e.g. column 14 with
+/// <see cref="Relative"/> can indicate <c>R[14]</c> or <c>X14</c> for A1
+/// style.
+/// </para>
+/// <para>
+/// Not all combinations are valid and the content of the reference corresponds
+/// to a valid token in expected reference style (e.g. in R1C1, <c>R</c> is
+/// a valid standalone reference, but there is no such possibility for A1).
+/// </para>
 /// </summary>
-public readonly struct Reference : IEquatable<Reference>
+public readonly struct RowCol : IEquatable<RowCol>
 {
     /// <summary>
     /// How to interpret the <see cref="ColumnValue"/> value.
@@ -31,10 +51,16 @@ public readonly struct Reference : IEquatable<Reference>
     /// </summary>
     public readonly int RowValue;
 
-    public Reference(ReferenceAxisType columnType, int columnValue, ReferenceAxisType rowType, int rowValue)
+    public RowCol(ReferenceAxisType columnType, int columnValue, ReferenceAxisType rowType, int rowValue)
     {
-        if (columnType == ReferenceAxisType.None && rowType == ReferenceAxisType.None)
-            throw new ArgumentException($"At least one of axis must be non-none.");
+        if (columnType == None && rowType == None)
+            throw new ArgumentException("At least one of axis must be non-none.");
+
+        if (columnType == None && columnValue != 0)
+            throw new ArgumentException("Value for `None` type must be zero.", nameof(columnValue));
+
+        if (rowType == None && rowValue != 0)
+            throw new ArgumentException("Value for `None` type must be zero.", nameof(rowValue));
 
         ColumnType = columnType;
         ColumnValue = columnValue;
@@ -42,19 +68,19 @@ public readonly struct Reference : IEquatable<Reference>
         RowValue = rowValue;
     }
 
-    public Reference(bool colAbs, int columnValue, bool rowAbs, int rowValue)
-        : this(colAbs ? ReferenceAxisType.Absolute : ReferenceAxisType.Relative, columnValue, rowAbs ? ReferenceAxisType.Absolute : ReferenceAxisType.Relative, rowValue)
+    public RowCol(bool colAbs, int columnValue, bool rowAbs, int rowValue)
+        : this(colAbs ? Absolute : Relative, columnValue, rowAbs ? Absolute : Relative, rowValue)
     {
     }
 
-    public Reference(int column, int row)
-        : this(ReferenceAxisType.Relative, column, ReferenceAxisType.Relative, row)
+    public RowCol(int column, int row)
+        : this(Relative, column, Relative, row)
     {
     }
 
-    public static bool operator ==(Reference lhs, Reference rhs) => lhs.Equals(rhs);
+    public static bool operator ==(RowCol lhs, RowCol rhs) => lhs.Equals(rhs);
 
-    public static bool operator !=(Reference lhs, Reference rhs) => !(lhs == rhs);
+    public static bool operator !=(RowCol lhs, RowCol rhs) => !(lhs == rhs);
 
     /// <summary>
     /// Get a reference in A1 notation. The content must have been created from A1
@@ -65,15 +91,15 @@ public readonly struct Reference : IEquatable<Reference>
         var sb = new StringBuilder();
         switch (ColumnType)
         {
-            case ReferenceAxisType.Absolute:
+            case Absolute:
                 sb.Append('$').Append(GetA1Reference());
                 break;
 
-            case ReferenceAxisType.Relative:
+            case Relative:
                 sb.Append(GetA1Reference());
                 break;
 
-            case ReferenceAxisType.None:
+            case None:
                 break;
 
             default:
@@ -82,15 +108,15 @@ public readonly struct Reference : IEquatable<Reference>
 
         switch (RowType)
         {
-            case ReferenceAxisType.Absolute:
+            case Absolute:
                 sb.Append('$').Append(RowValue);
                 break;
 
-            case ReferenceAxisType.Relative:
+            case Relative:
                 sb.Append(RowValue);
                 break;
 
-            case ReferenceAxisType.None:
+            case None:
                 break;
 
             default:
@@ -112,19 +138,20 @@ public readonly struct Reference : IEquatable<Reference>
         {
             switch (type)
             {
-                case ReferenceAxisType.Absolute:
+                case Absolute:
                     sb.Append(axis).Append(position);
                     break;
 
-                case ReferenceAxisType.Relative when position != 0:
+                case Relative when position != 0:
                     sb.Append(axis).Append('[').Append(position).Append(']');
                     break;
 
-                case ReferenceAxisType.Relative when position == 0:
+                case Relative:
+                    // position is always 0
                     sb.Append(axis);
                     break;
 
-                case ReferenceAxisType.None:
+                case None:
                     break;
 
                 default:
@@ -151,10 +178,10 @@ public readonly struct Reference : IEquatable<Reference>
 
     public override bool Equals(object obj)
     {
-        return obj is Reference other && Equals(other);
+        return obj is RowCol other && Equals(other);
     }
 
-    public bool Equals(Reference other)
+    public bool Equals(RowCol other)
     {
         return ColumnType == other.ColumnType &&
                ColumnValue == other.ColumnValue &&

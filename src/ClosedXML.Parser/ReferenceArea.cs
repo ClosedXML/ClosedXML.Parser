@@ -12,15 +12,15 @@ public readonly struct ReferenceArea
     /// <summary>
     /// First reference. First in terms of position in formula, not position in sheet.
     /// </summary>
-    public readonly Reference First;
+    public readonly RowCol First;
 
     /// <summary>
     /// Second reference. Second in terms of position in formula, not position in sheet.
     /// If area was specified using only one corner, the value is same as <see cref="First"/>.
     /// </summary>
-    public readonly Reference Second;
+    public readonly RowCol Second;
 
-    public ReferenceArea(Reference first, Reference second)
+    public ReferenceArea(RowCol first, RowCol second)
     {
         First = first;
         Second = second;
@@ -29,21 +29,21 @@ public readonly struct ReferenceArea
     /// <summary>
     /// Create an area for a single reference.
     /// </summary>
-    public ReferenceArea(Reference reference)
+    public ReferenceArea(RowCol rowCol)
     {
-        First = reference;
-        Second = reference;
+        First = rowCol;
+        Second = rowCol;
     }
 
     /// <summary>
-    /// Create a new area from a single <see cref="Reference"/>.
+    /// Create a new area from a single <see cref="RowCol"/>.
     /// </summary>
     /// <param name="columnType">Column axis type of a reference.</param>
     /// <param name="columnPosition">Column position.</param>
     /// <param name="rowType">Row axis type of a reference.</param>
     /// <param name="rowPosition">Row position.</param>
     public ReferenceArea(ReferenceAxisType columnType, int columnPosition, ReferenceAxisType rowType, int rowPosition)
-        : this(new Reference(columnType, columnPosition, rowType, rowPosition))
+        : this(new RowCol(columnType, columnPosition, rowType, rowPosition))
     {
     }
 
@@ -53,7 +53,7 @@ public readonly struct ReferenceArea
     /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
     public ReferenceArea(int columnPosition, int rowPosition)
-        : this(new Reference(ReferenceAxisType.Relative, columnPosition, ReferenceAxisType.Relative, rowPosition))
+        : this(new RowCol(ReferenceAxisType.Relative, columnPosition, ReferenceAxisType.Relative, rowPosition))
     {
     }
 

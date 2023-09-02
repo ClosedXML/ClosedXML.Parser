@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ClosedXML.Parser;
 
 /// <summary>
-/// A factory used to create an AST through <see cref="FormulaParser{TScalarValue,TNode}"/>.
+/// A factory used to create an AST through <see cref="FormulaParser{TScalarValue,TNode,TContext}"/>.
 /// </summary>
 /// <remarks>
 /// Sheet names are in most cases strings, while most other texts are <c>ReadOnlySpan&lt;char&gt;</c>.
@@ -158,9 +158,9 @@ public interface IAstFactory<TScalarValue, TNode, TContext>
     /// </summary>
     /// <remarks>Cell functions are not yet supported by Excel, but are part of a grammar.</remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    /// <param name="cell">A reference to a cell with a LAMBDA.</param>
+    /// <param name="cell">A reference to a cell with a LAMBDA. Is a single cell.</param>
     /// <param name="arguments">Arguments to pass to a LAMBDA.</param>
-    TNode CellFunction(TContext context, Reference cell, IReadOnlyList<TNode> arguments);
+    TNode CellFunction(TContext context, RowCol cell, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a node to represent a structure reference without a table to a range of columns.

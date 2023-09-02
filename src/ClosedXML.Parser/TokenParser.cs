@@ -117,7 +117,7 @@ internal static class TokenParser
         return buffer.Slice(0, bufferIdx).ToString();
     }
 
-    internal static Reference ExtractCellFunction(ReadOnlySpan<char> cellFunctionToken)
+    internal static RowCol ExtractCellFunction(ReadOnlySpan<char> cellFunctionToken)
     {
         var i = 0;
         return ReadCell(cellFunctionToken, ref i);
@@ -156,13 +156,13 @@ internal static class TokenParser
         return new ReferenceArea(ref1, ref2);
     }
 
-    private static Reference ParseR1C1Reference(ReadOnlySpan<char> token, ref int i)
+    private static RowCol ParseR1C1Reference(ReadOnlySpan<char> token, ref int i)
     {
         if (token[i] is 'C' or 'c')
         {
             // Token is COLUMN. ROW must be after column, so there can't be one.
             var loneCol = ReadR1C1Axis(token, ref i);
-            return new Reference(loneCol.Type, loneCol.Value, ReferenceAxisType.None, 0);
+            return new RowCol(loneCol.Type, loneCol.Value, ReferenceAxisType.None, 0);
         }
 
         // It must be a row.
@@ -173,11 +173,11 @@ internal static class TokenParser
 
         // Token is ROW. Either it has ended or it is followed by :
         if (i == token.Length || token[i] is not ('C' or 'c'))
-            return new Reference(ReferenceAxisType.None, 0, row.Type, row.Value);
+            return new RowCol(ReferenceAxisType.None, 0, row.Type, row.Value);
 
         // Token is ROW COLUMN
         var col = ReadR1C1Axis(token, ref i);
-        return new Reference(col.Type, col.Value, row.Type, row.Value);
+        return new RowCol(col.Type, col.Value, row.Type, row.Value);
     }
 
     /// <summary>
@@ -255,8 +255,8 @@ internal static class TokenParser
 
             var row2 = ReadRow(input, ref i);
             return new ReferenceArea(
-                new Reference(true, 1, abs1, row1), 
-                new Reference(true, MaxCol, absRow2, row2));
+                new RowCol(true, 1, abs1, row1), 
+                new RowCol(true, MaxCol, absRow2, row2));
         }
 
         var col = ReadColumn(input, ref i);
@@ -270,8 +270,8 @@ internal static class TokenParser
 
             var col2 = ReadColumn(input, ref i);
             return new ReferenceArea(
-                new Reference(abs1, col, true, 1), 
-                new Reference(absCol2, col2, true, MaxRow));
+                new RowCol(abs1, col, true, 1), 
+                new RowCol(absCol2, col2, true, MaxRow));
         }
 
         var secondAbsolute = IsAbsolute(input, i);
@@ -284,7 +284,7 @@ internal static class TokenParser
         // A1_CELL | A1_AREA : A1_CELL ':' A1_CELL
         var row = ReadRow(input, ref i);
 
-        var cell = new Reference(abs1, col, secondAbsolute, row);
+        var cell = new RowCol(abs1, col, secondAbsolute, row);
         if (i == input.Length)
         {
             // A1_CELL
@@ -297,7 +297,7 @@ internal static class TokenParser
         return new ReferenceArea(cell, secondCell);
     }
 
-    private static Reference ReadCell(ReadOnlySpan<char> input, ref int i)
+    private static RowCol ReadCell(ReadOnlySpan<char> input, ref int i)
     {
         var colAbs = IsAbsolute(input, i);
         if (colAbs)
@@ -309,7 +309,7 @@ internal static class TokenParser
             i++;
 
         var row = ReadRow(input, ref i);
-        return new Reference(colAbs, col, rowAbs, row);
+        return new RowCol(colAbs, col, rowAbs, row);
     }
 
     private static bool IsAbsolute(ReadOnlySpan<char> input, int startIdx) => input[startIdx] == '$';

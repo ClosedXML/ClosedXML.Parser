@@ -23,14 +23,14 @@ public class ReferenceAreaTests
             // When both corners are same, only one is rendered.
             yield return new object[]
             {
-                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1), new Reference(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1)),
+                new ReferenceArea(new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1), new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1)),
                 "A1"
             };
 
             // When both corners are same, only one is rendered.
             yield return new object[]
             {
-                new ReferenceArea(new Reference(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1), new Reference(ReferenceAxisType.Relative, 3, ReferenceAxisType.Relative, 5)),
+                new ReferenceArea(new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1), new RowCol(ReferenceAxisType.Relative, 3, ReferenceAxisType.Relative, 5)),
                 "A1:C5"
             };
         }
@@ -42,13 +42,13 @@ public class ReferenceAreaTests
         {
             yield return new object[]
             {
-                new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7), new Reference(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7)),
+                new ReferenceArea(new RowCol(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7), new RowCol(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7)),
                 "R7C1"
             };
 
             yield return new object[]
             {
-                new ReferenceArea(new Reference(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7), new Reference(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, 0)),
+                new ReferenceArea(new RowCol(ReferenceAxisType.Absolute, 1, ReferenceAxisType.Absolute, 7), new RowCol(ReferenceAxisType.None, 0, ReferenceAxisType.Relative, 0)),
                 "R7C1:R"
             };
        }

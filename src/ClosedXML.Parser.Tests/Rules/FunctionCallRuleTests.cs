@@ -33,7 +33,7 @@ public class FunctionCallRuleTests
     [Fact]
     public void Function_can_be_cell_function()
     {
-        var expectedNode = new CellFunctionNode(new Reference(false, 2, true, 3)) { Children = new AstNode[] { new ValueNode("Number", 5.0) } };
+        var expectedNode = new CellFunctionNode(new RowCol(false, 2, true, 3)) { Children = new AstNode[] { new ValueNode("Number", 5.0) } };
         AssertFormula.SingleNodeParsed("B$3(5)", expectedNode);
     }
 }
