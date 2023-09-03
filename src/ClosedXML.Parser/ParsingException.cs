@@ -7,7 +7,7 @@ namespace ClosedXML.Parser;
 /// </summary>
 public class ParsingException : Exception
 {
-    public ParsingException(string message) : base(message)
+    internal ParsingException(string message) : base(message)
     {
     }
 }

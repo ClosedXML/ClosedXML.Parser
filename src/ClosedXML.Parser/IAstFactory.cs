@@ -15,7 +15,7 @@ namespace ClosedXML.Parser;
 /// <typeparam name="TScalarValue">Type of a scalar value used across expressions.</typeparam>
 /// <typeparam name="TNode">Type of a node used in the AST.</typeparam>
 /// <typeparam name="TContext">A context of the parsing. It's passed to every factory method and can contain global info that doesn't belong individual nodes.</typeparam>
-public interface IAstFactory<TScalarValue, TNode, TContext>
+public interface IAstFactory<TScalarValue, TNode, in TContext>
     where TNode : class
 {
     /// <summary>
@@ -149,8 +149,23 @@ public interface IAstFactory<TScalarValue, TNode, TContext>
     /// <param name="args">Nodes of argument values.</param>
     TNode Function(TContext context, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> args);
 
-    TNode ExternalFunction(TContext context, int workbookIndex, string sheet, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
+    /// <summary>
+    /// Create a node for a sheet-scoped function from an external workbook.
+    /// </summary>
+    /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
+    /// <param name="sheetName">Name of a sheet in external workbook.</param>
+    /// <param name="functionName">Name of the function.</param>
+    /// <param name="arguments">Nodes of argument values.</param>
+    TNode ExternalFunction(TContext context, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
+    /// <summary>
+    /// Create a node for a function from an external workbook.
+    /// </summary>
+    /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
+    /// <param name="functionName">Name of the function.</param>
+    /// <param name="arguments">Nodes of argument values.</param>
     TNode ExternalFunction(TContext context, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
     /// <summary>

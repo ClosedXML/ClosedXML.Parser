@@ -1,5 +1,8 @@
 ﻿namespace ClosedXML.Parser;
 
+/// <summary>
+/// Binary operations that can occur in the formula.
+/// </summary>
 public enum BinaryOperation
 {
     #region Text operators

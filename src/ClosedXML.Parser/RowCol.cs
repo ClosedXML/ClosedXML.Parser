@@ -51,7 +51,14 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// </summary>
     public readonly int RowValue;
 
-    public RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue)
+    /// <summary>
+    /// Create a new <see cref="RowCol"/> with both row and columns specified.
+    /// </summary>
+    /// <param name="rowType">The type used to interpret the row position.</param>
+    /// <param name="rowValue">The value for the row position.</param>
+    /// <param name="columnType">The type used to interpret the column position.</param>
+    /// <param name="columnValue">The value for the column position.</param>
+    internal RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue)
     {
         if (columnType == None && rowType == None)
             throw new ArgumentException("At least one of axis must be non-none.");
@@ -68,18 +75,39 @@ public readonly struct RowCol : IEquatable<RowCol>
         RowValue = rowValue;
     }
 
-    public RowCol(bool rowAbs, int rowValue, bool colAbs, int columnValue)
+    /// <summary>
+    /// Create a new <see cref="RowCol"/> with both row and columns specified.
+    /// </summary>
+    /// <param name="rowAbs">Is the row reference absolute? If false, then relative.</param>
+    /// <param name="rowValue">The value for the row position.</param>
+    /// <param name="colAbs">Is the column reference absolute? If false, then relative.</param>
+    /// <param name="columnValue">The value for the column position.</param>
+    internal RowCol(bool rowAbs, int rowValue, bool colAbs, int columnValue)
         : this(rowAbs ? Absolute : Relative, rowValue, colAbs ? Absolute : Relative, columnValue)
     {
     }
 
-    public RowCol(int row, int column)
+    /// <summary>
+    /// Create a new <see cref="RowCol"/> with both row and columns specified
+    /// with relative values. Used mostly for A1 style.
+    /// </summary>
+    /// <param name="row">The relative position of the row.</param>
+    /// <param name="column">The relative position of the column.</param>
+    internal RowCol(int row, int column)
         : this(Relative, row, Relative, column)
     {
     }
 
+    /// <summary>
+    /// Compares two <see cref="RowCol"/> objects by value. The result specifies whether
+    /// all properties of the two <see cref="RowCol"/> objects are equal.
+    /// </summary>
     public static bool operator ==(RowCol lhs, RowCol rhs) => lhs.Equals(rhs);
 
+    /// <summary>
+    /// Compares two <see cref="RowCol"/> objects by value. The result specifies whether
+    /// any property of the two <see cref="RowCol"/> objects is not equal.
+    /// </summary>
     public static bool operator !=(RowCol lhs, RowCol rhs) => !(lhs == rhs);
 
     /// <summary>
@@ -126,6 +154,10 @@ public readonly struct RowCol : IEquatable<RowCol>
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Get the representation of the <see cref="RowCol"/> as a text in R1C1
+    /// style.
+    /// </summary>
     public string GetDisplayStringR1C1()
     {
         var sb = new StringBuilder();
@@ -176,11 +208,19 @@ public readonly struct RowCol : IEquatable<RowCol>
         return column;
     }
 
+    /// <summary>
+    /// Check whether the <paramref name="obj"/> is of type <see cref="RowCol"/>
+    /// and all values are same as this one.
+    /// </summary>
     public override bool Equals(object obj)
     {
         return obj is RowCol other && Equals(other);
     }
 
+    /// <summary>
+    /// Check whether the all values of <paramref name="other"/> are same as
+    /// this one.
+    /// </summary>
     public bool Equals(RowCol other)
     {
         return ColumnType == other.ColumnType &&
@@ -189,6 +229,9 @@ public readonly struct RowCol : IEquatable<RowCol>
                RowValue == other.RowValue;
     }
 
+    /// <summary>
+    /// Returns a hash code for this <see cref="RowCol"/>.
+    /// </summary>
     public override int GetHashCode()
     {
         unchecked

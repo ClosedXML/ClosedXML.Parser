@@ -10,17 +10,24 @@ namespace ClosedXML.Parser;
 public readonly struct ReferenceSymbol
 {
     /// <summary>
-    /// First reference. First in terms of position in formula, not position in sheet.
+    /// First reference. First in terms of position in formula, not position
+    /// in sheet.
     /// </summary>
     public readonly RowCol First;
 
     /// <summary>
-    /// Second reference. Second in terms of position in formula, not position in sheet.
-    /// If area was specified using only one corner, the value is same as <see cref="First"/>.
+    /// Second reference. Second in terms of position in formula, not position
+    /// in sheet. If area was specified using only one cell, the value is
+    /// same as <see cref="First"/>.
     /// </summary>
     public readonly RowCol Second;
 
-    public ReferenceSymbol(RowCol first, RowCol second)
+    /// <summary>
+    /// Create a reference symbol using the two <see cref="RowCol"/> (e.g.
+    /// <c>A1:B2</c>) or two columns (e.g. <c>A:D</c>) or two rows (e.g.
+    /// <c>7:8</c>).
+    /// </summary>
+    internal ReferenceSymbol(RowCol first, RowCol second)
     {
         First = first;
         Second = second;
@@ -29,7 +36,7 @@ public readonly struct ReferenceSymbol
     /// <summary>
     /// Create an area for a single reference.
     /// </summary>
-    public ReferenceSymbol(RowCol rowCol)
+    internal ReferenceSymbol(RowCol rowCol)
     {
         First = rowCol;
         Second = rowCol;
@@ -42,7 +49,7 @@ public readonly struct ReferenceSymbol
     /// <param name="rowPosition">Row position.</param>
     /// <param name="columnType">Column axis type of a reference.</param>
     /// <param name="columnPosition">Column position.</param>
-    public ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType, int columnPosition)
+    internal ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType, int columnPosition)
         : this(new RowCol(rowType, rowPosition, columnType, columnPosition))
     {
     }
@@ -52,7 +59,7 @@ public readonly struct ReferenceSymbol
     /// </summary>
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
     /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
-    public ReferenceSymbol(int rowPosition, int columnPosition)
+    internal ReferenceSymbol(int rowPosition, int columnPosition)
         : this(new RowCol(ReferenceAxisType.Relative, rowPosition, ReferenceAxisType.Relative, columnPosition))
     {
     }

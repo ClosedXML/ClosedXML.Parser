@@ -89,9 +89,9 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new FunctionNode(sheet, name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode ExternalFunction(Ctx _, int workbookIndex, string sheet, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode ExternalFunction(Ctx _, int workbookIndex, string sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
-        return new ExternalFunctionNode(workbookIndex, sheet, name.ToString())
+        return new ExternalFunctionNode(workbookIndex, sheetName, name.ToString())
         {
             Children = args.ToArray()
         };
