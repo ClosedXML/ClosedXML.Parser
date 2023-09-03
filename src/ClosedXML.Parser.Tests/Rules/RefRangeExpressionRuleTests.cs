@@ -40,7 +40,7 @@ public class RefRangeExpressionRuleTests
         {
             Children = new AstNode[]
             {
-                new ReferenceNode(new ReferenceSymbol(1, 5)),
+                new ReferenceNode(new ReferenceSymbol(5, 1)),
                 new UnaryNode(UnaryOperation.SpillRange)
                 {
                     Children = new AstNode[]
@@ -85,7 +85,7 @@ public class RefRangeExpressionRuleTests
                     new BinaryNode(
                         BinaryOperation.Range,
                         new ValueNode("Error", "#REF!"),
-                        new ReferenceNode(new ReferenceSymbol(2, 1))),
+                        new ReferenceNode(new ReferenceSymbol(1, 2))),
                     new NameNode("last"))
             };
         }

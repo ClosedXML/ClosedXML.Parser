@@ -18,10 +18,10 @@ public class RefIntersectionExpressionRuleTests
                 new BinaryNode(
                     BinaryOperation.Range,
                     new ValueNode("Error", "#REF!"),
-                    new ReferenceNode(new ReferenceSymbol(1, 2))),
+                    new ReferenceNode(new ReferenceSymbol(2, 1))),
                 new BinaryNode(
                     BinaryOperation.Range,
-                    new ReferenceNode(new ReferenceSymbol(1, 3)),
+                    new ReferenceNode(new ReferenceSymbol(3, 1)),
                     new NameNode("two")));
         AssertFormula.SingleNodeParsed("#REF!:A2 A3:two", expectedNode);
     }
@@ -43,7 +43,7 @@ public class RefIntersectionExpressionRuleTests
                 "A1 A2",
                 new BinaryNode(BinaryOperation.Intersection,
                     new ReferenceNode(new ReferenceSymbol(1, 1)),
-                    new ReferenceNode(new ReferenceSymbol(1, 2)))
+                    new ReferenceNode(new ReferenceSymbol(2, 1)))
             };
 
             // ref_intersection_expression : ref_range_expression SPACE ref_range_expression
@@ -53,8 +53,8 @@ public class RefIntersectionExpressionRuleTests
                 new BinaryNode(BinaryOperation.Intersection,
                     new BinaryNode(BinaryOperation.Intersection,
                         new ReferenceNode(new ReferenceSymbol(1, 1)),
-                        new ReferenceNode(new ReferenceSymbol(1, 2))),
-                    new ReferenceNode(new ReferenceSymbol(1, 3)))
+                        new ReferenceNode(new ReferenceSymbol(2, 1))),
+                    new ReferenceNode(new ReferenceSymbol(3, 1)))
             };
         }
     }

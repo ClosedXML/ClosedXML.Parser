@@ -28,7 +28,7 @@ public class RefAtomExpressionRuleTests
             Children = new AstNode[]
             {
                 new ValueNode(true),
-                new ReferenceNode(new ReferenceSymbol(2, 5))
+                new ReferenceNode(new ReferenceSymbol(5, 2))
             }
         });
     }

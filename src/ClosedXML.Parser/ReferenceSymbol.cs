@@ -38,11 +38,11 @@ public readonly struct ReferenceSymbol
     /// <summary>
     /// Create a new area from a single <see cref="RowCol"/>.
     /// </summary>
-    /// <param name="columnType">Column axis type of a reference.</param>
-    /// <param name="columnPosition">Column position.</param>
     /// <param name="rowType">Row axis type of a reference.</param>
     /// <param name="rowPosition">Row position.</param>
-    public ReferenceSymbol(ReferenceAxisType columnType, int columnPosition, ReferenceAxisType rowType, int rowPosition)
+    /// <param name="columnType">Column axis type of a reference.</param>
+    /// <param name="columnPosition">Column position.</param>
+    public ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType, int columnPosition)
         : this(new RowCol(rowType, rowPosition, columnType, columnPosition))
     {
     }
@@ -50,9 +50,9 @@ public readonly struct ReferenceSymbol
     /// <summary>
     /// Create a new area from a single row/column intersection.
     /// </summary>
-    /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
-    public ReferenceSymbol(int columnPosition, int rowPosition)
+    /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
+    public ReferenceSymbol(int rowPosition, int columnPosition)
         : this(new RowCol(ReferenceAxisType.Relative, rowPosition, ReferenceAxisType.Relative, columnPosition))
     {
     }
