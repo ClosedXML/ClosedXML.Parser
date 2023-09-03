@@ -51,7 +51,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// </summary>
     public readonly int RowValue;
 
-    public RowCol(ReferenceAxisType columnType, int columnValue, ReferenceAxisType rowType, int rowValue)
+    public RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue)
     {
         if (columnType == None && rowType == None)
             throw new ArgumentException("At least one of axis must be non-none.");
@@ -68,13 +68,13 @@ public readonly struct RowCol : IEquatable<RowCol>
         RowValue = rowValue;
     }
 
-    public RowCol(bool colAbs, int columnValue, bool rowAbs, int rowValue)
-        : this(colAbs ? Absolute : Relative, columnValue, rowAbs ? Absolute : Relative, rowValue)
+    public RowCol(bool rowAbs, int rowValue, bool colAbs, int columnValue)
+        : this(rowAbs ? Absolute : Relative, rowValue, colAbs ? Absolute : Relative, columnValue)
     {
     }
 
-    public RowCol(int column, int row)
-        : this(Relative, column, Relative, row)
+    public RowCol(int row, int column)
+        : this(Relative, row, Relative, column)
     {
     }
 

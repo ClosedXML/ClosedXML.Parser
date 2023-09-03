@@ -22,8 +22,8 @@ public class CellFunctionListTokenTests
         {
             yield return new object[] { "A1(", new RowCol(1, 1) };
             yield return new object[] { "$A$1(", new RowCol(true, 1, true, 1) };
-            yield return new object[] { "$B3(", new RowCol(true, 2, false, 3) };
-            yield return new object[] { "B$3(", new RowCol(false, 2, true, 3) };
+            yield return new object[] { "$B3(", new RowCol(false, 3, true, 2) };
+            yield return new object[] { "B$3(", new RowCol(true, 3, false, 2) };
         }
     }
 }

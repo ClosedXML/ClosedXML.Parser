@@ -162,7 +162,7 @@ internal static class TokenParser
         {
             // Token is COLUMN. ROW must be after column, so there can't be one.
             var loneCol = ReadR1C1Axis(token, ref i);
-            return new RowCol(loneCol.Type, loneCol.Value, ReferenceAxisType.None, 0);
+            return new RowCol(ReferenceAxisType.None, 0, loneCol.Type, loneCol.Value);
         }
 
         // It must be a row.
@@ -173,11 +173,11 @@ internal static class TokenParser
 
         // Token is ROW. Either it has ended or it is followed by :
         if (i == token.Length || token[i] is not ('C' or 'c'))
-            return new RowCol(ReferenceAxisType.None, 0, row.Type, row.Value);
+            return new RowCol(row.Type, row.Value, ReferenceAxisType.None, 0);
 
         // Token is ROW COLUMN
         var col = ReadR1C1Axis(token, ref i);
-        return new RowCol(col.Type, col.Value, row.Type, row.Value);
+        return new RowCol(row.Type, row.Value, col.Type, col.Value);
     }
 
     /// <summary>
@@ -255,8 +255,8 @@ internal static class TokenParser
 
             var row2 = ReadRow(input, ref i);
             return new ReferenceSymbol(
-                new RowCol(true, 1, abs1, row1), 
-                new RowCol(true, MaxCol, absRow2, row2));
+                new RowCol(abs1, row1, true, 1), 
+                new RowCol(absRow2, row2, true, MaxCol));
         }
 
         var col = ReadColumn(input, ref i);
@@ -270,8 +270,8 @@ internal static class TokenParser
 
             var col2 = ReadColumn(input, ref i);
             return new ReferenceSymbol(
-                new RowCol(abs1, col, true, 1), 
-                new RowCol(absCol2, col2, true, MaxRow));
+                new RowCol(true, 1, abs1, col), 
+                new RowCol(true, MaxRow, absCol2, col2));
         }
 
         var secondAbsolute = IsAbsolute(input, i);
@@ -284,7 +284,7 @@ internal static class TokenParser
         // A1_CELL | A1_AREA : A1_CELL ':' A1_CELL
         var row = ReadRow(input, ref i);
 
-        var cell = new RowCol(abs1, col, secondAbsolute, row);
+        var cell = new RowCol(secondAbsolute, row, abs1, col);
         if (i == input.Length)
         {
             // A1_CELL
@@ -309,7 +309,7 @@ internal static class TokenParser
             i++;
 
         var row = ReadRow(input, ref i);
-        return new RowCol(colAbs, col, rowAbs, row);
+        return new RowCol(rowAbs, row, colAbs, col);
     }
 
     private static bool IsAbsolute(ReadOnlySpan<char> input, int startIdx) => input[startIdx] == '$';

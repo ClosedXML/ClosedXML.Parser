@@ -43,7 +43,7 @@ public readonly struct ReferenceSymbol
     /// <param name="rowType">Row axis type of a reference.</param>
     /// <param name="rowPosition">Row position.</param>
     public ReferenceSymbol(ReferenceAxisType columnType, int columnPosition, ReferenceAxisType rowType, int rowPosition)
-        : this(new RowCol(columnType, columnPosition, rowType, rowPosition))
+        : this(new RowCol(rowType, rowPosition, columnType, columnPosition))
     {
     }
 
@@ -53,7 +53,7 @@ public readonly struct ReferenceSymbol
     /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
     public ReferenceSymbol(int columnPosition, int rowPosition)
-        : this(new RowCol(ReferenceAxisType.Relative, columnPosition, ReferenceAxisType.Relative, rowPosition))
+        : this(new RowCol(ReferenceAxisType.Relative, rowPosition, ReferenceAxisType.Relative, columnPosition))
     {
     }
 
