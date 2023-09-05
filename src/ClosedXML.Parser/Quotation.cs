@@ -46,7 +46,7 @@ public static class Quotation
     /// </remarks>
     /// <param name="sheetName">The name of a sheet. Must be at least 1 char long.</param>
     /// <returns>True, if the sheet name should be quoted in formula.</returns>
-    internal static bool ShouldQuoteSheet(ReadOnlySpan<char> sheetName)
+    public static bool ShouldQuoteSheet(ReadOnlySpan<char> sheetName)
     {
         if (sheetName.Length == 0)
             throw new ArgumentException("Sheet name is empty.");
