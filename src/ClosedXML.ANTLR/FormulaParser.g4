@@ -42,7 +42,7 @@ percent_expression
         ;
 
 prefix_atom_expression
-        : (PLUS | MINUS | INTERSECT) prefix_atom_expression
+        : (PLUS | MINUS) prefix_atom_expression
         | atom_expression
         ;
 
@@ -65,7 +65,12 @@ atom_expression
 /* ------------------------- Reference expression -------------------------- */
 
 ref_expression
-        : ref_intersection_expression (COMMA ref_intersection_expression)*
+        : ref_implicit_expression (COMMA ref_implicit_expression)*
+        ;
+
+ref_implicit_expression
+        : INTERSECT ref_implicit_expression
+        | ref_intersection_expression
         ;
 
 ref_intersection_expression
@@ -76,9 +81,6 @@ ref_range_expression
         : ref_spill_expression (COLON ref_spill_expression)*
         ;
 
-/*
- * This is an additional node based on experimentation. MS doesn't publish up-to-date grammar.
- */
 ref_spill_expression
         : ref_atom_expression SPILL?
         ;
@@ -175,7 +177,7 @@ arg_percent_expression
         ;
 
 arg_prefix_atom_expression
-        : (PLUS | MINUS | INTERSECT) arg_prefix_atom_expression
+        : (PLUS | MINUS) arg_prefix_atom_expression
         | arg_atom_expression
         ;
 
@@ -191,7 +193,7 @@ arg_atom_expression
         : constant
         | OPEN_BRACE expression CLOSE_BRACE
         | function_call
-        | ref_intersection_expression
+        | ref_implicit_expression
         ;
 
 /*

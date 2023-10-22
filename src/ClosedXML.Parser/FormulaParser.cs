@@ -229,14 +229,14 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     /// <para>
     /// <c>
     /// prefix_atom_expression
-    ///     : (PLUS | MINUS | INTERSECT) prefix_atom_expression
+    ///     : (PLUS | MINUS) prefix_atom_expression
     ///     | atom_expression
     ///     ;
     /// </c>
     /// 
     /// <c>
     /// arg_prefix_atom_expression
-    ///     : (PLUS | MINUS | INTERSECT) arg_prefix_atom_expression
+    ///     : (PLUS | MINUS) arg_prefix_atom_expression
     ///     | arg_atom_expression
     ///     ;     
     /// </c>
@@ -255,9 +255,6 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 break;
             case Token.MINUS:
                 op = UnaryOperation.Minus;
-                break;
-            case Token.INTERSECT:
-                op = UnaryOperation.ImplicitIntersection;
                 break;
             default:
                 return AtomExpression(skipRangeUnion, out isPureRef);
@@ -304,7 +301,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     // Incorrect expectation, backtrack to the ref_expression
                     // note the passed true argument for 'replaceFirstAtom'
                     if (skipRangeUnion)
-                        return RefIntersectionExpression(true, nestedNode);
+                        return RefImplicitExpression(true, nestedNode);
 
                     return RefExpression(true, nestedNode);
                 }
@@ -366,15 +363,35 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode RefExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
-        var leftNode = RefIntersectionExpression(replaceFirstAtom, refAtom);
+        var leftNode = RefImplicitExpression(replaceFirstAtom, refAtom);
         while (_la == Token.COMMA)
         {
             Consume();
-            var rightNode = RefIntersectionExpression();
+            var rightNode = RefImplicitExpression();
             leftNode = _factory.BinaryNode(_context, BinaryOperation.Union, leftNode, rightNode);
         }
 
         return leftNode;
+    }
+
+    /// <summary>
+    /// <code>
+    /// ref_implicit_expression
+    ///        : INTERSECT ref_implicit_expression
+    ///        | ref_intersection_expression
+    ///        ;
+    /// </code>
+    /// </summary>
+    private TNode RefImplicitExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    {
+        if (_la == Token.INTERSECT)
+        {
+            Consume();
+            var refNode = RefImplicitExpression(replaceFirstAtom, refAtom);
+            return _factory.Unary(_context, UnaryOperation.ImplicitIntersection, refNode);
+        }
+
+        return RefIntersectionExpression(replaceFirstAtom, refAtom);
     }
 
     private TNode RefIntersectionExpression(bool replaceFirstAtom = false, TNode? refAtom = null)

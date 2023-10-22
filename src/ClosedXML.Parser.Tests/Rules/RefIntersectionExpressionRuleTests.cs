@@ -10,20 +10,16 @@ public class RefIntersectionExpressionRuleTests
     }
 
     [Fact]
-    public void Intersection_operator_has_lower_priority_than_range()
+    public void Intersection_operator_has_lower_priority_than_implicit_intersection()
     {
         var expectedNode =
-            new BinaryNode(
-                BinaryOperation.Intersection,
+            new UnaryNode(
+                UnaryOperation.ImplicitIntersection,
                 new BinaryNode(
-                    BinaryOperation.Range,
-                    new ValueNode("Error", "#REF!"),
-                    new ReferenceNode(new ReferenceSymbol(2, 1))),
-                new BinaryNode(
-                    BinaryOperation.Range,
-                    new ReferenceNode(new ReferenceSymbol(3, 1)),
-                    new NameNode("two")));
-        AssertFormula.SingleNodeParsed("#REF!:A2 A3:two", expectedNode);
+                    BinaryOperation.Intersection,
+                    new ReferenceNode(new ReferenceSymbol(new RowCol(1,1), new RowCol(10,1))),
+                    new ReferenceNode(new ReferenceSymbol(5, 1))));
+        AssertFormula.SingleNodeParsed("@A1:A10 A5", expectedNode);
     }
 
     public static IEnumerable<object[]> TestCases

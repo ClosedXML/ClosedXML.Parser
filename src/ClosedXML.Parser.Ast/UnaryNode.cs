@@ -2,6 +2,12 @@
 
 public record UnaryNode(UnaryOperation Operation) : AstNode
 {
+    public UnaryNode(UnaryOperation operation, AstNode child)
+        : this(operation)
+    {
+        Children = new[] { child };
+    }
+
     public override string GetDisplayString(ReferenceStyle style)
     {
         return Operation switch
