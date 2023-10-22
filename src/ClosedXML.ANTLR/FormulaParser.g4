@@ -126,15 +126,21 @@ constant_list_row
 /* ---------------------------- Cell references ---------------------------- */
 
 cell_reference
-        : A1_REFERENCE                                       // local_cell_reference
+        : a1_reference                                       // local_cell_reference
         | BANG_REFERENCE                                     // external_cell_reference
-        | SHEET_RANGE_PREFIX A1_REFERENCE                    // external_cell_reference
-        | SINGLE_SHEET_PREFIX (A1_REFERENCE | REF_CONSTANT)  // external_cell_reference
+        | SHEET_RANGE_PREFIX a1_reference                    // external_cell_reference
+        | SINGLE_SHEET_PREFIX (a1_reference | REF_CONSTANT)  // external_cell_reference
         // TODO: This is a workaround for the 3D reference aliasing problem
         // (A1:Sheet!B5 were detected as 3D references).
         // This workaround will correctly detect 3D references for sheet names that
         // are not aliases for rows or columns or single cells.
-        | NAME COLON SINGLE_SHEET_PREFIX A1_REFERENCE        // external_cell_reference
+        | NAME COLON SINGLE_SHEET_PREFIX a1_reference        // external_cell_reference
+        ;
+
+a1_reference
+        : A1_CELL
+        | A1_CELL COLON A1_CELL
+        | A1_SPAN_REFERENCE
         ;
 
 /* ------------------------------- Arguments ------------------------------- */

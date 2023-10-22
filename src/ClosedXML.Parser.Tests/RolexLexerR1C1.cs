@@ -12,7 +12,7 @@ public class RolexLexerR1C1
     {
         var tokens = RolexLexer.GetTokensR1C1(formula);
         Assert.Equal(2, tokens.Count);
-        Assert.Equal(Token.A1_REFERENCE, tokens[0].SymbolId);
+        Assert.Equal(Token.A1_CELL, tokens[0].SymbolId);
     }
 
     [Theory]
@@ -28,14 +28,14 @@ public class RolexLexerR1C1
     {
         var tokens = RolexLexer.GetTokensR1C1(formula);
         Assert.Equal(2, tokens.Count);
-        Assert.Equal(Token.A1_REFERENCE, tokens[0].SymbolId);
+        Assert.Equal(Token.A1_CELL, tokens[0].SymbolId);
     }
 
     [Theory]
-    [InlineData("R[1048576]C1", Token.A1_REFERENCE, Token.INTRA_TABLE_REFERENCE, Token.A1_REFERENCE, Token.EofSymbolId)]
-    [InlineData("R[-1048576]C1", Token.A1_REFERENCE, Token.INTRA_TABLE_REFERENCE, Token.A1_REFERENCE, Token.EofSymbolId)]
-    [InlineData("R1C[16384]", Token.A1_REFERENCE, Token.INTRA_TABLE_REFERENCE, Token.EofSymbolId)]
-    [InlineData("R1C[-16384]", Token.A1_REFERENCE, Token.INTRA_TABLE_REFERENCE, Token.EofSymbolId)]
+    [InlineData("R[1048576]C1", Token.A1_SPAN_REFERENCE, Token.INTRA_TABLE_REFERENCE, Token.A1_SPAN_REFERENCE, Token.EofSymbolId)]
+    [InlineData("R[-1048576]C1", Token.A1_SPAN_REFERENCE, Token.INTRA_TABLE_REFERENCE, Token.A1_SPAN_REFERENCE, Token.EofSymbolId)]
+    [InlineData("R1C[16384]", Token.A1_CELL, Token.INTRA_TABLE_REFERENCE, Token.EofSymbolId)]
+    [InlineData("R1C[-16384]", Token.A1_CELL, Token.INTRA_TABLE_REFERENCE, Token.EofSymbolId)]
     public void Relative_references_cant_reach_outside_of_worksheet(string formula, params int[] expectedSymbols)
     {
         // Because relative references are one off, i.e. at row 1, the R[1] references second row

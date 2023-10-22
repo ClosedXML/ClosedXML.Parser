@@ -58,12 +58,13 @@ internal readonly struct Token
     public const int BANG_REFERENCE = 30;
     public const int SHEET_RANGE_PREFIX = 31;
     public const int SINGLE_SHEET_PREFIX = 32;
-    public const int A1_REFERENCE = 33;
-    public const int REF_FUNCTION_LIST = 34;
-    public const int CELL_FUNCTION_LIST = 35;
-    public const int USER_DEFINED_FUNCTION_NAME = 36;
-    public const int NAME = 37;
-    public const int INTRA_TABLE_REFERENCE = 38;
+    public const int A1_CELL = 33;
+    public const int A1_SPAN_REFERENCE = 34;
+    public const int REF_FUNCTION_LIST = 35;
+    public const int CELL_FUNCTION_LIST = 36;
+    public const int USER_DEFINED_FUNCTION_NAME = 37;
+    public const int NAME = 38;
+    public const int INTRA_TABLE_REFERENCE = 39;
 
     /// <summary>
     /// A token ID or TokenType. Non-negative integer. The values are from Antlr grammar, starting with 1.

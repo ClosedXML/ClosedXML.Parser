@@ -152,7 +152,7 @@ BOOK_PREFIX : WORKBOOK_INDEX '!';
 // In name formulas, they are relative to a cell where formula is entered.
 // E.g. bang reference from a name `!B3` in cell C2 references cell E5.
 BANG_REFERENCE
-        : '!' (A1_REFERENCE | REF_CONSTANT)
+        : '!' (A1_CELL | A1_SPAN_REFERENCE | REF_CONSTANT | A1_CELL ':' A1_CELL)
         ;
 
 SHEET_RANGE_PREFIX
@@ -248,19 +248,13 @@ fragment SHEET_NAME_BASE_CHARACTER
 
 /* -------------------------- Local A1 References -------------------------- */
 
-A1_REFERENCE
-        : A1_COLUMN ':' A1_COLUMN
-        | A1_ROW ':' A1_ROW
-        | A1_CELL
-        | A1_AREA
-        ;
-
-fragment A1_CELL
+A1_CELL
         : A1_COLUMN A1_ROW
         ;
 
-fragment A1_AREA
-        : A1_CELL ':' A1_CELL
+A1_SPAN_REFERENCE
+        : A1_COLUMN ':' A1_COLUMN
+        | A1_ROW ':' A1_ROW
         ;
 
 fragment A1_COLUMN
@@ -324,22 +318,16 @@ fragment A1_ABSOLUTE_ROW
 
 /* -------------------------- Local R1C1 References -------------------------- */
 /*
-A1_REFERENCE
+// Cell function can accept even things like R(1) or C(5) and it references the A1_CELL, therefore the alternates are valid
+A1_CELL
+        : R1C1_ROW R1C1_COLUMN
+        ;
+
+A1_SPAN_REFERENCE
         : R1C1_COLUMN ':' R1C1_COLUMN
         | R1C1_ROW ':' R1C1_ROW
-        | A1_CELL
-        | R1C1_AREA
-        ;
-
-// Cell function can accept even things like R(1) or C(5) and it references the A1_CELL, therefore the alternates are valid
-fragment A1_CELL
-        : R1C1_ROW R1C1_COLUMN
         | R1C1_ROW
         | R1C1_COLUMN
-        ;
-
-fragment R1C1_AREA
-        : A1_CELL ':' A1_CELL
         ;
 
 fragment R1C1_COLUMN
