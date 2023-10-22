@@ -88,6 +88,19 @@ public class RefRangeExpressionRuleTests
                         new ReferenceNode(new ReferenceSymbol(1, 2))),
                     new NameNode("last"))
             };
+
+            // ref_range_expression : A1_CELL COLON NAME COLON A1_CELL
+            yield return new object[]
+            {
+                "A5:B6C7:D8", // Make sure parser doesn't mistake first part of formula for area A5:B6
+                new BinaryNode(
+                    BinaryOperation.Range,
+                    new BinaryNode(
+                        BinaryOperation.Range,
+                        new ReferenceNode(new ReferenceSymbol(5, 1)),
+                        new NameNode("B6C7")),
+                    new ReferenceNode(new ReferenceSymbol(8, 4)))
+            };
         }
     }
 }
