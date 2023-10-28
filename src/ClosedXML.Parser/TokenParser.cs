@@ -469,6 +469,7 @@ internal static class TokenParser
 
     private static StructuredReferenceArea GetArea(ReadOnlySpan<char> input, int i)
     {
+        // Tokenizer has taken care that input can contain only valid values = only first two chars is enough.
         var item = input[i + 1] switch
         {
             'A' => StructuredReferenceArea.All,

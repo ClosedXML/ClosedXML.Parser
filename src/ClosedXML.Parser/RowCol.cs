@@ -192,6 +192,35 @@ public readonly struct RowCol : IEquatable<RowCol>
         }
     }
 
+    /// <summary>
+    /// Convert A1 RowCol to a R1C1 string representation.
+    /// </summary>
+    /// <remarks>There is no check that RowCol was parsed through A1.</remarks>
+    /// <param name="sb">String buffer to write the representation.</param>
+    /// <param name="row">Actual row of a cell.</param>
+    /// <param name="col">Actual column of a cell.</param>
+    internal void ToR1C1(StringBuilder sb, int row, int col)
+    {
+        // TODO: Is this stupid idea? Maybe I should convert RowCol from R1C1 and then use GetDisplayStringR1C1.
+        AppendAxis(sb, 'R', RowType, RowValue, row);
+        AppendAxis(sb, 'C', ColumnType, ColumnValue, col);
+
+        static void AppendAxis(StringBuilder sb, char axisName, ReferenceAxisType axisType, int axisValue, int actual)
+        {
+            // None is ignored because that means other axis is full row/column.
+            if (axisType == Relative)
+            {
+                sb.Append(axisName);
+                if (axisValue != actual)
+                    sb.Append('[').Append(axisValue - actual).Append(']');
+            }
+            else if (axisType == Absolute)
+            {
+                sb.Append(axisName).Append(axisValue);
+            }
+        }
+    }
+
     private string GetA1Reference()
     {
         var columnIndex = ColumnValue;

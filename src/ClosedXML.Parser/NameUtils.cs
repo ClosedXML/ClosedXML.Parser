@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Text;
 
 namespace ClosedXML.Parser;
 
@@ -102,5 +103,12 @@ public static class NameUtils
             return false;
 
         return sheetName.IndexOfAny(InvalidSheetChars) == -1;
+    }
+
+    internal static StringBuilder EscapeName(StringBuilder sb, string sheet)
+    {
+        return ShouldQuote(sheet.AsSpan())
+            ? sb.Append('\'').Append(sheet).Replace("'", "''", 1, sheet.Length).Append('\'')
+            : sb.Append(sheet);
     }
 }
