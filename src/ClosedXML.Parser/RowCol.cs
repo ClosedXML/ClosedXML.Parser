@@ -34,22 +34,22 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <summary>
     /// How to interpret the <see cref="ColumnValue"/> value.
     /// </summary>
-    public readonly ReferenceAxisType ColumnType;
+    public ReferenceAxisType ColumnType { get; }
 
     /// <summary>
     /// Position of a column.
     /// </summary>
-    public readonly int ColumnValue;
+    public int ColumnValue { get; }
 
     /// <summary>
     /// How to interpret the <see cref="RowValue"/> value.
     /// </summary>
-    public readonly ReferenceAxisType RowType;
+    public ReferenceAxisType RowType { get; }
 
     /// <summary>
     /// Position of a row.
     /// </summary>
-    public readonly int RowValue;
+    public int RowValue { get; }
 
     /// <summary>
     /// Create a new <see cref="RowCol"/> with both row and columns specified.

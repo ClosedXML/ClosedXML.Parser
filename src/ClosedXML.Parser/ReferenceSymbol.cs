@@ -13,14 +13,14 @@ public readonly struct ReferenceSymbol
     /// First reference. First in terms of position in formula, not position
     /// in sheet.
     /// </summary>
-    public readonly RowCol First;
+    public RowCol First { get; }
 
     /// <summary>
     /// Second reference. Second in terms of position in formula, not position
     /// in sheet. If area was specified using only one cell, the value is
     /// same as <see cref="First"/>.
     /// </summary>
-    public readonly RowCol Second;
+    public RowCol Second { get; }
 
     /// <summary>
     /// Create a reference symbol using the two <see cref="RowCol"/> (e.g.
