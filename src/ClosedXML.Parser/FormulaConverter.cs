@@ -232,7 +232,7 @@ public static class FormulaConverter
         public string Function((int, int) _, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
         {
             var sb = new StringBuilder(functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
-            return sb.AppendFunction(functionName, arguments).ToString();
+            return sb.AppendFunction(ModifyFunction(functionName), arguments).ToString();
         }
 
         public string ExternalFunction((int, int) _, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
@@ -241,7 +241,7 @@ public static class FormulaConverter
             return sb
                 .AppendBookIndex(workbookIndex)
                 .AppendReferenceSeparator()
-                .AppendFunction(functionName, arguments)
+                .AppendFunction(ModifyFunction(functionName), arguments)
                 .ToString();
         }
 
@@ -251,7 +251,7 @@ public static class FormulaConverter
             return sb
                 .AppendSheetName(ModifySheet(sheetName, point))
                 .AppendReferenceSeparator()
-                .AppendFunction(functionName, arguments)
+                .AppendFunction(ModifyFunction(functionName), arguments)
                 .ToString();
         }
 
@@ -261,7 +261,7 @@ public static class FormulaConverter
             return sb
                 .AppendExternalSheetName(workbookIndex, ModifySheet(sheetName, point))
                 .AppendReferenceSeparator()
-                .AppendFunction(functionName, arguments)
+                .AppendFunction(ModifyFunction(functionName), arguments)
                 .ToString();
         }
 
@@ -463,6 +463,11 @@ public static class FormulaConverter
         protected virtual string ModifySheet(string sheetName, (int Row, int Col) point)
         {
             return sheetName;
+        }
+
+        protected virtual ReadOnlySpan<char> ModifyFunction(ReadOnlySpan<char> functionName)
+        {
+            return functionName;
         }
     }
 }
