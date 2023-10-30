@@ -162,7 +162,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     public string GetDisplayStringR1C1()
     {
         var sb = new StringBuilder();
-        GetDisplayStringR1C1(sb);
+        AppendR1C1(sb);
         return sb.ToString();
     }
 
@@ -201,7 +201,7 @@ public readonly struct RowCol : IEquatable<RowCol>
 
     /// <inheritdoc cref="GetDisplayStringR1C1()"/>
     /// <param name="sb">String buffer where to write the output.</param>
-    internal void GetDisplayStringR1C1(StringBuilder sb)
+    internal void AppendR1C1(StringBuilder sb)
     {
         AppendAxis(sb, 'R', RowType, RowValue);
         AppendAxis(sb, 'C', ColumnType, ColumnValue);
@@ -230,18 +230,6 @@ public readonly struct RowCol : IEquatable<RowCol>
                     throw new NotSupportedException();
             }
         }
-    }
-
-    /// <summary>
-    /// Convert A1 RowCol to a R1C1 string representation.
-    /// </summary>
-    /// <remarks>There is no check that RowCol was parsed through A1.</remarks>
-    /// <param name="sb">String buffer to write the representation.</param>
-    /// <param name="row">Actual row of a cell.</param>
-    /// <param name="col">Actual column of a cell.</param>
-    internal void AppendR1C1(StringBuilder sb, int row, int col)
-    {
-        ToR1C1(row, col).GetDisplayStringR1C1(sb);
     }
 
     private string GetA1Reference()

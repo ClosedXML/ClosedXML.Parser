@@ -30,12 +30,12 @@ public static class FormulaConverter
     {
         protected override StringBuilder AppendRefAsText(ReferenceSymbol reference, (int Row, int Col) point, StringBuilder sb)
         {
-            return reference.AppendR1C1(sb, point.Row, point.Col);
+            return reference.ToR1C1(point.Row, point.Col).AppendR1C1(sb);
         }
 
         protected override StringBuilder AppendRefAsText(RowCol cell, (int Row, int Col) point, StringBuilder sb)
         {
-            cell.AppendR1C1(sb, point.Row, point.Col);
+            cell.ToR1C1(point.Row, point.Col).AppendR1C1(sb);
             return sb;
         }
     }

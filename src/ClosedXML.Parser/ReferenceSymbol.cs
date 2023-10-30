@@ -99,16 +99,33 @@ public readonly struct ReferenceSymbol
     }
 
     /// <summary>
-    /// Get reference in R1C1 notation, assuming it is in A1 format.
+    /// Convert A1 reference to R1C1.
     /// </summary>
-    internal StringBuilder AppendR1C1(StringBuilder sb, int row, int col)
+    /// <remarks>Assumes reference is in A1.</remarks>
+    internal ReferenceSymbol ToR1C1(int anchorRow, int anchorCol)
     {
-        First.AppendR1C1(sb, row, col);
+        var first = First.ToR1C1(anchorRow, anchorCol);
+        if (First != Second)
+        {
+            var second = Second.ToR1C1(anchorRow, anchorCol);
+            return new ReferenceSymbol(first, second);
+        }
+
+        return new ReferenceSymbol(first, first);
+    }
+
+    /// <summary>
+    /// Get reference in R1C1 notation.
+    /// </summary>
+    /// <remarks>Assumes reference is in R1C1.</remarks>
+    internal StringBuilder AppendR1C1(StringBuilder sb)
+    {
+        First.AppendR1C1(sb);
 
         if (First != Second)
         {
             sb.Append(':');
-            Second.AppendR1C1(sb, row, col);
+            Second.AppendR1C1(sb);
         }
 
         return sb;
