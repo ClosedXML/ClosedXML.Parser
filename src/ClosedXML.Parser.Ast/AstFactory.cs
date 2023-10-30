@@ -54,27 +54,27 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ArrayNode(rows, columns, array);
     }
 
-    public AstNode Reference(Ctx _, ReferenceSymbol reference)
+    public AstNode Reference(Ctx _, ReferenceArea reference)
     {
         return new ReferenceNode(reference);
     }
 
-    public AstNode SheetReference(Ctx _, string sheet, ReferenceSymbol reference)
+    public AstNode SheetReference(Ctx _, string sheet, ReferenceArea reference)
     {
         return new SheetReferenceNode(sheet, reference);
     }
 
-    public AstNode Reference3D(Ctx _, string firstSheet, string lastSheet, ReferenceSymbol reference)
+    public AstNode Reference3D(Ctx _, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         return new Reference3DNode(firstSheet, lastSheet, reference);
     }
 
-    public AstNode ExternalSheetReference(Ctx _, int workbookIndex, string sheet, ReferenceSymbol reference)
+    public AstNode ExternalSheetReference(Ctx _, int workbookIndex, string sheet, ReferenceArea reference)
     {
         return new ExternalSheetReferenceNode(workbookIndex, sheet, reference);
     }
 
-    public AstNode ExternalReference3D(Ctx _, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
+    public AstNode ExternalReference3D(Ctx _, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         return new ExternalReference3DNode(workbookIndex, firstSheet, lastSheet, reference);
     }

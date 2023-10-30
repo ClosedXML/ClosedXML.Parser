@@ -19,7 +19,7 @@ namespace ClosedXML.Parser;
 ///   </item>
 /// </list>
 /// The content of values and thus their interpretation depends on the
-/// <see cref="ReferenceSymbol"/> reference style, e.g. column 14 with
+/// <see cref="ReferenceArea"/> reference style, e.g. column 14 with
 /// <see cref="Relative"/> can indicate <c>R[14]</c> or <c>X14</c> for A1
 /// style.
 /// </para>

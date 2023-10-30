@@ -36,7 +36,7 @@ public static class FormulaConverter
 
     private class TextVisitorR1C1 : FormulaGeneratorVisitor
     {
-        protected override ReferenceSymbol ModifyRef(ReferenceSymbol reference, (int Row, int Col) point)
+        protected override ReferenceArea ModifyRef(ReferenceArea reference, (int Row, int Col) point)
         {
             return reference.ToR1C1(point.Row, point.Col);
         }
@@ -49,7 +49,7 @@ public static class FormulaConverter
 
     private class TextVisitorA1 : FormulaGeneratorVisitor
     {
-        protected override ReferenceSymbol ModifyRef(ReferenceSymbol reference, (int Row, int Col) point)
+        protected override ReferenceArea ModifyRef(ReferenceArea reference, (int Row, int Col) point)
         {
             return reference.ToA1(point.Row, point.Col);
         }

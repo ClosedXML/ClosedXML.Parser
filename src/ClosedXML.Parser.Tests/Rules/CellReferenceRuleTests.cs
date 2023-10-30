@@ -25,7 +25,7 @@ public class CellReferenceRuleTests
             yield return new object[]
             {
                 "Z5",
-                new ReferenceNode(new ReferenceSymbol(5, 26, A1))
+                new ReferenceNode(new ReferenceArea(5, 26, A1))
             };
 
             // cell_reference: A1_CELL COLON A1_CELL
@@ -33,7 +33,7 @@ public class CellReferenceRuleTests
             {
                 "A1:A1",
                 new ReferenceNode(
-                    new ReferenceSymbol(new RowCol(Relative, 1, Relative, 1, A1)))
+                    new ReferenceArea(new RowCol(Relative, 1, Relative, 1, A1)))
             };
 
             // cell_reference: A1_CELL COLON A1_CELL
@@ -41,7 +41,7 @@ public class CellReferenceRuleTests
             {
                 "Z1:AB25",
                 new ReferenceNode(
-                    new ReferenceSymbol(
+                    new ReferenceArea(
                         new RowCol(1, 26, A1),
                         new RowCol(25, 28, A1)))
             };
@@ -51,7 +51,7 @@ public class CellReferenceRuleTests
             {
                 "$XFC$1048575:$XFD$1048576",
                 new ReferenceNode(
-                    new ReferenceSymbol(
+                    new ReferenceArea(
                         new RowCol(true, MaxRow - 1, true, MaxCol - 1, A1),
                         new RowCol(true, MaxRow, true, MaxCol, A1)))
             };
@@ -72,7 +72,7 @@ public class CellReferenceRuleTests
                     2,
                     "First",
                     "Second",
-                    new ReferenceSymbol(
+                    new ReferenceArea(
                         new RowCol(3, 2, A1),
                         new RowCol(5, 4, A1)))
                 };
@@ -84,7 +84,7 @@ public class CellReferenceRuleTests
                 new ExternalSheetReferenceNode(
                     2,
                     "First",
-                    new ReferenceSymbol(
+                    new ReferenceArea(
                         new RowCol(3, 2, A1),
                         new RowCol(5, 4, A1)))
                         };

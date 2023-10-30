@@ -17,8 +17,8 @@ public class RefIntersectionExpressionRuleTests
                 UnaryOperation.ImplicitIntersection,
                 new BinaryNode(
                     BinaryOperation.Intersection,
-                    new ReferenceNode(new ReferenceSymbol(new RowCol(1,1, A1), new RowCol(10,1, A1))),
-                    new ReferenceNode(new ReferenceSymbol(5, 1, A1))));
+                    new ReferenceNode(new ReferenceArea(new RowCol(1,1, A1), new RowCol(10,1, A1))),
+                    new ReferenceNode(new ReferenceArea(5, 1, A1))));
         AssertFormula.SingleNodeParsed("@A1:A10 A5", expectedNode);
     }
 
@@ -30,7 +30,7 @@ public class RefIntersectionExpressionRuleTests
             yield return new object[]
             {
                 "A1",
-                new ReferenceNode(new ReferenceSymbol(1, 1, A1))
+                new ReferenceNode(new ReferenceArea(1, 1, A1))
             };
 
             // ref_intersection_expression : ref_range_expression SPACE ref_range_expression
@@ -38,8 +38,8 @@ public class RefIntersectionExpressionRuleTests
             {
                 "A1 A2",
                 new BinaryNode(BinaryOperation.Intersection,
-                    new ReferenceNode(new ReferenceSymbol(1, 1, A1)),
-                    new ReferenceNode(new ReferenceSymbol(2, 1, A1)))
+                    new ReferenceNode(new ReferenceArea(1, 1, A1)),
+                    new ReferenceNode(new ReferenceArea(2, 1, A1)))
             };
 
             // ref_intersection_expression : ref_range_expression SPACE ref_range_expression
@@ -48,9 +48,9 @@ public class RefIntersectionExpressionRuleTests
                 " A1   A2   A3  ",
                 new BinaryNode(BinaryOperation.Intersection,
                     new BinaryNode(BinaryOperation.Intersection,
-                        new ReferenceNode(new ReferenceSymbol(1, 1, A1)),
-                        new ReferenceNode(new ReferenceSymbol(2, 1, A1))),
-                    new ReferenceNode(new ReferenceSymbol(3, 1, A1)))
+                        new ReferenceNode(new ReferenceArea(1, 1, A1)),
+                        new ReferenceNode(new ReferenceArea(2, 1, A1))),
+                    new ReferenceNode(new ReferenceArea(3, 1, A1)))
             };
         }
     }

@@ -470,7 +470,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         Consume();
                         var secondCell = TokenParser.ParseReference(GetCurrentToken(), _a1Mode);
                         Consume();
-                        area = new ReferenceSymbol(area.First, secondCell.First);
+                        area = new ReferenceArea(area.First, secondCell.First);
                     }
 
                     var reference = _factory.Reference(_context, area);
@@ -617,7 +617,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     ///     ;
     /// </code>
     /// </summary>
-    private ReferenceSymbol? A1Reference()
+    private ReferenceArea? A1Reference()
     {
         if (_la == Token.A1_CELL)
         {
@@ -629,7 +629,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             {
                 Consume();
                 var secondCell = TokenParser.ParseReference(GetCurrentToken(), _a1Mode);
-                area = new ReferenceSymbol(cell.First, secondCell.First);
+                area = new ReferenceArea(cell.First, secondCell.First);
                 Consume();
             }
 

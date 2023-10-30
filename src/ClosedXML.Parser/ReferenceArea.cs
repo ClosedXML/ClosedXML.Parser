@@ -8,7 +8,7 @@ namespace ClosedXML.Parser;
 /// an area in a sheet. This is the DTO from parser to engine. Two corners make an area
 /// for A1 notation, but not for R1C1 (has several edge cases).
 /// </summary>
-public readonly struct ReferenceSymbol
+public readonly struct ReferenceArea
 {
     /// <summary>
     /// First reference. First in terms of position in formula, not position
@@ -33,7 +33,7 @@ public readonly struct ReferenceSymbol
     /// <c>A1:B2</c>) or two columns (e.g. <c>A:D</c>) or two rows (e.g.
     /// <c>7:8</c>).
     /// </summary>
-    internal ReferenceSymbol(RowCol first, RowCol second)
+    internal ReferenceArea(RowCol first, RowCol second)
     {
         if (first.IsA1 ^ second.IsA1)
             throw new ArgumentException("Both RowCol must use same semantic.");
@@ -45,7 +45,7 @@ public readonly struct ReferenceSymbol
     /// <summary>
     /// Create an area for a single reference.
     /// </summary>
-    internal ReferenceSymbol(RowCol rowCol)
+    internal ReferenceArea(RowCol rowCol)
     {
         First = rowCol;
         Second = rowCol;
@@ -59,7 +59,7 @@ public readonly struct ReferenceSymbol
     /// <param name="columnType">Column axis type of a reference.</param>
     /// <param name="columnPosition">Column position.</param>
     /// <param name="style">Semantic of the reference.</param>
-    internal ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType,
+    internal ReferenceArea(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType,
         int columnPosition, ReferenceStyle style)
         : this(new RowCol(rowType, rowPosition, columnType, columnPosition, style))
     {
@@ -71,7 +71,7 @@ public readonly struct ReferenceSymbol
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
     /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
     /// <param name="style">Semantic of the reference.</param>
-    internal ReferenceSymbol(int rowPosition, int columnPosition, ReferenceStyle style)
+    internal ReferenceArea(int rowPosition, int columnPosition, ReferenceStyle style)
         : this(new RowCol(ReferenceAxisType.Relative, rowPosition, ReferenceAxisType.Relative, columnPosition, style))
     {
     }
@@ -114,32 +114,32 @@ public readonly struct ReferenceSymbol
     /// Convert A1 reference to R1C1.
     /// </summary>
     /// <remarks>Assumes reference is in A1.</remarks>
-    internal ReferenceSymbol ToR1C1(int anchorRow, int anchorCol)
+    internal ReferenceArea ToR1C1(int anchorRow, int anchorCol)
     {
         var first = First.ToR1C1(anchorRow, anchorCol);
         if (First != Second)
         {
             var second = Second.ToR1C1(anchorRow, anchorCol);
-            return new ReferenceSymbol(first, second);
+            return new ReferenceArea(first, second);
         }
 
-        return new ReferenceSymbol(first, first);
+        return new ReferenceArea(first, first);
     }
 
     /// <summary>
     /// Convert R1C1 reference to A1.
     /// </summary>
     /// <remarks>Assumes reference is in R1C1.</remarks>
-    internal ReferenceSymbol ToA1(int anchorRow, int anchorCol)
+    internal ReferenceArea ToA1(int anchorRow, int anchorCol)
     {
         var first = First.ToA1(anchorRow, anchorCol);
         if (First != Second)
         {
             var second = Second.ToA1(anchorRow, anchorCol);
-            return new ReferenceSymbol(first, second);
+            return new ReferenceArea(first, second);
         }
 
-        return new ReferenceSymbol(first, first);
+        return new ReferenceArea(first, first);
     }
 
     internal StringBuilder Append(StringBuilder sb)

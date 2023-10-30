@@ -66,7 +66,7 @@ internal static class StringBuilderExtensions
         return sb.Append(')');
     }
 
-    public static StringBuilder AppendRef(this StringBuilder sb, ReferenceSymbol reference)
+    public static StringBuilder AppendRef(this StringBuilder sb, ReferenceArea reference)
     {
         reference.Append(sb);
         return sb;

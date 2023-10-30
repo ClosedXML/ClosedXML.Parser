@@ -2,7 +2,7 @@
 
 internal static class ReferenceAreaExtensions
 {
-    public static string GetDisplayString(this ReferenceSymbol reference, ReferenceStyle style)
+    public static string GetDisplayString(this ReferenceArea reference, ReferenceStyle style)
     {
         return style switch
         {
