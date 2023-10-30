@@ -19,27 +19,27 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
     private const int BOOK_PREFIX_LEN = 3;
     private const int MAX_R1_C1_LEN = 20;
 
-    public string LogicalValue((int, int) _, bool value)
+    string IAstFactory<string, string, (int Row, int Col)>.LogicalValue((int, int) _, bool value)
     {
         return value ? "TRUE" : "FALSE";
     }
 
-    public string NumberValue((int, int) _, double value)
+    string IAstFactory<string, string, (int Row, int Col)>.NumberValue((int, int) _, double value)
     {
         return value.ToString(CultureInfo.InvariantCulture);
     }
 
-    public string TextValue((int, int) _, string text)
+    string IAstFactory<string, string, (int Row, int Col)>.TextValue((int, int) _, string text)
     {
         return "\"" + text.Replace("\"", "\"\"") + "\"";
     }
 
-    public string ErrorValue((int, int) _, ReadOnlySpan<char> error)
+    string IAstFactory<string, string, (int Row, int Col)>.ErrorValue((int, int) _, ReadOnlySpan<char> error)
     {
         return error.ToString();
     }
 
-    public string ArrayNode((int, int) _, int rows, int columns, IReadOnlyList<string> elements)
+    string IAstFactory<string, string, (int Row, int Col)>.ArrayNode((int, int) _, int rows, int columns, IReadOnlyList<string> elements)
     {
         var sb = new StringBuilder(2 + elements.Sum(x => x.Length) + elements.Count);
         sb.Append('{');
@@ -60,27 +60,27 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         return sb.ToString();
     }
 
-    public string BlankNode((int, int) _)
+    string IAstFactory<string, string, (int Row, int Col)>.BlankNode((int, int) _)
     {
         return string.Empty;
     }
 
-    public string LogicalNode((int, int) _, bool value)
+    string IAstFactory<string, string, (int Row, int Col)>.LogicalNode((int, int) _, bool value)
     {
         return value ? "TRUE" : "FALSE";
     }
 
-    public string ErrorNode((int, int) _, ReadOnlySpan<char> error)
+    string IAstFactory<string, string, (int Row, int Col)>.ErrorNode((int, int) _, ReadOnlySpan<char> error)
     {
         return error.ToString();
     }
 
-    public string NumberNode((int, int) _, double value)
+    string IAstFactory<string, string, (int Row, int Col)>.NumberNode((int, int) _, double value)
     {
         return value.ToString(CultureInfo.InvariantCulture);
     }
 
-    public string TextNode((int, int) _, string text)
+    string IAstFactory<string, string, (int Row, int Col)>.TextNode((int, int) _, string text)
     {
         return new StringBuilder(text.Length + QUOTE_RESERVE)
             .Append('"')
@@ -89,7 +89,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string Reference((int Row, int Col) point, ReferenceSymbol reference)
+    string IAstFactory<string, string, (int Row, int Col)>.Reference((int Row, int Col) point, ReferenceSymbol reference)
     {
         var sb = new StringBuilder(MAX_R1_C1_LEN);
         return sb
@@ -97,21 +97,21 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string SheetReference((int Row, int Col) point, string sheet, ReferenceSymbol reference)
+    string IAstFactory<string, string, (int Row, int Col)>.SheetReference((int Row, int Col) point, string sheet, ReferenceSymbol reference)
     {
         var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         return sb
-            .AppendSheetName(ModifySheet(sheet, point))
+            .AppendSheetName(ModifySheet(sheet))
             .AppendReferenceSeparator()
             .AppendRef(ModifyRef(reference, point))
             .ToString();
     }
 
-    public string Reference3D((int Row, int Col) point, string firstSheet, string lastSheet, ReferenceSymbol reference)
+    string IAstFactory<string, string, (int Row, int Col)>.Reference3D((int Row, int Col) point, string firstSheet, string lastSheet, ReferenceSymbol reference)
     {
         var sb = new StringBuilder(firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-        firstSheet = ModifySheet(firstSheet, point);
-        lastSheet = ModifySheet(lastSheet, point);
+        firstSheet = ModifySheet(firstSheet);
+        lastSheet = ModifySheet(lastSheet);
         if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
         {
             sb
@@ -134,21 +134,21 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string ExternalSheetReference((int Row, int Col) point, int workbookIndex, string sheet, ReferenceSymbol reference)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalSheetReference((int Row, int Col) point, int workbookIndex, string sheet, ReferenceSymbol reference)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         return sb
-            .AppendExternalSheetName(workbookIndex, ModifySheet(sheet, point))
+            .AppendExternalSheetName(workbookIndex, ModifySheet(sheet))
             .AppendReferenceSeparator()
             .AppendRef(ModifyRef(reference, point))
             .ToString();
     }
 
-    public string ExternalReference3D((int Row, int Col) point, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalReference3D((int Row, int Col) point, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-        firstSheet = ModifySheet(firstSheet, point);
-        lastSheet = ModifySheet(lastSheet, point);
+        firstSheet = ModifySheet(firstSheet);
+        lastSheet = ModifySheet(lastSheet);
         if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
         {
             sb
@@ -174,13 +174,13 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string Function((int, int) _, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.Function((int, int) _, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb.AppendFunction(ModifyFunction(functionName), arguments).ToString();
     }
 
-    public string ExternalFunction((int, int) _, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalFunction((int, int) _, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb
@@ -190,27 +190,27 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string Function((int Row, int Col) point, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.Function((int Row, int Col) point, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb
-            .AppendSheetName(ModifySheet(sheetName, point))
+            .AppendSheetName(ModifySheet(sheetName))
             .AppendReferenceSeparator()
             .AppendFunction(ModifyFunction(functionName), arguments)
             .ToString();
     }
 
-    public string ExternalFunction((int Row, int Col) point, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalFunction((int Row, int Col) point, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb
-            .AppendExternalSheetName(workbookIndex, ModifySheet(sheetName, point))
+            .AppendExternalSheetName(workbookIndex, ModifySheet(sheetName))
             .AppendReferenceSeparator()
             .AppendFunction(ModifyFunction(functionName), arguments)
             .ToString();
     }
 
-    public string CellFunction((int Row, int Col) point, RowCol cell, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.CellFunction((int Row, int Col) point, RowCol cell, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
         return sb
@@ -219,17 +219,17 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string StructureReference((int, int) _, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    string IAstFactory<string, string, (int Row, int Col)>.StructureReference((int, int) _, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return GetIntraTableReference(area, firstColumn, lastColumn);
     }
 
-    public string StructureReference((int, int) _, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    string IAstFactory<string, string, (int Row, int Col)>.StructureReference((int, int) _, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return table + GetIntraTableReference(area, firstColumn, lastColumn);
     }
 
-    public string ExternalStructureReference((int, int) _, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalStructureReference((int, int) _, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return new StringBuilder()
             .AppendBookIndex(workbookIndex).Append(table)
@@ -237,22 +237,22 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string Name((int, int) _, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.Name((int, int) _, string name)
     {
         return name;
     }
 
-    public string SheetName((int Row, int Col) point, string sheet, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.SheetName((int Row, int Col) point, string sheet, string name)
     {
         var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         return sb
-            .AppendSheetName(ModifySheet(sheet, point))
+            .AppendSheetName(ModifySheet(sheet))
             .AppendReferenceSeparator()
             .Append(name)
             .ToString();
     }
 
-    public string ExternalName((int, int) _, int workbookIndex, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalName((int, int) _, int workbookIndex, string name)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + SHEET_SEPARATOR_LEN + name.Length);
         return sb
@@ -262,17 +262,17 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    public string ExternalSheetName((int Row, int Col) point, int workbookIndex, string sheet, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalSheetName((int Row, int Col) point, int workbookIndex, string sheet, string name)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         return sb
-            .AppendExternalSheetName(workbookIndex, ModifySheet(sheet, point))
+            .AppendExternalSheetName(workbookIndex, ModifySheet(sheet))
             .AppendReferenceSeparator()
             .Append(name)
             .ToString();
     }
 
-    public string BinaryNode((int, int) _, BinaryOperation operation, string leftNode, string rightNode)
+    string IAstFactory<string, string, (int Row, int Col)>.BinaryNode((int, int) _, BinaryOperation operation, string leftNode, string rightNode)
     {
         var operand = operation switch
         {
@@ -296,7 +296,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         return leftNode + operand + rightNode;
     }
 
-    public string Unary((int, int) _, UnaryOperation operation, string node)
+    string IAstFactory<string, string, (int Row, int Col)>.Unary((int, int) _, UnaryOperation operation, string node)
     {
         return operation switch
         {
@@ -309,7 +309,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         };
     }
 
-    public string Nested((int, int) _, string node)
+    string IAstFactory<string, string, (int Row, int Col)>.Nested((int, int) _, string node)
     {
         return "(" + node + ")";
     }
@@ -395,21 +395,43 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         }
     }
 
+    /// <summary>
+    /// Modify reference to a cell.
+    /// </summary>
+    /// <param name="reference">Area reference.</param>
+    /// <param name="point">The origin of formula.</param>
+    /// <returns>Modified reference.</returns>
     protected virtual ReferenceSymbol ModifyRef(ReferenceSymbol reference, (int Row, int Col) point)
     {
         return reference;
     }
 
+    /// <summary>
+    /// Modify reference to a cell.
+    /// </summary>
+    /// <param name="cell">Cell reference.</param>
+    /// <param name="point">The origin of formula.</param>
+    /// <returns>Modified reference.</returns>
     protected virtual RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
     {
         return cell;
     }
 
-    protected virtual string ModifySheet(string sheetName, (int Row, int Col) point)
+    /// <summary>
+    /// An extension to modify sheet name, e.g. rename.
+    /// </summary>
+    /// <param name="sheetName">Original sheet name.</param>
+    /// <returns>New sheet name.</returns>
+    protected virtual string ModifySheet(string sheetName)
     {
         return sheetName;
     }
 
+    /// <summary>
+    /// An extension to modify name of a function.
+    /// </summary>
+    /// <param name="functionName">Original name of function.</param>
+    /// <returns>New name of a function.</returns>
     protected virtual ReadOnlySpan<char> ModifyFunction(ReadOnlySpan<char> functionName)
     {
         return functionName;
