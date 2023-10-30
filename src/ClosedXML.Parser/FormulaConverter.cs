@@ -41,7 +41,7 @@ public static class FormulaConverter
             return reference.ToR1C1(point.Row, point.Col);
         }
 
-        protected override RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
+        protected override RowCol ModifyCellFunction(RowCol cell, (int Row, int Col) point)
         {
             return cell.ToR1C1(point.Row, point.Col);
         }
@@ -54,7 +54,7 @@ public static class FormulaConverter
             return reference.ToA1(point.Row, point.Col);
         }
 
-        protected override RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
+        protected override RowCol ModifyCellFunction(RowCol cell, (int Row, int Col) point)
         {
             return cell.ToA1(point.Row, point.Col);
         }

@@ -214,7 +214,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
     {
         var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
         return sb
-            .AppendRef(ModifyRef(cell, point))
+            .AppendRef(ModifyCellFunction(cell, point))
             .AppendArguments(arguments)
             .ToString();
     }
@@ -407,12 +407,12 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
     }
 
     /// <summary>
-    /// Modify reference to a cell.
+    /// Modify reference to a cell function.
     /// </summary>
-    /// <param name="cell">Cell reference.</param>
+    /// <param name="cell">Original cell containing function.</param>
     /// <param name="point">The origin of formula.</param>
     /// <returns>Modified reference.</returns>
-    protected virtual RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
+    protected virtual RowCol ModifyCellFunction(RowCol cell, (int Row, int Col) point)
     {
         return cell;
     }
