@@ -115,6 +115,39 @@ public readonly struct ReferenceSymbol
     }
 
     /// <summary>
+    /// Convert R1C1 reference to A1.
+    /// </summary>
+    /// <remarks>Assumes reference is in R1C1.</remarks>
+    internal ReferenceSymbol ToA1(int anchorRow, int anchorCol)
+    {
+        var first = First.ToA1(anchorRow, anchorCol);
+        if (First != Second)
+        {
+            var second = Second.ToA1(anchorRow, anchorCol);
+            return new ReferenceSymbol(first, second);
+        }
+
+        return new ReferenceSymbol(first, first);
+    }
+
+    /// <summary>
+    /// Get reference in A1 notation.
+    /// </summary>
+    /// <remarks>Assumes reference is in A1.</remarks>
+    internal StringBuilder AppendA1(StringBuilder sb)
+    {
+        First.AppendA1(sb);
+
+        if (First != Second)
+        {
+            sb.Append(':');
+            Second.AppendA1(sb);
+        }
+
+        return sb;
+    }
+
+    /// <summary>
     /// Get reference in R1C1 notation.
     /// </summary>
     /// <remarks>Assumes reference is in R1C1.</remarks>

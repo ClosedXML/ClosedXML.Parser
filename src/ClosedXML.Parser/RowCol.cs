@@ -117,6 +117,92 @@ public readonly struct RowCol : IEquatable<RowCol>
     public string GetDisplayStringA1()
     {
         var sb = new StringBuilder();
+        AppendA1(sb);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Get the representation of the <see cref="RowCol"/> as a text in R1C1
+    /// style.
+    /// </summary>
+    /// <remarks>Doesn't check whether <c>RowCol</c> is R1C1.</remarks>
+    public string GetDisplayStringR1C1()
+    {
+        var sb = new StringBuilder();
+        AppendR1C1(sb);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Convert <c>RowCol</c> to <em>R1C1</em>.
+    /// </summary>
+    /// <remarks>Assumes that RowCol is in <em>A1</em>, but doesn't check.</remarks>
+    /// <param name="anchorRow">A row coordinate that should be used as an anchor for relative R1C1 reference.</param>
+    /// <param name="anchorCol">A column coordinate that should be used as an anchor for relative R1C1 reference.</param>
+    /// <returns>RowCol with R1C1 semantic.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Row or col is out of valid row or column number.</exception>
+    public RowCol ToR1C1(int anchorRow, int anchorCol)
+    {
+        if (anchorRow is < 1 or > 1048576)
+            throw new ArgumentOutOfRangeException(nameof(anchorRow));
+
+        if (anchorCol is < 1 or > 16384)
+            throw new ArgumentOutOfRangeException(nameof(anchorCol));
+
+        var newRowPosition = ConvertAxis(RowType, RowValue, anchorRow);
+        var newColPosition = ConvertAxis(ColumnType, ColumnValue, anchorCol);
+
+        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition);
+
+        static int ConvertAxis(ReferenceAxisType axisType, int axisValue, int anchorPosition)
+        {
+            return axisType switch
+            {
+                Relative => axisValue - anchorPosition,
+                Absolute => axisValue,
+                None => 0,
+                _ => throw new NotSupportedException()
+            };
+        }
+    }
+
+    /// <summary>
+    /// Convert <c>RowCol</c> to <em>A1</em>.
+    /// </summary>
+    /// <remarks>Assumes that RowCol is in <em>R1C1</em>, but doesn't check.</remarks>
+    /// <param name="anchorRow">A row coordinate that should be used as an anchor for relative <em>R1C1</em> reference.</param>
+    /// <param name="anchorCol">A column coordinate that should be used as an anchor for relative <em>R1C1</em> reference.</param>
+    /// <returns>RowCol with R1C1 semantic.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Row or col is out of valid row or column number.</exception>
+    public RowCol ToA1(int anchorRow, int anchorCol)
+    {
+        if (anchorRow is < 1 or > 1048576)
+            throw new ArgumentOutOfRangeException(nameof(anchorRow));
+
+        if (anchorCol is < 1 or > 16384)
+            throw new ArgumentOutOfRangeException(nameof(anchorCol));
+
+        var newRowPosition = ConvertAxis(RowType, RowValue, anchorRow);
+        var newColPosition = ConvertAxis(ColumnType, ColumnValue, anchorCol);
+
+        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition);
+
+        static int ConvertAxis(ReferenceAxisType axisType, int axisValue, int anchorPosition)
+        {
+            return axisType switch
+            {
+                Relative => axisValue + anchorPosition,
+                Absolute => axisValue,
+                None => 0,
+                _ => throw new NotSupportedException()
+            };
+        }
+    }
+
+    /// <inheritdoc cref="GetDisplayStringA1()"/>
+    /// <param name="sb">String buffer where to write the output.</param>
+    internal void AppendA1(StringBuilder sb)
+    {
         switch (ColumnType)
         {
             case Absolute:
@@ -149,53 +235,6 @@ public readonly struct RowCol : IEquatable<RowCol>
 
             default:
                 throw new NotSupportedException();
-        }
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Get the representation of the <see cref="RowCol"/> as a text in R1C1
-    /// style.
-    /// </summary>
-    /// <remarks>Doesn't check whether <c>RowCol</c> is R1C1.</remarks>
-    public string GetDisplayStringR1C1()
-    {
-        var sb = new StringBuilder();
-        AppendR1C1(sb);
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Convert RowCol to R1C1.
-    /// </summary>
-    /// <remarks>Assumes that RowCol is in A1, but doesn't check.</remarks>
-    /// <param name="anchorRow">A row coordinate that should be used as an anchor for relative R1C1 reference.</param>
-    /// <param name="anchorCol">A column coordinate that should be used as an anchor for relative R1C1 reference.</param>
-    /// <returns>RowCol with R1C1 semantic.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Row or col is out of valid row or column number.</exception>
-    public RowCol ToR1C1(int anchorRow, int anchorCol)
-    {
-        if (anchorRow is < 1 or > 1048576)
-            throw new ArgumentOutOfRangeException(nameof(anchorRow));
-
-        if (anchorCol is < 1 or > 16384)
-            throw new ArgumentOutOfRangeException(nameof(anchorCol));
-
-        var newRowPosition = ConvertAxis(RowType, RowValue, anchorRow);
-        var newColPosition = ConvertAxis(ColumnType, ColumnValue, anchorCol);
-
-        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition);
-
-        static int ConvertAxis(ReferenceAxisType axisType, int axisValue, int anchorPosition)
-        {
-            return axisType switch
-            {
-                Relative => axisValue - anchorPosition,
-                Absolute => axisValue,
-                None => 0,
-                _ => throw new NotSupportedException()
-            };
         }
     }
 
