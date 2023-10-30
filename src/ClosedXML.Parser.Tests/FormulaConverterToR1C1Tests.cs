@@ -1,6 +1,6 @@
 ﻿namespace ClosedXML.Parser.Tests;
 
-public class FormulaConverterTests
+public class FormulaConverterToR1C1Tests
 {
     [Theory]
     [InlineData("true", "TRUE")]
