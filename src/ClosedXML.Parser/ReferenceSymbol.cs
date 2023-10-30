@@ -101,17 +101,16 @@ public readonly struct ReferenceSymbol
     /// <summary>
     /// Get reference in R1C1 notation, assuming it is in A1 format.
     /// </summary>
-    internal string ToR1C1(int row, int col)
+    internal StringBuilder AppendR1C1(StringBuilder sb, int row, int col)
     {
-        var sb = new StringBuilder();
-        First.ToR1C1(sb, row, col);
+        First.AppendR1C1(sb, row, col);
 
         if (First != Second)
         {
             sb.Append(':');
-            Second.ToR1C1(sb, row, col);
+            Second.AppendR1C1(sb, row, col);
         }
 
-        return sb.ToString();
+        return sb;
     }
 }

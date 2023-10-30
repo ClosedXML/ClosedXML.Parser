@@ -239,7 +239,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <param name="sb">String buffer to write the representation.</param>
     /// <param name="row">Actual row of a cell.</param>
     /// <param name="col">Actual column of a cell.</param>
-    internal void ToR1C1(StringBuilder sb, int row, int col)
+    internal void AppendR1C1(StringBuilder sb, int row, int col)
     {
         ToR1C1(row, col).GetDisplayStringR1C1(sb);
     }

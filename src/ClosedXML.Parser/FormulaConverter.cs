@@ -11,6 +11,8 @@ namespace ClosedXML.Parser;
 /// </summary>
 public static class FormulaConverter
 {
+    private static readonly TextVisitorR1C1 s_visitorR1C1 = new();
+
     /// <summary>
     /// Convert a formula in <em>A1</em> form to the <em>R1C1</em> form.
     /// </summary>
@@ -21,10 +23,24 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToR1C1(string formulaA1, int row, int col)
     {
-        return FormulaParser<string, string, (int Row, int Col)>.CellFormulaA1(formulaA1, (row, col), new Visitor());
+        return FormulaParser<string, string, (int Row, int Col)>.CellFormulaA1(formulaA1, (row, col), s_visitorR1C1);
     }
 
-    private class Visitor : IAstFactory<string, string, (int Row, int Col)>
+    private class TextVisitorR1C1 : TextVisitor
+    {
+        protected override StringBuilder AppendRefAsText(ReferenceSymbol reference, (int Row, int Col) point, StringBuilder sb)
+        {
+            return reference.AppendR1C1(sb, point.Row, point.Col);
+        }
+
+        protected override StringBuilder AppendRefAsText(RowCol cell, (int Row, int Col) point, StringBuilder sb)
+        {
+            cell.AppendR1C1(sb, point.Row, point.Col);
+            return sb;
+        }
+    }
+
+    private abstract class TextVisitor : IAstFactory<string, string, (int Row, int Col)>
     {
         // 1 quote on left, 1 quote on right size and at most 4 quotes inside.
         private const int QUOTE_RESERVE = 6;
@@ -104,17 +120,18 @@ public static class FormulaConverter
 
         public string Reference((int Row, int Col) point, ReferenceSymbol reference)
         {
-            return reference.ToR1C1(point.Row, point.Col);
+            var sb = new StringBuilder(MAX_R1_C1_LEN);
+            return AppendRefAsText(reference, point, sb).ToString();
         }
 
         public string SheetReference((int Row, int Col) point, string sheet, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-            return sb
+            sb
                 .AppendSheetName(sheet)
-                .AppendReferenceSeparator()
-                .Append(reference.ToR1C1(point.Row, point.Col))
-                .ToString();
+                .AppendReferenceSeparator();
+
+            return AppendRefAsText(reference, point, sb).ToString();
         }
 
         public string Reference3D((int Row, int Col) point, string firstSheet, string lastSheet, ReferenceSymbol reference)
@@ -136,20 +153,17 @@ public static class FormulaConverter
                     .Append(lastSheet);
             }
 
-            return sb
-                .AppendReferenceSeparator()
-                .Append(reference.ToR1C1(point.Row, point.Col))
-                .ToString();
+            sb.AppendReferenceSeparator();
+            return AppendRefAsText(reference, point, sb).ToString();
         }
 
         public string ExternalSheetReference((int Row, int Col) point, int workbookIndex, string sheet, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-            return sb
+            sb
                 .AppendExternalSheetName(workbookIndex, sheet)
-                .AppendReferenceSeparator()
-                .Append(reference.ToR1C1(point.Row, point.Col))
-                .ToString();
+                .AppendReferenceSeparator();
+            return AppendRefAsText(reference, point, sb).ToString();
         }
 
         public string ExternalReference3D((int Row, int Col) point, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
@@ -174,10 +188,8 @@ public static class FormulaConverter
                     .Append(lastSheet);
             }
 
-            return sb
-                .AppendReferenceSeparator()
-                .Append(reference.ToR1C1(point.Row, point.Col))
-                .ToString();
+            sb.AppendReferenceSeparator();
+            return AppendRefAsText(reference, point, sb).ToString();
         }
 
         public string Function((int, int) _, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
@@ -219,8 +231,7 @@ public static class FormulaConverter
         public string CellFunction((int Row, int Col) point, RowCol cell, IReadOnlyList<string> arguments)
         {
             var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
-            cell.ToR1C1(sb, point.Row, point.Col);
-            return sb.AppendArguments(arguments).ToString();
+            return AppendRefAsText(cell, point, sb).AppendArguments(arguments).ToString();
         }
 
         public string StructureReference((int, int) _, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
@@ -398,6 +409,10 @@ public static class FormulaConverter
                 };
             }
         }
+
+        protected abstract StringBuilder AppendRefAsText(RowCol cell, (int Row, int Col) point, StringBuilder sb);
+
+        protected abstract StringBuilder AppendRefAsText(ReferenceSymbol reference, (int Row, int Col) point, StringBuilder sb);
     }
 }
 
