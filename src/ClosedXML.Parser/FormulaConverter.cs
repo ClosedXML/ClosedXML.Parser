@@ -42,29 +42,27 @@ public static class FormulaConverter
 
     private class TextVisitorR1C1 : TextVisitor
     {
-        protected override StringBuilder AppendRefAsText(ReferenceSymbol reference, (int Row, int Col) point, StringBuilder sb)
+        protected override ReferenceSymbol ModifyRef(ReferenceSymbol reference, (int Row, int Col) point)
         {
-            return reference.ToR1C1(point.Row, point.Col).AppendR1C1(sb);
+            return reference.ToR1C1(point.Row, point.Col);
         }
 
-        protected override StringBuilder AppendRefAsText(RowCol cell, (int Row, int Col) point, StringBuilder sb)
+        protected override RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
         {
-            cell.ToR1C1(point.Row, point.Col).AppendR1C1(sb);
-            return sb;
+            return cell.ToR1C1(point.Row, point.Col);
         }
     }
 
     private class TextVisitorA1 : TextVisitor
     {
-        protected override StringBuilder AppendRefAsText(ReferenceSymbol reference, (int Row, int Col) point, StringBuilder sb)
+        protected override ReferenceSymbol ModifyRef(ReferenceSymbol reference, (int Row, int Col) point)
         {
-            return reference.ToA1(point.Row, point.Col).AppendA1(sb);
+            return reference.ToA1(point.Row, point.Col);
         }
 
-        protected override StringBuilder AppendRefAsText(RowCol cell, (int Row, int Col) point, StringBuilder sb)
+        protected override RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
         {
-            cell.ToA1(point.Row, point.Col).AppendA1(sb);
-            return sb;
+            return cell.ToA1(point.Row, point.Col);
         }
     }
 
@@ -149,17 +147,19 @@ public static class FormulaConverter
         public string Reference((int Row, int Col) point, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(MAX_R1_C1_LEN);
-            return AppendRefAsText(reference, point, sb).ToString();
+            return sb
+                .AppendRef(ModifyRef(reference, point))
+                .ToString();
         }
 
         public string SheetReference((int Row, int Col) point, string sheet, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-            sb
+            return sb
                 .AppendSheetName(sheet)
-                .AppendReferenceSeparator();
-
-            return AppendRefAsText(reference, point, sb).ToString();
+                .AppendReferenceSeparator()
+                .AppendRef(ModifyRef(reference, point))
+                .ToString();
         }
 
         public string Reference3D((int Row, int Col) point, string firstSheet, string lastSheet, ReferenceSymbol reference)
@@ -181,17 +181,20 @@ public static class FormulaConverter
                     .Append(lastSheet);
             }
 
-            sb.AppendReferenceSeparator();
-            return AppendRefAsText(reference, point, sb).ToString();
+            return sb
+                .AppendReferenceSeparator()
+                .AppendRef(ModifyRef(reference, point))
+                .ToString();
         }
 
         public string ExternalSheetReference((int Row, int Col) point, int workbookIndex, string sheet, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-            sb
+            return sb
                 .AppendExternalSheetName(workbookIndex, sheet)
-                .AppendReferenceSeparator();
-            return AppendRefAsText(reference, point, sb).ToString();
+                .AppendReferenceSeparator()
+                .AppendRef(ModifyRef(reference, point))
+                .ToString();
         }
 
         public string ExternalReference3D((int Row, int Col) point, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
@@ -216,8 +219,10 @@ public static class FormulaConverter
                     .Append(lastSheet);
             }
 
-            sb.AppendReferenceSeparator();
-            return AppendRefAsText(reference, point, sb).ToString();
+            return sb
+                .AppendReferenceSeparator()
+                .AppendRef(ModifyRef(reference, point))
+                .ToString();
         }
 
         public string Function((int, int) _, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
@@ -259,7 +264,10 @@ public static class FormulaConverter
         public string CellFunction((int Row, int Col) point, RowCol cell, IReadOnlyList<string> arguments)
         {
             var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
-            return AppendRefAsText(cell, point, sb).AppendArguments(arguments).ToString();
+            return sb
+                .AppendRef(ModifyRef(cell, point))
+                .AppendArguments(arguments)
+                .ToString();
         }
 
         public string StructureReference((int, int) _, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
@@ -438,9 +446,15 @@ public static class FormulaConverter
             }
         }
 
-        protected abstract StringBuilder AppendRefAsText(RowCol cell, (int Row, int Col) point, StringBuilder sb);
+        protected virtual ReferenceSymbol ModifyRef(ReferenceSymbol reference, (int Row, int Col) point)
+        {
+            return reference;
+        }
 
-        protected abstract StringBuilder AppendRefAsText(ReferenceSymbol reference, (int Row, int Col) point, StringBuilder sb);
+        protected virtual RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
+        {
+            return cell;
+        }
     }
 }
 
@@ -504,5 +518,17 @@ internal static class StringBuilderExtensions
             sb.Append(',').Append(arguments[i]);
 
         return sb.Append(')');
+    }
+
+    public static StringBuilder AppendRef(this StringBuilder sb, ReferenceSymbol reference)
+    {
+        reference.Append(sb);
+        return sb;
+    }
+
+    public static StringBuilder AppendRef(this StringBuilder sb, RowCol rowCol)
+    {
+        rowCol.Append(sb);
+        return sb;
     }
 }

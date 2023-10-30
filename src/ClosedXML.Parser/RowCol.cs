@@ -229,6 +229,14 @@ public readonly struct RowCol : IEquatable<RowCol>
         }
     }
 
+    internal void Append(StringBuilder sb)
+    {
+        if (IsA1)
+            AppendA1(sb);
+        else
+            AppendR1C1(sb);
+    }
+
     /// <inheritdoc cref="GetDisplayStringA1()"/>
     /// <param name="sb">String buffer where to write the output.</param>
     /// <exception cref="InvalidOperationException">When <c>RowCol</c> is not in <em>A1</em> notation.</exception>

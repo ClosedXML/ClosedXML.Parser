@@ -59,7 +59,8 @@ public readonly struct ReferenceSymbol
     /// <param name="columnType">Column axis type of a reference.</param>
     /// <param name="columnPosition">Column position.</param>
     /// <param name="style">Semantic of the reference.</param>
-    internal ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType, int columnPosition, ReferenceStyle style)
+    internal ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType,
+        int columnPosition, ReferenceStyle style)
         : this(new RowCol(rowType, rowPosition, columnType, columnPosition, style))
     {
     }
@@ -139,6 +140,11 @@ public readonly struct ReferenceSymbol
         }
 
         return new ReferenceSymbol(first, first);
+    }
+
+    internal StringBuilder Append(StringBuilder sb)
+    {
+        return Style == A1 ? AppendA1(sb) : AppendR1C1(sb);
     }
 
     /// <summary>
