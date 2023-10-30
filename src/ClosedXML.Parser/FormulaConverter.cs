@@ -156,7 +156,7 @@ public static class FormulaConverter
         {
             var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
             return sb
-                .AppendSheetName(sheet)
+                .AppendSheetName(ModifySheet(sheet, point))
                 .AppendReferenceSeparator()
                 .AppendRef(ModifyRef(reference, point))
                 .ToString();
@@ -165,6 +165,8 @@ public static class FormulaConverter
         public string Reference3D((int Row, int Col) point, string firstSheet, string lastSheet, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
+            firstSheet = ModifySheet(firstSheet, point);
+            lastSheet = ModifySheet(lastSheet, point);
             if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
             {
                 sb
@@ -191,7 +193,7 @@ public static class FormulaConverter
         {
             var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
             return sb
-                .AppendExternalSheetName(workbookIndex, sheet)
+                .AppendExternalSheetName(workbookIndex, ModifySheet(sheet, point))
                 .AppendReferenceSeparator()
                 .AppendRef(ModifyRef(reference, point))
                 .ToString();
@@ -200,6 +202,8 @@ public static class FormulaConverter
         public string ExternalReference3D((int Row, int Col) point, int workbookIndex, string firstSheet, string lastSheet, ReferenceSymbol reference)
         {
             var sb = new StringBuilder(BOOK_PREFIX_LEN + firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
+            firstSheet = ModifySheet(firstSheet, point);
+            lastSheet = ModifySheet(lastSheet, point);
             if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
             {
                 sb
@@ -241,21 +245,21 @@ public static class FormulaConverter
                 .ToString();
         }
 
-        public string Function((int, int) _, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+        public string Function((int Row, int Col) point, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
         {
             var sb = new StringBuilder(sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
             return sb
-                .AppendSheetName(sheetName)
+                .AppendSheetName(ModifySheet(sheetName, point))
                 .AppendReferenceSeparator()
                 .AppendFunction(functionName, arguments)
                 .ToString();
         }
 
-        public string ExternalFunction((int, int) _, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+        public string ExternalFunction((int Row, int Col) point, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
         {
             var sb = new StringBuilder(BOOK_PREFIX_LEN + sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
             return sb
-                .AppendExternalSheetName(workbookIndex, sheetName)
+                .AppendExternalSheetName(workbookIndex, ModifySheet(sheetName, point))
                 .AppendReferenceSeparator()
                 .AppendFunction(functionName, arguments)
                 .ToString();
@@ -293,11 +297,11 @@ public static class FormulaConverter
             return name;
         }
 
-        public string SheetName((int, int) _, string sheet, string name)
+        public string SheetName((int Row, int Col) point, string sheet, string name)
         {
             var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
             return sb
-                .AppendSheetName(sheet)
+                .AppendSheetName(ModifySheet(sheet, point))
                 .AppendReferenceSeparator()
                 .Append(name)
                 .ToString();
@@ -313,11 +317,11 @@ public static class FormulaConverter
                 .ToString();
         }
 
-        public string ExternalSheetName((int, int) _, int workbookIndex, string sheet, string name)
+        public string ExternalSheetName((int Row, int Col) point, int workbookIndex, string sheet, string name)
         {
             var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
             return sb
-                .AppendExternalSheetName(workbookIndex, sheet)
+                .AppendExternalSheetName(workbookIndex, ModifySheet(sheet, point))
                 .AppendReferenceSeparator()
                 .Append(name)
                 .ToString();
@@ -454,6 +458,11 @@ public static class FormulaConverter
         protected virtual RowCol ModifyRef(RowCol cell, (int Row, int Col) point)
         {
             return cell;
+        }
+
+        protected virtual string ModifySheet(string sheetName, (int Row, int Col) point)
+        {
+            return sheetName;
         }
     }
 }
