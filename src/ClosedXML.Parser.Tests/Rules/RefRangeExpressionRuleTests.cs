@@ -17,8 +17,8 @@ public class RefRangeExpressionRuleTests
         {
             Children = new AstNode[]
             {
-                new ReferenceNode(new ReferenceSymbol(1, 1)),
-                new SheetReferenceNode("Sheet1", new ReferenceSymbol(2, 2))
+                new ReferenceNode(new ReferenceSymbol(1, 1, A1)),
+                new SheetReferenceNode("Sheet1", new ReferenceSymbol(2, 2, A1))
             }
         };
         AssertFormula.SingleNodeParsed(formula, expectedNode);
@@ -29,7 +29,7 @@ public class RefRangeExpressionRuleTests
     {
         // JAN and DEC are columns in A1 notation
         var formula = "JAN:DEC!B2";
-        var expectedNode = new Reference3DNode("JAN", "DEC", new ReferenceSymbol(2, 2));
+        var expectedNode = new Reference3DNode("JAN", "DEC", new ReferenceSymbol(2, 2, A1));
         AssertFormula.SingleNodeParsed(formula, expectedNode);
     }
 
@@ -40,7 +40,7 @@ public class RefRangeExpressionRuleTests
         {
             Children = new AstNode[]
             {
-                new ReferenceNode(new ReferenceSymbol(5, 1)),
+                new ReferenceNode(new ReferenceSymbol(5, 1, A1)),
                 new UnaryNode(UnaryOperation.SpillRange)
                 {
                     Children = new AstNode[]
@@ -62,7 +62,7 @@ public class RefRangeExpressionRuleTests
             yield return new object[]
             {
                 "A1",
-                new ReferenceNode(new ReferenceSymbol(1, 1))
+                new ReferenceNode(new ReferenceSymbol(1, 1, A1))
             };
 
             // ref_range_expression : ref_atom_expression COLON ref_atom_expression
@@ -85,7 +85,7 @@ public class RefRangeExpressionRuleTests
                     new BinaryNode(
                         BinaryOperation.Range,
                         new ValueNode("Error", "#REF!"),
-                        new ReferenceNode(new ReferenceSymbol(1, 2))),
+                        new ReferenceNode(new ReferenceSymbol(1, 2, A1))),
                     new NameNode("last"))
             };
 
@@ -97,9 +97,9 @@ public class RefRangeExpressionRuleTests
                     BinaryOperation.Range,
                     new BinaryNode(
                         BinaryOperation.Range,
-                        new ReferenceNode(new ReferenceSymbol(5, 1)),
+                        new ReferenceNode(new ReferenceSymbol(5, 1, A1)),
                         new NameNode("B6C7")),
-                    new ReferenceNode(new ReferenceSymbol(8, 4)))
+                    new ReferenceNode(new ReferenceSymbol(8, 4, A1)))
             };
         }
     }

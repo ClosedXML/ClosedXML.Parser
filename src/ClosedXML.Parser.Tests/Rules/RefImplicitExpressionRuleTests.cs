@@ -10,8 +10,8 @@ public class RefImplicitExpressionRuleTests
                 UnaryOperation.ImplicitIntersection,
                 new BinaryNode(
                     BinaryOperation.Range,
-                    new ReferenceNode(new ReferenceSymbol(new RowCol(1,1), new RowCol(2,1))),
-                    new ReferenceNode(new ReferenceSymbol(3, 1))));
+                    new ReferenceNode(new ReferenceSymbol(new RowCol(1, 1, A1), new RowCol(2, 1, A1))),
+                    new ReferenceNode(new ReferenceSymbol(3, 1, A1))));
         AssertFormula.SingleNodeParsed("@A1:A2:A3", expectedNode);
     }
 }

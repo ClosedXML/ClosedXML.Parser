@@ -52,13 +52,29 @@ public readonly struct RowCol : IEquatable<RowCol>
     public int RowValue { get; }
 
     /// <summary>
+    /// Does <c>RowCol</c> use <em>A1</em> semantic?
+    /// </summary>
+    public bool IsA1 => Style == A1;
+
+    /// <summary>
+    /// Does <c>RowCol</c> use <em>R1C1</em> semantic?
+    /// </summary>
+    public bool IsR1C1 => Style == R1C1;
+
+    /// <summary>
+    /// Reference style of the <c>RowCol</c>.
+    /// </summary>
+    public ReferenceStyle Style { get; }
+
+    /// <summary>
     /// Create a new <see cref="RowCol"/> with both row and columns specified.
     /// </summary>
     /// <param name="rowType">The type used to interpret the row position.</param>
     /// <param name="rowValue">The value for the row position.</param>
     /// <param name="columnType">The type used to interpret the column position.</param>
     /// <param name="columnValue">The value for the column position.</param>
-    internal RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue)
+    /// <param name="style">Semantic of the reference.</param>
+    internal RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue, ReferenceStyle style)
     {
         if (columnType == None && rowType == None)
             throw new ArgumentException("At least one of axis must be non-none.");
@@ -73,6 +89,7 @@ public readonly struct RowCol : IEquatable<RowCol>
         ColumnValue = columnValue;
         RowType = rowType;
         RowValue = rowValue;
+        Style = style;
     }
 
     /// <summary>
@@ -82,8 +99,9 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <param name="rowValue">The value for the row position.</param>
     /// <param name="colAbs">Is the column reference absolute? If false, then relative.</param>
     /// <param name="columnValue">The value for the column position.</param>
-    internal RowCol(bool rowAbs, int rowValue, bool colAbs, int columnValue)
-        : this(rowAbs ? Absolute : Relative, rowValue, colAbs ? Absolute : Relative, columnValue)
+    /// <param name="style">Semantic of the reference.</param>
+    internal RowCol(bool rowAbs, int rowValue, bool colAbs, int columnValue, ReferenceStyle style)
+        : this(rowAbs ? Absolute : Relative, rowValue, colAbs ? Absolute : Relative, columnValue, style)
     {
     }
 
@@ -93,8 +111,9 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// </summary>
     /// <param name="row">The relative position of the row.</param>
     /// <param name="column">The relative position of the column.</param>
-    internal RowCol(int row, int column)
-        : this(Relative, row, Relative, column)
+    /// <param name="style">Semantic of the reference.</param>
+    internal RowCol(int row, int column, ReferenceStyle style)
+        : this(Relative, row, Relative, column, style)
     {
     }
 
@@ -111,23 +130,28 @@ public readonly struct RowCol : IEquatable<RowCol>
     public static bool operator !=(RowCol lhs, RowCol rhs) => !(lhs == rhs);
 
     /// <summary>
-    /// Get a reference in A1 notation. The content must have been created from A1
-    /// token, otherwise the output won't be correct.
+    /// Get a reference in <em>A1</em> notation.
     /// </summary>
+    /// <exception cref="InvalidOperationException">When <c>RowCol</c> doesn't use <em>A1</em> semantic.</exception>
     public string GetDisplayStringA1()
     {
+        if (!IsA1)
+            throw new InvalidOperationException("RowCol doesn't use A1 semantic.");
+
         var sb = new StringBuilder();
         AppendA1(sb);
         return sb.ToString();
     }
 
     /// <summary>
-    /// Get the representation of the <see cref="RowCol"/> as a text in R1C1
-    /// style.
+    /// Get a reference in <em>R1C1</em> notation.
     /// </summary>
-    /// <remarks>Doesn't check whether <c>RowCol</c> is R1C1.</remarks>
+    /// <exception cref="InvalidOperationException">When <c>RowCol</c> doesn't use <em>R1C1</em> semantic.</exception>
     public string GetDisplayStringR1C1()
     {
+        if (!IsR1C1)
+            throw new InvalidOperationException("RowCol doesn't use R1C1 semantic.");
+
         var sb = new StringBuilder();
         AppendR1C1(sb);
         return sb.ToString();
@@ -136,7 +160,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <summary>
     /// Convert <c>RowCol</c> to <em>R1C1</em>.
     /// </summary>
-    /// <remarks>Assumes that RowCol is in <em>A1</em>, but doesn't check.</remarks>
+    /// <remarks>If <c>RowCol</c> already is in <em>R1C1</em>, return it directly.</remarks>
     /// <param name="anchorRow">A row coordinate that should be used as an anchor for relative R1C1 reference.</param>
     /// <param name="anchorCol">A column coordinate that should be used as an anchor for relative R1C1 reference.</param>
     /// <returns>RowCol with R1C1 semantic.</returns>
@@ -149,10 +173,13 @@ public readonly struct RowCol : IEquatable<RowCol>
         if (anchorCol is < 1 or > 16384)
             throw new ArgumentOutOfRangeException(nameof(anchorCol));
 
+        if (IsR1C1)
+            return this;
+
         var newRowPosition = ConvertAxis(RowType, RowValue, anchorRow);
         var newColPosition = ConvertAxis(ColumnType, ColumnValue, anchorCol);
 
-        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition);
+        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition, R1C1);
 
         static int ConvertAxis(ReferenceAxisType axisType, int axisValue, int anchorPosition)
         {
@@ -169,7 +196,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <summary>
     /// Convert <c>RowCol</c> to <em>A1</em>.
     /// </summary>
-    /// <remarks>Assumes that RowCol is in <em>R1C1</em>, but doesn't check.</remarks>
+    /// <remarks>If <c>RowCol</c> already is in <em>A1</em>, return it directly.</remarks>
     /// <param name="anchorRow">A row coordinate that should be used as an anchor for relative <em>R1C1</em> reference.</param>
     /// <param name="anchorCol">A column coordinate that should be used as an anchor for relative <em>R1C1</em> reference.</param>
     /// <returns>RowCol with R1C1 semantic.</returns>
@@ -182,10 +209,13 @@ public readonly struct RowCol : IEquatable<RowCol>
         if (anchorCol is < 1 or > 16384)
             throw new ArgumentOutOfRangeException(nameof(anchorCol));
 
+        if (IsA1)
+            return this;
+
         var newRowPosition = ConvertAxis(RowType, RowValue, anchorRow);
         var newColPosition = ConvertAxis(ColumnType, ColumnValue, anchorCol);
 
-        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition);
+        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition, A1);
 
         static int ConvertAxis(ReferenceAxisType axisType, int axisValue, int anchorPosition)
         {
@@ -201,8 +231,12 @@ public readonly struct RowCol : IEquatable<RowCol>
 
     /// <inheritdoc cref="GetDisplayStringA1()"/>
     /// <param name="sb">String buffer where to write the output.</param>
+    /// <exception cref="InvalidOperationException">When <c>RowCol</c> is not in <em>A1</em> notation.</exception>
     internal void AppendA1(StringBuilder sb)
     {
+        if (!IsA1)
+            throw new InvalidOperationException("RowCol doesn't use A1 semantic.");
+
         switch (ColumnType)
         {
             case Absolute:
@@ -240,8 +274,12 @@ public readonly struct RowCol : IEquatable<RowCol>
 
     /// <inheritdoc cref="GetDisplayStringR1C1()"/>
     /// <param name="sb">String buffer where to write the output.</param>
+    /// <exception cref="InvalidOperationException">When <c>RowCol</c> is not in <em>A1</em> notation.</exception>
     internal void AppendR1C1(StringBuilder sb)
     {
+        if (!IsR1C1)
+            throw new InvalidOperationException("RowCol doesn't use R1C1 semantic.");
+
         AppendAxis(sb, 'R', RowType, RowValue);
         AppendAxis(sb, 'C', ColumnType, ColumnValue);
 
@@ -305,7 +343,8 @@ public readonly struct RowCol : IEquatable<RowCol>
         return ColumnType == other.ColumnType &&
                ColumnValue == other.ColumnValue &&
                RowType == other.RowType &&
-               RowValue == other.RowValue;
+               RowValue == other.RowValue &&
+               IsA1 == other.IsA1;
     }
 
     /// <summary>
@@ -319,6 +358,7 @@ public readonly struct RowCol : IEquatable<RowCol>
             hashCode = (hashCode * 397) ^ ColumnValue;
             hashCode = (hashCode * 397) ^ (int)RowType;
             hashCode = (hashCode * 397) ^ RowValue;
+            hashCode = (hashCode * 397) ^ IsA1.GetHashCode();
             return hashCode;
         }
     }

@@ -23,14 +23,14 @@ public class ReferenceSymbolTests
             // When both corners are same, only one is rendered.
             yield return new object[]
             {
-                new ReferenceSymbol(new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1), new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1)),
+                new ReferenceSymbol(new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1, A1), new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1, A1)),
                 "A1"
             };
 
             // When both corners are same, only one is rendered.
             yield return new object[]
             {
-                new ReferenceSymbol(new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1), new RowCol(ReferenceAxisType.Relative, 5, ReferenceAxisType.Relative, 3)),
+                new ReferenceSymbol(new RowCol(ReferenceAxisType.Relative, 1, ReferenceAxisType.Relative, 1, A1), new RowCol(ReferenceAxisType.Relative, 5, ReferenceAxisType.Relative, 3, A1)),
                 "A1:C5"
             };
         }
@@ -42,13 +42,13 @@ public class ReferenceSymbolTests
         {
             yield return new object[]
             {
-                new ReferenceSymbol(new RowCol(ReferenceAxisType.Absolute, 7, ReferenceAxisType.Absolute, 1), new RowCol(ReferenceAxisType.Absolute, 7, ReferenceAxisType.Absolute, 1)),
+                new ReferenceSymbol(new RowCol(ReferenceAxisType.Absolute, 7, ReferenceAxisType.Absolute, 1, R1C1), new RowCol(ReferenceAxisType.Absolute, 7, ReferenceAxisType.Absolute, 1, R1C1)),
                 "R7C1"
             };
 
             yield return new object[]
             {
-                new ReferenceSymbol(new RowCol(ReferenceAxisType.Absolute, 7, ReferenceAxisType.Absolute, 1), new RowCol(ReferenceAxisType.Relative, 0, ReferenceAxisType.None, 0)),
+                new ReferenceSymbol(new RowCol(ReferenceAxisType.Absolute, 7, ReferenceAxisType.Absolute, 1, R1C1), new RowCol(ReferenceAxisType.Relative, 0, ReferenceAxisType.None, 0, R1C1)),
                 "R7C1:R"
             };
        }

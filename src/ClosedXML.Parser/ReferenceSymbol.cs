@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace ClosedXML.Parser;
 
@@ -23,12 +24,20 @@ public readonly struct ReferenceSymbol
     public RowCol Second { get; }
 
     /// <summary>
+    /// Semantic style of reference.
+    /// </summary>
+    public ReferenceStyle Style => First.Style;
+
+    /// <summary>
     /// Create a reference symbol using the two <see cref="RowCol"/> (e.g.
     /// <c>A1:B2</c>) or two columns (e.g. <c>A:D</c>) or two rows (e.g.
     /// <c>7:8</c>).
     /// </summary>
     internal ReferenceSymbol(RowCol first, RowCol second)
     {
+        if (first.IsA1 ^ second.IsA1)
+            throw new ArgumentException("Both RowCol must use same semantic.");
+
         First = first;
         Second = second;
     }
@@ -49,8 +58,9 @@ public readonly struct ReferenceSymbol
     /// <param name="rowPosition">Row position.</param>
     /// <param name="columnType">Column axis type of a reference.</param>
     /// <param name="columnPosition">Column position.</param>
-    internal ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType, int columnPosition)
-        : this(new RowCol(rowType, rowPosition, columnType, columnPosition))
+    /// <param name="style">Semantic of the reference.</param>
+    internal ReferenceSymbol(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType, int columnPosition, ReferenceStyle style)
+        : this(new RowCol(rowType, rowPosition, columnType, columnPosition, style))
     {
     }
 
@@ -59,8 +69,9 @@ public readonly struct ReferenceSymbol
     /// </summary>
     /// <param name="rowPosition"><see cref="ReferenceAxisType.Relative"/> row.</param>
     /// <param name="columnPosition"><see cref="ReferenceAxisType.Relative"/> column.</param>
-    internal ReferenceSymbol(int rowPosition, int columnPosition)
-        : this(new RowCol(ReferenceAxisType.Relative, rowPosition, ReferenceAxisType.Relative, columnPosition))
+    /// <param name="style">Semantic of the reference.</param>
+    internal ReferenceSymbol(int rowPosition, int columnPosition, ReferenceStyle style)
+        : this(new RowCol(ReferenceAxisType.Relative, rowPosition, ReferenceAxisType.Relative, columnPosition, style))
     {
     }
 
