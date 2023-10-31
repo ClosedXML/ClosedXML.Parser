@@ -78,7 +78,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <param name="columnType">The type used to interpret the column position.</param>
     /// <param name="columnValue">The value for the column position.</param>
     /// <param name="style">Semantic of the reference.</param>
-    internal RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue, ReferenceStyle style)
+    public RowCol(ReferenceAxisType rowType, int rowValue, ReferenceAxisType columnType, int columnValue, ReferenceStyle style)
     {
         if (columnType == None && rowType == None)
             throw new ArgumentException("At least one of axis must be non-none.");

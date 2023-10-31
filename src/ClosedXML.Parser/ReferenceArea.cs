@@ -33,7 +33,7 @@ public readonly struct ReferenceArea
     /// <c>A1:B2</c>) or two columns (e.g. <c>A:D</c>) or two rows (e.g.
     /// <c>7:8</c>).
     /// </summary>
-    internal ReferenceArea(RowCol first, RowCol second)
+    public ReferenceArea(RowCol first, RowCol second)
     {
         if (first.IsA1 ^ second.IsA1)
             throw new ArgumentException("Both RowCol must use same semantic.");
