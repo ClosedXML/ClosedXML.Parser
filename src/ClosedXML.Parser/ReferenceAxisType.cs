@@ -6,6 +6,17 @@
 public enum ReferenceAxisType
 {
     /// <summary>
+    /// Axis is relative. E.g. <c>A5</c> for A1, <c>R[-3]</c> for R1C1.
+    /// </summary>
+    /// <remarks>Keep 0, so default <c>RowCol</c> is <em>A1</em>.</remarks>
+    Relative = 0,
+
+    /// <summary>
+    /// Units are absolute. E.g. <c>$A$5</c> for A1, <c>R8C5</c> for R1C1.
+    /// </summary>
+    Absolute = 1,
+
+    /// <summary>
     /// <para>
     /// The reference axis (row or column) is not specified for reference.
     /// Generally, it means whole axis is used. If the type is <see cref="None"/>,
@@ -19,15 +30,5 @@ public enum ReferenceAxisType
     /// </list>
     /// </para>
     /// </summary>
-    None = 0,
-
-    /// <summary>
-    /// Axis is relative. E.g. <c>A5</c> for A1, <c>R[-3]</c> for R1C1.
-    /// </summary>
-    Relative = 1,
-
-    /// <summary>
-    /// Units are absolute. E.g. <c>$A$5</c> for A1, <c>R8C5</c> for R1C1.
-    /// </summary>
-    Absolute = 2,
+    None = 2,
 }

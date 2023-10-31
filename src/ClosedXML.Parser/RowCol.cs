@@ -31,6 +31,10 @@ namespace ClosedXML.Parser;
 /// </summary>
 public readonly struct RowCol : IEquatable<RowCol>
 {
+    // keep at 0, so default ctor creates is A1
+    private readonly int _rowIndex;
+    private readonly int _columnIndex;
+
     /// <summary>
     /// How to interpret the <see cref="ColumnValue"/> value.
     /// </summary>
@@ -39,7 +43,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <summary>
     /// Position of a column.
     /// </summary>
-    public int ColumnValue { get; }
+    public int ColumnValue => _columnIndex + 1;
 
     /// <summary>
     /// How to interpret the <see cref="RowValue"/> value.
@@ -49,7 +53,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <summary>
     /// Position of a row.
     /// </summary>
-    public int RowValue { get; }
+    public int RowValue => _rowIndex + 1;
 
     /// <summary>
     /// Does <c>RowCol</c> use <em>A1</em> semantic?
@@ -86,9 +90,9 @@ public readonly struct RowCol : IEquatable<RowCol>
             throw new ArgumentException("Value for `None` type must be zero.", nameof(rowValue));
 
         ColumnType = columnType;
-        ColumnValue = columnValue;
+        _columnIndex = columnValue - 1;
         RowType = rowType;
-        RowValue = rowValue;
+        _rowIndex = rowValue - 1;
         Style = style;
     }
 
