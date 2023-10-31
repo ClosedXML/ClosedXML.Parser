@@ -94,6 +94,42 @@ public class AstFactoryTests
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
 
+    [Theory]
+    [InlineData("A1+SUM(4)+name", 3, 9)]
+    public void FunctionRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new FunctionVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("A1+[1]!SUM(4)+name", 3, 13)]
+    public void ExternalFunctionRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalFunctionVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("A1+Sheet!SUM(4)+name", 3, 15)]
+    public void SheetFunctionRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new SheetFunctionVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("A1+[5]Sheet!SUM(4)+name", 3, 18)]
+    public void ExternalSheetFunctionRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalSheetFunctionVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
     private class ReferenceVisitor : BaseVisitor
     {
         public override string Reference(Result context, SymbolRange range, ReferenceArea reference)
@@ -169,6 +205,42 @@ public class AstFactoryTests
     private class ExternalStructureReferenceVisitor : BaseVisitor
     {
         public override string ExternalStructureReference(Result context, SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class FunctionVisitor : BaseVisitor
+    {
+        public override string Function(Result context, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalFunctionVisitor : BaseVisitor
+    {
+        public override string ExternalFunction(Result context, SymbolRange range, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class SheetFunctionVisitor : BaseVisitor
+    {
+        public override string Function(Result context, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalSheetFunctionVisitor : BaseVisitor
+    {
+        public override string ExternalFunction(Result context, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
         {
             context.Value = range;
             return string.Empty;
@@ -271,23 +343,23 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode Function(TContext context, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments)
+        public virtual TNode Function(TContext context, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments)
         {
             return _defaultNode;
         }
 
-        public virtual TNode Function(TContext context, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> args)
+        public virtual TNode Function(TContext context, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> args)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ExternalFunction(TContext context, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName,
+        public virtual TNode ExternalFunction(TContext context, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName,
             IReadOnlyList<TNode> arguments)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ExternalFunction(TContext context, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments)
+        public virtual TNode ExternalFunction(TContext context, SymbolRange range, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments)
         {
             return _defaultNode;
         }

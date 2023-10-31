@@ -329,26 +329,30 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 if (_la == Token.SINGLE_SHEET_PREFIX && LL(1) == Token.USER_DEFINED_FUNCTION_NAME)
                 {
                     isPureRef = false;
+                    var start = _tokenSource.StartIndex;
                     TokenParser.ParseSingleSheetPrefix(GetCurrentToken(), out var wbIndex, out var sheetName);
                     Consume();
                     var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
                     Consume();
                     var args = ArgumentList();
+                    var range = new SymbolRange(start, _tokenSource.StartIndex);
                     return wbIndex is null
-                        ? _factory.Function(_context, sheetName, functionName, args)
-                        : _factory.ExternalFunction(_context, wbIndex.Value, sheetName, functionName, args);
+                        ? _factory.Function(_context, range, sheetName, functionName, args)
+                        : _factory.ExternalFunction(_context, range, wbIndex.Value, sheetName, functionName, args);
                 }
 
                 // function_call : BOOK_PREFIX USER_DEFINED_FUNCTION_NAME argument_list
                 if (_la == Token.BOOK_PREFIX && LL(1) == Token.USER_DEFINED_FUNCTION_NAME)
                 {
                     isPureRef = false;
+                    var start = _tokenSource.StartIndex;
                     var wbIndex = TokenParser.ParseBookPrefix(GetCurrentToken());
                     Consume();
                     var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
                     Consume();
                     var args = ArgumentList();
-                    return _factory.ExternalFunction(_context, wbIndex, functionName, args);
+                    var range = new SymbolRange(start, _tokenSource.StartIndex);
+                    return _factory.ExternalFunction(_context, range, wbIndex, functionName, args);
                 }
 
                 // ref_expression 
@@ -932,10 +936,12 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode LocalFunctionCall()
     {
+        var start = _tokenSource.StartIndex;
         var functionName = TokenParser.ExtractLocalFunctionName(GetCurrentToken());
         Consume();
         var args = ArgumentList();
-        return _factory.Function(_context, functionName, args);
+        var range = new SymbolRange(start, _tokenSource.StartIndex);
+        return _factory.Function(_context, range, functionName, args);
     }
 
     private Exception UnexpectedTokenError(params int[] expectedToken)

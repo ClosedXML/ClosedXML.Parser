@@ -141,37 +141,43 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create a node for a function.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the function including arguments.</param>
     /// <param name="functionName">Name of a function.</param>
     /// <param name="arguments">Nodes of argument values.</param>
-    TNode Function(TContext context, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
+    TNode Function(TContext context, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a node for a function on a sheet. Might happen for VBA.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="sheetName">Name of a sheet.</param>
     /// <param name="functionName">Name of a function.</param>
     /// <param name="args">Nodes of argument values.</param>
-    TNode Function(TContext context, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> args);
+    TNode Function(TContext context, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName,
+        IReadOnlyList<TNode> args);
 
     /// <summary>
     /// Create a node for a sheet-scoped function from an external workbook.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="sheetName">Name of a sheet in external workbook.</param>
     /// <param name="functionName">Name of the function.</param>
     /// <param name="arguments">Nodes of argument values.</param>
-    TNode ExternalFunction(TContext context, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
+    TNode ExternalFunction(TContext context, SymbolRange range, int workbookIndex, string sheetName,
+        ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a node for a function from an external workbook.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the function including arguments.</param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="functionName">Name of the function.</param>
     /// <param name="arguments">Nodes of argument values.</param>
-    TNode ExternalFunction(TContext context, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
+    TNode ExternalFunction(TContext context, SymbolRange range, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a cell function. It references another function that should likely contain a LAMBDA value.

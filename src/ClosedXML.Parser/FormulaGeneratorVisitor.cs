@@ -174,13 +174,13 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Function((int, int) _, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.Function((int, int) _, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb.AppendFunction(ModifyFunction(functionName), arguments).ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ExternalFunction((int, int) _, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalFunction((int, int) _, SymbolRange range, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb
@@ -190,7 +190,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Function((int Row, int Col) point, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.Function((int Row, int Col) point, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb
@@ -200,7 +200,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ExternalFunction((int Row, int Col) point, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalFunction((int Row, int Col) point, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         return sb

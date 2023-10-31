@@ -79,17 +79,17 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ExternalReference3DNode(workbookIndex, firstSheet, lastSheet, reference);
     }
 
-    public AstNode Function(Ctx _, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode Function(Ctx _, SymbolRange range, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
         return new FunctionNode(null, name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode Function(Ctx _, string sheet, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode Function(Ctx _, SymbolRange range, string sheet, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
         return new FunctionNode(sheet, name.ToString()) { Children = args.ToArray() };
     }
 
-    public AstNode ExternalFunction(Ctx _, int workbookIndex, string sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode ExternalFunction(Ctx _, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
         return new ExternalFunctionNode(workbookIndex, sheetName, name.ToString())
         {
@@ -97,7 +97,7 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         };
     }
 
-    public AstNode ExternalFunction(Ctx _, int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
+    public AstNode ExternalFunction(Ctx _, SymbolRange range, int workbookIndex, ReadOnlySpan<char> name, IReadOnlyList<AstNode> args)
     {
         return new ExternalFunctionNode(workbookIndex, null, name.ToString())
         {
