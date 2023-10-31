@@ -16,9 +16,49 @@ public class AstFactoryTests
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
 
+    [Theory]
+    [InlineData("Sheet!A1", 0, 8)]
+    [InlineData(" S!$A$1:$B4 ", 1, 11)]
+    [InlineData("1+'Johnny''s'!Z26", 2, 17)]
+    public void SheetReferenceRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new SheetReferenceVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("Jan:Feb!A1", 0, 10)]
+    [InlineData("1+Z:B!$A$1:$B4+4", 2, 14)]
+    [InlineData("1+'2022 Q1:2024 Q1'!Z26", 2, 23)]
+    public void Reference3DRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new Reference3DVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
     private class ReferenceVisitor : BaseVisitor
     {
         public override string Reference(Result context, SymbolRange range, ReferenceArea reference)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class SheetReferenceVisitor : BaseVisitor
+    {
+        public override string SheetReference(Result context, SymbolRange range, string sheet, ReferenceArea reference)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class Reference3DVisitor : BaseVisitor
+    {
+        public override string Reference3D(Result context, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
         {
             context.Value = range;
             return string.Empty;
@@ -100,12 +140,12 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode SheetReference(TContext context, string sheet, ReferenceArea reference)
+        public virtual TNode SheetReference(TContext context, SymbolRange range, string sheet, ReferenceArea reference)
         {
             return _defaultNode;
         }
 
-        public virtual TNode Reference3D(TContext context, string firstSheet, string lastSheet, ReferenceArea reference)
+        public virtual TNode Reference3D(TContext context, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
         {
             return _defaultNode;
         }

@@ -59,12 +59,12 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ReferenceNode(reference);
     }
 
-    public AstNode SheetReference(Ctx _, string sheet, ReferenceArea reference)
+    public AstNode SheetReference(Ctx _, SymbolRange range, string sheet, ReferenceArea reference)
     {
         return new SheetReferenceNode(sheet, reference);
     }
 
-    public AstNode Reference3D(Ctx _, string firstSheet, string lastSheet, ReferenceArea reference)
+    public AstNode Reference3D(Ctx _, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         return new Reference3DNode(firstSheet, lastSheet, reference);
     }

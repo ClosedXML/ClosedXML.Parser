@@ -97,7 +97,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.SheetReference((int Row, int Col) point, string sheet, ReferenceArea reference)
+    string IAstFactory<string, string, (int Row, int Col)>.SheetReference((int Row, int Col) point, SymbolRange range, string sheet, ReferenceArea reference)
     {
         var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         return sb
@@ -107,7 +107,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Reference3D((int Row, int Col) point, string firstSheet, string lastSheet, ReferenceArea reference)
+    string IAstFactory<string, string, (int Row, int Col)>.Reference3D((int Row, int Col) point, SymbolRange _, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         var sb = new StringBuilder(firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         firstSheet = ModifySheet(firstSheet);

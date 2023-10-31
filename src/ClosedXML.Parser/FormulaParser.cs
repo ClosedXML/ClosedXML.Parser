@@ -496,6 +496,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             // external_cell_reference: SHEET_RANGE_PREFIX (A1_CELL | A1_CELL COLON A1_CELL | A1_SPAN_REFERENCE)
             case Token.SHEET_RANGE_PREFIX:
                 {
+                    var start = _tokenSource.StartIndex;
                     var sheetRangePrefixToken = GetCurrentToken();
                     TokenParser.ParseSheetRangePrefix(sheetRangePrefixToken, out var wbIdx, out var firstName,
                         out var secondName);
@@ -505,9 +506,10 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     if (area is null)
                         throw UnexpectedTokenError(Token.A1_CELL, Token.A1_SPAN_REFERENCE);
 
+                    var end = _tokenSource.StartIndex;
                     return wbIdx is not null
                         ? _factory.ExternalReference3D(_context, wbIdx.Value, firstName, secondName, area.Value)
-                        : _factory.Reference3D(_context, firstName, secondName, area.Value);
+                        : _factory.Reference3D(_context, new SymbolRange(start, end), firstName, secondName, area.Value);
                 }
 
             // ref_function_call
@@ -531,6 +533,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     // 3D reference
                     if (_la == Token.COLON && LL(1) == Token.SINGLE_SHEET_PREFIX)
                     {
+                        var start = _tokenSource.StartIndex;
                         var firstSheetName = localName.ToString();
                         Consume(); // COLON
 
@@ -546,7 +549,8 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         if (area is null)
                             throw UnexpectedTokenError(Token.A1_CELL, Token.A1_SPAN_REFERENCE);
 
-                        return _factory.Reference3D(_context, firstSheetName, lastSheetName, area.Value);
+                        var end = _tokenSource.StartIndex;
+                        return _factory.Reference3D(_context, new SymbolRange(start, end), firstSheetName, lastSheetName, area.Value);
                     }
 
                     return _factory.Name(_context, localName.ToString());
@@ -572,6 +576,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_CELL | A1_CELL COLON A1_CELL | A1_SPAN_REFERENCE | REF_CONSTANT)
             case Token.SINGLE_SHEET_PREFIX:
                 {
+                    var start = _tokenSource.StartIndex;
                     var sheetPrefix = GetCurrentToken();
                     TokenParser.ParseSingleSheetPrefix(sheetPrefix, out var wbIdx, out string sheetName);
                     Consume();
@@ -579,8 +584,9 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     var area = A1Reference();
                     if (area is not null)
                     {
+                        var end = _tokenSource.StartIndex;
                         return wbIdx is null
-                            ? _factory.SheetReference(_context, sheetName, area.Value)
+                            ? _factory.SheetReference(_context, new SymbolRange(start, end), sheetName, area.Value)
                             : _factory.ExternalSheetReference(_context, wbIdx.Value, sheetName, area.Value);
                     }
 

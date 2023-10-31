@@ -101,18 +101,20 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create a node for a reference in a specific sheet.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the sheet reference.</param>
     /// <param name="sheet">Name of a sheet (unescaped) of the <paramref name="reference"/>.</param>
     /// <param name="reference">Area in the sheet.</param>
-    TNode SheetReference(TContext context, string sheet, ReferenceArea reference);
+    TNode SheetReference(TContext context, SymbolRange range, string sheet, ReferenceArea reference);
 
     /// <summary>
     /// Create a node for a 3D reference.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the 3D reference.</param>
     /// <param name="firstSheet">First sheet of 3D reference.</param>
     /// <param name="lastSheet">Last sheet of 3D reference.</param>
     /// <param name="reference">Area in all sheets of 3D reference.</param>
-    TNode Reference3D(TContext context, string firstSheet, string lastSheet, ReferenceArea reference);
+    TNode Reference3D(TContext context, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference);
 
     /// <summary>
     /// Create a node for a reference to cells of a specific sheet in a different worksheet.
