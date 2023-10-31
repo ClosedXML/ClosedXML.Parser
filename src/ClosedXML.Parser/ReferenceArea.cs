@@ -46,9 +46,8 @@ public readonly struct ReferenceArea
     /// Create an area for a single reference.
     /// </summary>
     internal ReferenceArea(RowCol rowCol)
+        : this(rowCol, rowCol)
     {
-        First = rowCol;
-        Second = rowCol;
     }
 
     /// <summary>
