@@ -29,7 +29,7 @@ public class AstFactoryTests
 
     [Theory]
     [InlineData("Jan:Feb!A1", 0, 10)]
-    [InlineData("1+Z:B!$A$1:$B4+4", 2, 14)]
+    [InlineData("1+Zara:Beta!$A$1:$B4+4", 2, 20)]
     [InlineData("1+'2022 Q1:2024 Q1'!Z26", 2, 23)]
     public void Reference3DRange(string formula, int start, int end)
     {
@@ -64,6 +64,33 @@ public class AstFactoryTests
     {
         var result = new Result();
         FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new CellFunctionVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("2+[Column]", 2, 10)]
+    public void StructureReferenceNoTableRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new StructureReferenceNoTableVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("2+Table1[Column]+3", 2, 16)]
+    public void StructureReferenceRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new StructureReferenceVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("2+[1]!Table1[Column]+3", 2, 20)]
+    public void ExternalStructureReferenceRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalStructureReferenceVisitor());
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
 
@@ -121,9 +148,36 @@ public class AstFactoryTests
         }
     }
 
+    private class StructureReferenceNoTableVisitor : BaseVisitor
+    {
+        public override string StructureReference(Result context, SymbolRange range, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class StructureReferenceVisitor : BaseVisitor
+    {
+        public override string StructureReference(Result context, SymbolRange range, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalStructureReferenceVisitor : BaseVisitor
+    {
+        public override string ExternalStructureReference(Result context, SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
     private class BaseVisitor : BaseVisitor<object?, string, Result>
     {
-        protected BaseVisitor() 
+        protected BaseVisitor()
             : base(null, string.Empty)
         {
         }
@@ -243,18 +297,17 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode StructureReference(TContext context, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+        public virtual TNode StructureReference(TContext context, SymbolRange range, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
         {
             return _defaultNode;
         }
 
-        public virtual TNode StructureReference(TContext context, string table, StructuredReferenceArea area, string? firstColumn,
-            string? lastColumn)
+        public virtual TNode StructureReference(TContext context, SymbolRange range, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ExternalStructureReference(TContext context, int workbookIndex, string table, StructuredReferenceArea area,
+        public virtual TNode ExternalStructureReference(TContext context, SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area,
             string? firstColumn, string? lastColumn)
         {
             return _defaultNode;

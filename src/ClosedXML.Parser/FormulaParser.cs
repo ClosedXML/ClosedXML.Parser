@@ -523,19 +523,20 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             // Either defined name or table name for a structure reference
             case Token.NAME:
                 {
+                    var start = _tokenSource.StartIndex;
                     var localName = GetCurrentToken();
                     Consume();
                     if (_la == Token.INTRA_TABLE_REFERENCE)
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
-                        return _factory.StructureReference(_context, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
+                        var range = new SymbolRange(start, _tokenSource.StartIndex);
+                        return _factory.StructureReference(_context, range, localName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
                     // 3D reference
                     if (_la == Token.COLON && LL(1) == Token.SINGLE_SHEET_PREFIX)
                     {
-                        var start = _tokenSource.StartIndex;
                         var firstSheetName = localName.ToString();
                         Consume(); // COLON
 
@@ -561,6 +562,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             // reference to another workbook
             case Token.BOOK_PREFIX:
                 {
+                    var start = _tokenSource.StartIndex;
                     var bookPrefix = TokenParser.ParseBookPrefix(GetCurrentToken());
                     Consume();
                     var externalName = GetCurrentToken();
@@ -569,7 +571,8 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     {
                         TokenParser.ParseIntraTableReference(GetCurrentToken(), out var specifics, out var firstColumn, out var lastColumn);
                         Consume();
-                        return _factory.ExternalStructureReference(_context, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
+                        var range = new SymbolRange(start, _tokenSource.StartIndex);
+                        return _factory.ExternalStructureReference(_context, range, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
                     return _factory.ExternalName(_context, bookPrefix, externalName.ToString());
@@ -610,10 +613,12 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             // structure_reference - only for formulas directly in the table, e.g. totals row.
             case Token.INTRA_TABLE_REFERENCE:
                 {
+                    var start = _tokenSource.StartIndex;
                     var localTableReference = GetCurrentToken();
                     TokenParser.ParseIntraTableReference(localTableReference, out var specifics, out var firstColumn, out var lastColumn);
                     Consume();
-                    return _factory.StructureReference(_context, specifics, firstColumn, lastColumn ?? firstColumn);
+                    var range = new SymbolRange(start, _tokenSource.StartIndex);
+                    return _factory.StructureReference(_context, range, specifics, firstColumn, lastColumn ?? firstColumn);
                 }
         }
 

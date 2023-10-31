@@ -188,31 +188,34 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Such reference is only allowed in the table (e.g. total formulas).
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the structure reference.</param>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode StructureReference(TContext context, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
+    TNode StructureReference(TContext context, SymbolRange range, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node to represent a structure reference to a table.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the structure reference.</param>
     /// <param name="table">A name of a table.</param>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode StructureReference(TContext context, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
+    TNode StructureReference(TContext context, SymbolRange range, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node to represent a structure reference to a table in some other workbook.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the structure reference.</param>
     /// <param name="workbookIndex">Id of external workbook.</param>
     /// <param name="table">A name of a table.</param>
     /// <param name="area">A portion of a table that should be considered.</param>
     /// <param name="firstColumn">The first column of a range. Null, if whole table. If only one column, same as <paramref name="lastColumn"/>.</param>
     /// <param name="lastColumn">The last column of a range. Null, if whole table.If only one column, same as <paramref name="firstColumn"/>.</param>
-    TNode ExternalStructureReference(TContext context, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
+    TNode ExternalStructureReference(TContext context, SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a name defined in a workbook.

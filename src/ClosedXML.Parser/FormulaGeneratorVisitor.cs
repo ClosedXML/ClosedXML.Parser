@@ -219,17 +219,21 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.StructureReference((int, int) _, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    string IAstFactory<string, string, (int Row, int Col)>.StructureReference((int Row, int Col) _, SymbolRange range,
+        StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return GetIntraTableReference(area, firstColumn, lastColumn);
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.StructureReference((int, int) _, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    string IAstFactory<string, string, (int Row, int Col)>.StructureReference((int Row, int Col) _, SymbolRange range,
+        string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return table + GetIntraTableReference(area, firstColumn, lastColumn);
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ExternalStructureReference((int, int) _, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalStructureReference((int Row, int Col) _,
+        SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn,
+        string? lastColumn)
     {
         return new StringBuilder()
             .AppendBookIndex(workbookIndex).Append(table)

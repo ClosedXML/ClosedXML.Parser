@@ -105,17 +105,17 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         };
     }
 
-    public AstNode StructureReference(Ctx _, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    public AstNode StructureReference(Ctx _, SymbolRange range, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return new StructureReferenceNode(null, area, firstColumn, lastColumn);
     }
 
-    public AstNode StructureReference(Ctx _, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    public AstNode StructureReference(Ctx _, SymbolRange range, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return new StructureReferenceNode(table, area, firstColumn, lastColumn);
     }
 
-    public AstNode ExternalStructureReference(Ctx _, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    public AstNode ExternalStructureReference(Ctx _, SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
     {
         return new ExternalStructureReferenceNode(workbookIndex, table, area, firstColumn, lastColumn);
     }
