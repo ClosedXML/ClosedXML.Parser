@@ -89,7 +89,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Reference((int Row, int Col) point, ReferenceArea reference)
+    string IAstFactory<string, string, (int Row, int Col)>.Reference((int Row, int Col) point, SymbolRange _, ReferenceArea reference)
     {
         var sb = new StringBuilder(MAX_R1_C1_LEN);
         return sb

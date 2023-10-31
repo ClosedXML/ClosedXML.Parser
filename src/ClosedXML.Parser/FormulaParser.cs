@@ -463,6 +463,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             //     (A1_CELL | A1_CELL COLON A1_CELL) -- inlined a1_reference
             case Token.A1_CELL:
                 {
+                    var startIdx = _tokenSource.StartIndex;
                     var area = TokenParser.ParseReference(GetCurrentToken(), _a1Mode);
                     Consume();
                     if (_la == Token.COLON && LL(1) == Token.A1_CELL)
@@ -473,7 +474,8 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         area = new ReferenceArea(area.First, secondCell.First);
                     }
 
-                    var reference = _factory.Reference(_context, area);
+                    var endIdx = _tokenSource.StartIndex;
+                    var reference = _factory.Reference(_context, new SymbolRange(startIdx, endIdx), area);
                     return reference;
                 }
 
@@ -481,9 +483,11 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             //     (A1_SPAN_REFERENCE)  -- inlined a1_reference
             case Token.A1_SPAN_REFERENCE:
                 {
+                    var start = _tokenSource.StartIndex;
                     var area = TokenParser.ParseReference(GetCurrentToken(), _a1Mode);
-                    var reference = _factory.Reference(_context, area);
                     Consume();
+                    var end = _tokenSource.StartIndex;
+                    var reference = _factory.Reference(_context, new SymbolRange(start, end), area);
                     return reference;
                 }
 

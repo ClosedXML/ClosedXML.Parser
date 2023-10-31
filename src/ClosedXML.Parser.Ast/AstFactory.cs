@@ -54,7 +54,7 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ArrayNode(rows, columns, array);
     }
 
-    public AstNode Reference(Ctx _, ReferenceArea reference)
+    public AstNode Reference(Ctx _, SymbolRange range, ReferenceArea reference)
     {
         return new ReferenceNode(reference);
     }

@@ -93,8 +93,9 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create a node for a reference to cells without a worksheet.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the reference.</param>
     /// <param name="reference">The referenced area.</param>
-    TNode Reference(TContext context, ReferenceArea reference);
+    TNode Reference(TContext context, SymbolRange range, ReferenceArea reference);
 
     /// <summary>
     /// Create a node for a reference in a specific sheet.
