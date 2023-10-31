@@ -508,7 +508,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
                     var end = _tokenSource.StartIndex;
                     return wbIdx is not null
-                        ? _factory.ExternalReference3D(_context, wbIdx.Value, firstName, secondName, area.Value)
+                        ? _factory.ExternalReference3D(_context, new SymbolRange(start, end), wbIdx.Value, firstName, secondName, area.Value)
                         : _factory.Reference3D(_context, new SymbolRange(start, end), firstName, secondName, area.Value);
                 }
 
@@ -587,7 +587,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         var end = _tokenSource.StartIndex;
                         return wbIdx is null
                             ? _factory.SheetReference(_context, new SymbolRange(start, end), sheetName, area.Value)
-                            : _factory.ExternalSheetReference(_context, wbIdx.Value, sheetName, area.Value);
+                            : _factory.ExternalSheetReference(_context, new SymbolRange(start, end), wbIdx.Value, sheetName, area.Value);
                     }
 
                     if (_la == Token.REF_CONSTANT)

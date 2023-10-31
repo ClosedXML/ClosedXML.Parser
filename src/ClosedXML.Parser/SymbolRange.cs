@@ -25,6 +25,9 @@ public readonly struct SymbolRange
     /// </summary>
     public int End { get; }
 
+    /// <summary>
+    /// Get range indexes.
+    /// </summary>
     public override string ToString()
     {
         return $"[{Start}:{End}]";

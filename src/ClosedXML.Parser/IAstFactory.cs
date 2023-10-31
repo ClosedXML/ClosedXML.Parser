@@ -120,20 +120,22 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create a node for a reference to cells of a specific sheet in a different worksheet.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the external sheet reference.</param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="sheet">Name of a sheet (unescaped) of the <paramref name="reference"/>.</param>
     /// <param name="reference">Area the external sheet.</param>
-    TNode ExternalSheetReference(TContext context, int workbookIndex, string sheet, ReferenceArea reference);
+    TNode ExternalSheetReference(TContext context, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference);
 
     /// <summary>
     /// Create a node for a 3D reference in a different workbook.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the external 3D reference.</param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="firstSheet">First sheet of 3D reference.</param>
     /// <param name="lastSheet">Last sheet of 3D reference.</param>
     /// <param name="reference">Area in all sheets of 3D reference.</param>
-    TNode ExternalReference3D(TContext context, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference);
+    TNode ExternalReference3D(TContext context, SymbolRange range, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference);
 
     /// <summary>
     /// Create a node for a function.

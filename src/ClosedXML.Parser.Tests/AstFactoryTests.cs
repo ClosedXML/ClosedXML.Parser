@@ -38,6 +38,25 @@ public class AstFactoryTests
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
 
+    [Theory]
+    [InlineData("1+[2]S!A1 + 2", 2, 9)]
+    [InlineData("1+'[2]D and D'!A1*2", 2, 17)]
+    public void ExternalSheetReferenceRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalSheetReferenceVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("1+[2]A:Z!A1 + 2", 2, 11)]
+    [InlineData("1+'[2]D and D:B and B'!A1*2", 2, 25)]
+    public void ExternalReference3DRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalReference3DVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
     private class ReferenceVisitor : BaseVisitor
     {
         public override string Reference(Result context, SymbolRange range, ReferenceArea reference)
@@ -59,6 +78,24 @@ public class AstFactoryTests
     private class Reference3DVisitor : BaseVisitor
     {
         public override string Reference3D(Result context, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalSheetReferenceVisitor : BaseVisitor
+    {
+        public override string ExternalSheetReference(Result context, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalReference3DVisitor : BaseVisitor
+    {
+        public override string ExternalReference3D(Result context, SymbolRange range, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference)
         {
             context.Value = range;
             return string.Empty;
@@ -150,12 +187,12 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode ExternalSheetReference(TContext context, int workbookIndex, string sheet, ReferenceArea reference)
+        public virtual TNode ExternalSheetReference(TContext context, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ExternalReference3D(TContext context, int workbookIndex, string firstSheet, string lastSheet,
+        public virtual TNode ExternalReference3D(TContext context, SymbolRange range, int workbookIndex, string firstSheet, string lastSheet,
             ReferenceArea reference)
         {
             return _defaultNode;
