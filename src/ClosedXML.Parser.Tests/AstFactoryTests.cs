@@ -130,6 +130,42 @@ public class AstFactoryTests
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
 
+    [Theory]
+    [InlineData("A1+TRUE-name", 8, 12)]
+    public void NameRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new NameVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("Sheet!name + 4", 0, 10)]
+    public void SheetNameRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new SheetNameVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("+[7]!name + 4", 1, 9)]
+    public void ExternalNameRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalNameVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("+[7]Sheet!name + 4", 1, 14)]
+    public void ExternalSheetNameRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalSheetNameVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
     private class ReferenceVisitor : BaseVisitor
     {
         public override string Reference(Result context, SymbolRange range, ReferenceArea reference)
@@ -241,6 +277,42 @@ public class AstFactoryTests
     private class ExternalSheetFunctionVisitor : BaseVisitor
     {
         public override string ExternalFunction(Result context, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class NameVisitor : BaseVisitor
+    {
+        public override string Name(Result context, SymbolRange range, string name)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class SheetNameVisitor : BaseVisitor
+    {
+        public override string SheetName(Result context, SymbolRange range, string sheetName, string name)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalNameVisitor : BaseVisitor
+    {
+        public override string ExternalName(Result context, SymbolRange range, int workbookIndex, string name)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ExternalSheetNameVisitor : BaseVisitor
+    {
+        public override string ExternalSheetName(Result context, SymbolRange range, int workbookIndex, string sheet, string name)
         {
             context.Value = range;
             return string.Empty;
@@ -385,22 +457,22 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode Name(TContext context, string name)
+        public virtual TNode Name(TContext context, SymbolRange range, string name)
         {
             return _defaultNode;
         }
 
-        public virtual TNode SheetName(TContext context, string sheet, string name)
+        public virtual TNode SheetName(TContext context, SymbolRange range, string sheet, string name)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ExternalName(TContext context, int workbookIndex, string name)
+        public virtual TNode ExternalName(TContext context, SymbolRange range, int workbookIndex, string name)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ExternalSheetName(TContext context, int workbookIndex, string sheet, string name)
+        public virtual TNode ExternalSheetName(TContext context, SymbolRange range, int workbookIndex, string sheet, string name)
         {
             return _defaultNode;
         }

@@ -231,8 +231,9 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="name">The defined name.</param>
-    TNode Name(TContext context, string name);
+    TNode Name(TContext context, SymbolRange range, string name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a name defined in a worksheet.
@@ -242,17 +243,19 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="sheet">Name of a sheet, unescaped.</param>
     /// <param name="name">The defined name.</param>
-    TNode SheetName(TContext context, string sheet, string name);
+    TNode SheetName(TContext context, SymbolRange range, string sheet, string name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a defined name in a different workbook.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="name">Name from a workbook. It can be defined name or a name of a table.</param>
-    TNode ExternalName(TContext context, int workbookIndex, string name);
+    TNode ExternalName(TContext context, SymbolRange range, int workbookIndex, string name);
 
     /// <summary>
     /// Create a node that should evaluate to a value of a defined name in a worksheet of a different workbook.
@@ -262,10 +265,11 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="sheet">Name of a sheet in the external workbook, unescaped.</param>
     /// <param name="name">The defined name.</param>
-    TNode ExternalSheetName(TContext context, int workbookIndex, string sheet, string name);
+    TNode ExternalSheetName(TContext context, SymbolRange range, int workbookIndex, string sheet, string name);
 
     /// <summary>
     /// Create a node that performs a binary operation on values from another nodes.

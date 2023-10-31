@@ -560,7 +560,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         return _factory.Reference3D(_context, new SymbolRange(start, end), firstSheetName, lastSheetName, area.Value);
                     }
 
-                    return _factory.Name(_context, localName.ToString());
+                    return _factory.Name(_context, new SymbolRange(start, _tokenSource.StartIndex), localName.ToString());
                 }
 
             // reference to another workbook
@@ -579,7 +579,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                         return _factory.ExternalStructureReference(_context, range, bookPrefix, externalName.ToString(), specifics, firstColumn, lastColumn ?? firstColumn);
                     }
 
-                    return _factory.ExternalName(_context, bookPrefix, externalName.ToString());
+                    return _factory.ExternalName(_context, new SymbolRange(start, _tokenSource.StartIndex), bookPrefix, externalName.ToString());
                 }
             // name_reference: SINGLE_SHEET_PREFIX NAME
             // external_cell_reference: SINGLE_SHEET_PREFIX (A1_CELL | A1_CELL COLON A1_CELL | A1_SPAN_REFERENCE | REF_CONSTANT)
@@ -609,9 +609,10 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     // name_reference
                     var name = GetCurrentToken();
                     Match(Token.NAME);
+                    var range = new SymbolRange(start, _tokenSource.StartIndex);
                     return wbIdx is null
-                        ? _factory.SheetName(_context, sheetName, name.ToString())
-                        : _factory.ExternalSheetName(_context, wbIdx.Value, sheetName, name.ToString());
+                        ? _factory.SheetName(_context, range, sheetName, name.ToString())
+                        : _factory.ExternalSheetName(_context, range, wbIdx.Value, sheetName, name.ToString());
                 }
 
             // structure_reference - only for formulas directly in the table, e.g. totals row.

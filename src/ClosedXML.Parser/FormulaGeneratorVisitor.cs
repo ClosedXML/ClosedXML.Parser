@@ -241,12 +241,12 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Name((int, int) _, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.Name((int, int) _, SymbolRange range, string name)
     {
         return name;
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.SheetName((int Row, int Col) point, string sheet, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.SheetName((int Row, int Col) point, SymbolRange range, string sheet, string name)
     {
         var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         return sb
@@ -256,7 +256,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ExternalName((int, int) _, int workbookIndex, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalName((int, int) _, SymbolRange range, int workbookIndex, string name)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + SHEET_SEPARATOR_LEN + name.Length);
         return sb
@@ -266,7 +266,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ExternalSheetName((int Row, int Col) point, int workbookIndex, string sheet, string name)
+    string IAstFactory<string, string, (int Row, int Col)>.ExternalSheetName((int Row, int Col) point, SymbolRange range, int workbookIndex, string sheet, string name)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         return sb

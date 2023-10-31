@@ -128,22 +128,22 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         };
     }
 
-    public AstNode Name(Ctx _, string name)
+    public AstNode Name(Ctx _, SymbolRange range, string name)
     {
         return new NameNode(name);
     }
 
-    public AstNode SheetName(Ctx _, string sheet, string name)
+    public AstNode SheetName(Ctx _, SymbolRange range, string sheet, string name)
     {
         return new SheetNameNode(sheet, name);
     }
 
-    public AstNode ExternalName(Ctx _, int workbookIndex, string name)
+    public AstNode ExternalName(Ctx _, SymbolRange range, int workbookIndex, string name)
     {
         return new ExternalNameNode(workbookIndex, name);
     }
 
-    public AstNode ExternalSheetName(Ctx _, int workbookIndex, string sheet, string name)
+    public AstNode ExternalSheetName(Ctx _, SymbolRange range, int workbookIndex, string sheet, string name)
     {
         return new ExternalSheetNameNode(workbookIndex, sheet, name);
     }
