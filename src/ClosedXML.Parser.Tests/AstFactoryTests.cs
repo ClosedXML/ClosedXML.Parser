@@ -57,6 +57,16 @@ public class AstFactoryTests
         FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ExternalReference3DVisitor());
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
+
+    [Theory]
+    [InlineData("2+A1(14,7)+2", 2, 10)]
+    public void CellFunctionRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new CellFunctionVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
     private class ReferenceVisitor : BaseVisitor
     {
         public override string Reference(Result context, SymbolRange range, ReferenceArea reference)
@@ -96,6 +106,15 @@ public class AstFactoryTests
     private class ExternalReference3DVisitor : BaseVisitor
     {
         public override string ExternalReference3D(Result context, SymbolRange range, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class CellFunctionVisitor : BaseVisitor
+    {
+        public override string CellFunction(Result context, SymbolRange range, RowCol cell, IReadOnlyList<string> arguments)
         {
             context.Value = range;
             return string.Empty;
@@ -219,7 +238,7 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode CellFunction(TContext context, RowCol cell, IReadOnlyList<TNode> arguments)
+        public virtual TNode CellFunction(TContext context, SymbolRange range, RowCol cell, IReadOnlyList<TNode> arguments)
         {
             return _defaultNode;
         }

@@ -210,7 +210,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.CellFunction((int Row, int Col) point, RowCol cell, IReadOnlyList<string> arguments)
+    string IAstFactory<string, string, (int Row, int Col)>.CellFunction((int Row, int Col) point, SymbolRange range, RowCol cell, IReadOnlyList<string> arguments)
     {
         var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
         return sb

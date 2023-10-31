@@ -178,9 +178,10 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// </summary>
     /// <remarks>Cell functions are not yet supported by Excel, but are part of a grammar.</remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the cell function.</param>
     /// <param name="cell">A reference to a cell with a LAMBDA. Is a single cell.</param>
     /// <param name="arguments">Arguments to pass to a LAMBDA.</param>
-    TNode CellFunction(TContext context, RowCol cell, IReadOnlyList<TNode> arguments);
+    TNode CellFunction(TContext context, SymbolRange range, RowCol cell, IReadOnlyList<TNode> arguments);
 
     /// <summary>
     /// Create a node to represent a structure reference without a table to a range of columns.

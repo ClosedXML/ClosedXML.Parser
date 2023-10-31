@@ -312,10 +312,12 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             case Token.CELL_FUNCTION_LIST:
                 {
                     isPureRef = false;
+                    var start = _tokenSource.StartIndex;
                     var cellReference = TokenParser.ExtractCellFunction(GetCurrentToken());
                     Consume();
                     var args = ArgumentList();
-                    return _factory.CellFunction(_context, cellReference, args);
+                    var range = new SymbolRange(start, _tokenSource.StartIndex);
+                    return _factory.CellFunction(_context, range, cellReference, args);
                 }
 
             case Token.USER_DEFINED_FUNCTION_NAME:
