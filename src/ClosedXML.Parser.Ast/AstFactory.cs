@@ -148,17 +148,17 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ExternalSheetNameNode(workbookIndex, sheet, name);
     }
 
-    public AstNode BinaryNode(Ctx _, BinaryOperation operation, AstNode leftNode, AstNode rightNode)
+    public AstNode BinaryNode(Ctx _, SymbolRange range, BinaryOperation operation, AstNode leftNode, AstNode rightNode)
     {
         return new BinaryNode(operation, leftNode, rightNode);
     }
 
-    public AstNode Unary(Ctx _, UnaryOperation operation, AstNode node)
+    public AstNode Unary(Ctx _, SymbolRange range, UnaryOperation operation, AstNode node)
     {
         return new UnaryNode(operation) { Children = new[] { node } };
     }
 
-    public AstNode Nested(Ctx _, AstNode node)
+    public AstNode Nested(Ctx _, SymbolRange range, AstNode node)
     {
         // AST is mostly there for testing and visualization, so omit the unnecessary nodes in a tree.
         return node;

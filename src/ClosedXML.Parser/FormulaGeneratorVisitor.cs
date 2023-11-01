@@ -276,7 +276,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
             .ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.BinaryNode((int, int) _, BinaryOperation operation, string leftNode, string rightNode)
+    string IAstFactory<string, string, (int Row, int Col)>.BinaryNode((int, int) _, SymbolRange range, BinaryOperation operation, string leftNode, string rightNode)
     {
         var operand = operation switch
         {
@@ -300,7 +300,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         return leftNode + operand + rightNode;
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Unary((int, int) _, UnaryOperation operation, string node)
+    string IAstFactory<string, string, (int Row, int Col)>.Unary((int, int) _, SymbolRange range, UnaryOperation operation, string node)
     {
         return operation switch
         {
@@ -313,7 +313,7 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         };
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.Nested((int, int) _, string node)
+    string IAstFactory<string, string, (int Row, int Col)>.Nested((int, int) _, SymbolRange range, string node)
     {
         return "(" + node + ")";
     }

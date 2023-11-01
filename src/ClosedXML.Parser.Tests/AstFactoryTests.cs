@@ -166,6 +166,30 @@ public class AstFactoryTests
         Assert.Equal(new SymbolRange(start, end), result.Value);
     }
 
+    [Fact]
+    public void BinaryOperationRange()
+    {
+        var result = new List<SymbolRange>();
+        FormulaParser<object?, string, List<SymbolRange>>.CellFormulaA1("1+2+3+4", result, new BinaryOperationVisitor());
+        Assert.Equal(new[] { new SymbolRange(0, 3), new SymbolRange(0, 5), new SymbolRange(0, 7) }, result);
+    }
+
+    [Fact]
+    public void UnaryOperationRange()
+    {
+        var result = new List<SymbolRange>();
+        FormulaParser<object?, string, List<SymbolRange>>.CellFormulaA1("-7+8%", result, new UnaryOperationVisitor());
+        Assert.Equal(new[] { new SymbolRange(0, 2), new SymbolRange(3, 5) }, result);
+    }
+
+    [Fact]
+    public void NestedRange()
+    {
+        var result = new List<SymbolRange>();
+        FormulaParser<object?, string, List<SymbolRange>>.CellFormulaA1("-( 1 + (2))+8%", result, new NestedOperationVisitor());
+        Assert.Equal(new[] { new SymbolRange(7, 10), new SymbolRange(1, 11) }, result);
+    }
+
     private class ReferenceVisitor : BaseVisitor
     {
         public override string Reference(Result context, SymbolRange range, ReferenceArea reference)
@@ -315,6 +339,48 @@ public class AstFactoryTests
         public override string ExternalSheetName(Result context, SymbolRange range, int workbookIndex, string sheet, string name)
         {
             context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class BinaryOperationVisitor : BaseVisitor<object?, string, List<SymbolRange>>
+    {
+        public BinaryOperationVisitor()
+            : base(null, string.Empty)
+        {
+        }
+
+        public override string BinaryNode(List<SymbolRange> context, SymbolRange range, BinaryOperation operation, string leftNode, string rightNode)
+        {
+            context.Add(range);
+            return string.Empty;
+        }
+    }
+
+    private class UnaryOperationVisitor : BaseVisitor<object?, string, List<SymbolRange>>
+    {
+        public UnaryOperationVisitor()
+            : base(null, string.Empty)
+        {
+        }
+
+        public override string Unary(List<SymbolRange> context, SymbolRange range, UnaryOperation operation, string node)
+        {
+            context.Add(range);
+            return string.Empty;
+        }
+    }
+
+    private class NestedOperationVisitor : BaseVisitor<object?, string, List<SymbolRange>>
+    {
+        public NestedOperationVisitor()
+            : base(null, string.Empty)
+        {
+        }
+
+        public override string Nested(List<SymbolRange> context, SymbolRange range, string node)
+        {
+            context.Add(range);
             return string.Empty;
         }
     }
@@ -477,17 +543,17 @@ public class AstFactoryTests
             return _defaultNode;
         }
 
-        public virtual TNode BinaryNode(TContext context, BinaryOperation operation, TNode leftNode, TNode rightNode)
+        public virtual TNode BinaryNode(TContext context, SymbolRange range, BinaryOperation operation, TNode leftNode, TNode rightNode)
         {
             return _defaultNode;
         }
 
-        public virtual TNode Unary(TContext context, UnaryOperation operation, TNode node)
+        public virtual TNode Unary(TContext context, SymbolRange range, UnaryOperation operation, TNode node)
         {
             return _defaultNode;
         }
 
-        public virtual TNode Nested(TContext context, TNode node)
+        public virtual TNode Nested(TContext context, SymbolRange range, TNode node)
         {
             return _defaultNode;
         }

@@ -231,7 +231,7 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    /// <param name="range"></param>
+    /// <param name="range">Range in a formula that contains the name.</param>
     /// <param name="name">The defined name.</param>
     TNode Name(TContext context, SymbolRange range, string name);
 
@@ -243,7 +243,7 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    /// <param name="range"></param>
+    /// <param name="range">Range in a formula that contains the name.</param>
     /// <param name="sheet">Name of a sheet, unescaped.</param>
     /// <param name="name">The defined name.</param>
     TNode SheetName(TContext context, SymbolRange range, string sheet, string name);
@@ -265,7 +265,7 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// names can be global (usable in a whole workbook) or local (only for one worksheet).
     /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    /// <param name="range"></param>
+    /// <param name="range">Range in a formula that contains the name.</param>
     /// <param name="workbookIndex">Id of an external workbook. The actual path to the file is in workbook part, <c>externalReferences</c> tag.</param>
     /// <param name="sheet">Name of a sheet in the external workbook, unescaped.</param>
     /// <param name="name">The defined name.</param>
@@ -275,25 +275,28 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create a node that performs a binary operation on values from another nodes.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the binary operation.</param>
     /// <param name="operation">Binary operation.</param>
     /// <param name="leftNode">Node that should be evaluated for left argument of a binary operation.</param>
     /// <param name="rightNode">Node that should be evaluated for right argument of a binary operation.</param>
-    TNode BinaryNode(TContext context, BinaryOperation operation, TNode leftNode, TNode rightNode);
+    TNode BinaryNode(TContext context, SymbolRange range, BinaryOperation operation, TNode leftNode, TNode rightNode);
 
     /// <summary>
     /// Create a node that performs an unary operation on a value from another node.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="operation">Unary operation.</param>
     /// <param name="node">Node that should be evaluated for a value.</param>
-    TNode Unary(TContext context, UnaryOperation operation, TNode node);
+    TNode Unary(TContext context, SymbolRange range, UnaryOperation operation, TNode node);
 
     /// <summary>
     /// This factory method is called for nested expression in braces (<c>(1+2)/4</c>). The problem isn't that
     /// it would be evaluated incorrectly, but it is to preserve braces during A1 to R1C1 transformation.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    /// <remarks>Simplest implementation returns the same node and avoids extra nodes.</remarks>
+    /// <param name="range"></param>
     /// <param name="node">The node representing expression in braces.</param>
-    TNode Nested(TContext context, TNode node);
+    /// <remarks>Simplest implementation returns the same node and avoids extra nodes.</remarks>
+    TNode Nested(TContext context, SymbolRange range, TNode node);
 }

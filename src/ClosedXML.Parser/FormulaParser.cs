@@ -97,6 +97,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode Expression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = ConcatExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
@@ -129,25 +130,27 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             isPureRef = false;
 
             var rightNode = ConcatExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode(_context, cmpOp, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), cmpOp, leftNode, rightNode);
         }
     }
 
     private TNode ConcatExpression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = AdditiveExpression(skipRangeUnion, out isPureRef);
         while (_la == Token.CONCAT)
         {
             Consume();
             isPureRef = false;
             var rightNode = AdditiveExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode(_context, BinaryOperation.Concat, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), BinaryOperation.Concat, leftNode, rightNode);
         }
 
         return leftNode;
     }
     private TNode AdditiveExpression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = MultiplyingExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
@@ -167,12 +170,13 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             Consume();
             isPureRef = false;
             var rightNode = MultiplyingExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode(_context, op, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), op, leftNode, rightNode);
         }
     }
 
     private TNode MultiplyingExpression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = PowExpression(skipRangeUnion, out isPureRef);
         while (true)
         {
@@ -192,19 +196,20 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             Consume();
             isPureRef = false;
             var appendNode = PowExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode(_context, op, leftNode, appendNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), op, leftNode, appendNode);
         }
     }
 
     private TNode PowExpression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = PercentExpression(skipRangeUnion, out isPureRef);
         while (_la == Token.POW)
         {
             Consume();
             isPureRef = false;
             var rightNode = PercentExpression(skipRangeUnion, out _);
-            leftNode = _factory.BinaryNode(_context, BinaryOperation.Power, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), BinaryOperation.Power, leftNode, rightNode);
         }
 
         return leftNode;
@@ -212,13 +217,14 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode PercentExpression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         var prefixAtomNode = PrefixAtomExpression(skipRangeUnion, out isPureRef);
         var percentNode = prefixAtomNode;
         while (_la == Token.PERCENT)
         {
             Consume();
             isPureRef = false;
-            percentNode = _factory.Unary(_context, UnaryOperation.Percent, percentNode);
+            percentNode = _factory.Unary(_context, new SymbolRange(start, _tokenSource.StartIndex), UnaryOperation.Percent, percentNode);
         }
 
         return percentNode;
@@ -247,6 +253,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     /// <returns></returns>
     private TNode PrefixAtomExpression(bool skipRangeUnion, out bool isPureRef)
     {
+        var start = _tokenSource.StartIndex;
         UnaryOperation op;
         switch (_la)
         {
@@ -263,7 +270,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         Consume();
         var neutralAtom = PrefixAtomExpression(skipRangeUnion, out _);
         isPureRef = false;
-        return _factory.Unary(_context, op, neutralAtom);
+        return _factory.Unary(_context, new SymbolRange(start, _tokenSource.StartIndex), op, neutralAtom);
     }
 
     private TNode AtomExpression(bool skipRangeUnion, out bool isPureRef)
@@ -282,31 +289,35 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
             // '(' expression ')'
             case Token.OPEN_BRACE:
-                Consume();
-                var nestedNode = _factory.Nested(_context, Expression(false, out isPureRef));
-                Match(Token.CLOSE_BRACE);
-
-                // This is the point of an ambiguity. Atom should be a value, but it can
-                // be determined by calling an expression inside the braces or
-                // it can go through ref_expression path that also has an ref_expression
-                // in braces. The second option should be seriously rare, so parser
-                // tracks whether expression is a ref_expression and if it is, we 'backtrack'
-                // through patching to the correct path of the 'ref_expression' below.
-                // Example: '(A1) A1:B2' <- the '(A1)' should be detected as ref_expression
-                // and thus the ' ' intersection operator be valid. Of course, braces can be
-                // very nested '(((A1))) A1:B2' and when we are entering the brace, there is
-                // no way to detect whether it is ref_expression or expression.
-                if (isPureRef)
                 {
-                    // Incorrect expectation, backtrack to the ref_expression
-                    // note the passed true argument for 'replaceFirstAtom'
-                    if (skipRangeUnion)
-                        return RefImplicitExpression(true, nestedNode);
+                    var start = _tokenSource.StartIndex;
+                    Consume();
+                    var expression = Expression(false, out isPureRef);
+                    Match(Token.CLOSE_BRACE);
+                    var nestedNode = _factory.Nested(_context, new SymbolRange(start, _tokenSource.StartIndex), expression);
 
-                    return RefExpression(true, nestedNode);
+                    // This is the point of an ambiguity. Atom should be a value, but it can
+                    // be determined by calling an expression inside the braces or
+                    // it can go through ref_expression path that also has an ref_expression
+                    // in braces. The second option should be seriously rare, so parser
+                    // tracks whether expression is a ref_expression and if it is, we 'backtrack'
+                    // through patching to the correct path of the 'ref_expression' below.
+                    // Example: '(A1) A1:B2' <- the '(A1)' should be detected as ref_expression
+                    // and thus the ' ' intersection operator be valid. Of course, braces can be
+                    // very nested '(((A1))) A1:B2' and when we are entering the brace, there is
+                    // no way to detect whether it is ref_expression or expression.
+                    if (isPureRef)
+                    {
+                        // Incorrect expectation, backtrack to the ref_expression
+                        // note the passed true argument for 'replaceFirstAtom'
+                        if (skipRangeUnion)
+                            return RefImplicitExpression(true, nestedNode);
+
+                        return RefExpression(true, nestedNode);
+                    }
+
+                    return nestedNode;
                 }
-
-                return nestedNode;
 
             // function_call
             case Token.CELL_FUNCTION_LIST:
@@ -369,12 +380,13 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode RefExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = RefImplicitExpression(replaceFirstAtom, refAtom);
         while (_la == Token.COMMA)
         {
             Consume();
             var rightNode = RefImplicitExpression();
-            leftNode = _factory.BinaryNode(_context, BinaryOperation.Union, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), BinaryOperation.Union, leftNode, rightNode);
         }
 
         return leftNode;
@@ -390,11 +402,12 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     /// </summary>
     private TNode RefImplicitExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
+        var start = _tokenSource.StartIndex;
         if (_la == Token.INTERSECT)
         {
             Consume();
             var refNode = RefImplicitExpression(replaceFirstAtom, refAtom);
-            return _factory.Unary(_context, UnaryOperation.ImplicitIntersection, refNode);
+            return _factory.Unary(_context, new SymbolRange(start, _tokenSource.StartIndex), UnaryOperation.ImplicitIntersection, refNode);
         }
 
         return RefIntersectionExpression(replaceFirstAtom, refAtom);
@@ -402,12 +415,13 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode RefIntersectionExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = RefRangeExpression(replaceFirstAtom, refAtom);
         while (_la == Token.SPACE)
         {
             Consume();
             var rightNode = RefRangeExpression();
-            leftNode = _factory.BinaryNode(_context, BinaryOperation.Intersection, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), BinaryOperation.Intersection, leftNode, rightNode);
         }
 
         return leftNode;
@@ -415,12 +429,13 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode RefRangeExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
+        var start = _tokenSource.StartIndex;
         var leftNode = RefSpillExpression(replaceFirstAtom, refAtom);
         while (_la == Token.COLON)
         {
             Consume();
             var rightNode = RefSpillExpression();
-            leftNode = _factory.BinaryNode(_context, BinaryOperation.Range, leftNode, rightNode);
+            leftNode = _factory.BinaryNode(_context, new SymbolRange(start, _tokenSource.StartIndex), BinaryOperation.Range, leftNode, rightNode);
         }
 
         return leftNode;
@@ -436,11 +451,12 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     /// </summary>
     private TNode RefSpillExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
     {
+        var start = _tokenSource.StartIndex;
         var refAtomNode = RefAtomExpression(replaceFirstAtom, refAtom);
         if (_la == Token.SPILL)
         {
             Consume();
-            return _factory.Unary(_context, UnaryOperation.SpillRange, refAtomNode);
+            return _factory.Unary(_context, new SymbolRange(start, _tokenSource.StartIndex), UnaryOperation.SpillRange, refAtomNode);
         }
 
         return refAtomNode;
@@ -458,11 +474,13 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 return ErrorNode();
 
             case Token.OPEN_BRACE:
-                Consume();
-                var refExpression = _factory.Nested(_context, RefExpression());
-                Match(Token.CLOSE_BRACE);
-                return refExpression;
-
+                {
+                    var start = _tokenSource.StartIndex;
+                    Consume();
+                    var refExpression = RefExpression();
+                    Match(Token.CLOSE_BRACE);
+                    return _factory.Nested(_context, new SymbolRange(start, _tokenSource.StartIndex), refExpression);
+                }
             // cell_reference has been inlined into this switch
 
             // cell_reference:
