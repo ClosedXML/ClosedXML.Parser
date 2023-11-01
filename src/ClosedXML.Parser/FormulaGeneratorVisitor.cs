@@ -39,7 +39,8 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         return error.ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ArrayNode((int, int) _, int rows, int columns, IReadOnlyList<string> elements)
+    string IAstFactory<string, string, (int Row, int Col)>.ArrayNode((int Row, int Col) _, SymbolRange range, int rows,
+        int columns, IReadOnlyList<string> elements)
     {
         var sb = new StringBuilder(2 + elements.Sum(x => x.Length) + elements.Count);
         sb.Append('{');
@@ -60,27 +61,29 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
         return sb.ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.BlankNode((int, int) _)
+    string IAstFactory<string, string, (int Row, int Col)>.BlankNode((int Row, int Col) _, SymbolRange range)
     {
         return string.Empty;
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.LogicalNode((int, int) _, bool value)
+    string IAstFactory<string, string, (int Row, int Col)>.LogicalNode((int Row, int Col) _, SymbolRange range,
+        bool value)
     {
         return value ? "TRUE" : "FALSE";
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ErrorNode((int, int) _, ReadOnlySpan<char> error)
+    string IAstFactory<string, string, (int Row, int Col)>.ErrorNode((int Row, int Col) _, SymbolRange range,
+        ReadOnlySpan<char> error)
     {
         return error.ToString();
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.NumberNode((int, int) _, double value)
+    string IAstFactory<string, string, (int Row, int Col)>.NumberNode((int, int) _, SymbolRange range, double value)
     {
         return value.ToString(CultureInfo.InvariantCulture);
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.TextNode((int, int) _, string text)
+    string IAstFactory<string, string, (int Row, int Col)>.TextNode((int, int) _, SymbolRange range, string text)
     {
         return new StringBuilder(text.Length + QUOTE_RESERVE)
             .Append('"')

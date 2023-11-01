@@ -50,44 +50,50 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create an array for scalar values.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range"></param>
     /// <param name="rows">Number of rows of an array. At least 1.</param>
     /// <param name="columns">Number of column of an array. At least 1.</param>
     /// <param name="elements">Elements of an array, row by row. The number of elements is <paramref name="rows"/>*<paramref name="columns"/>.</param>
-    TNode ArrayNode(TContext context, int rows, int columns, IReadOnlyList<TScalarValue> elements);
+    TNode ArrayNode(TContext context, SymbolRange range, int rows, int columns, IReadOnlyList<TScalarValue> elements);
 
     /// <summary>
     /// Create a blank node. In most cases, a blank argument of a function, e.g. <c>IF(TRUE,,)</c>.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    TNode BlankNode(TContext context);
+    /// <param name="range">Range in a formula that contains the blank.</param>
+    TNode BlankNode(TContext context, SymbolRange range);
 
     /// <summary>
     /// Create a node with a logical value.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the logical.</param>
     /// <param name="value">The logical value that will be represented by the node.</param>
-    TNode LogicalNode(TContext context, bool value);
+    TNode LogicalNode(TContext context, SymbolRange range, bool value);
 
     /// <summary>
     /// Create a node with an error value.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the error.</param>
     /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace. In upper case format.</param>
-    TNode ErrorNode(TContext context, ReadOnlySpan<char> error);
+    TNode ErrorNode(TContext context, SymbolRange range, ReadOnlySpan<char> error);
 
     /// <summary>
     /// Create a node with an error value.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the number.</param>
     /// <param name="value">The numeric value of an array. Never <c>NaN</c> or <c>Infinity</c>.</param>
-    TNode NumberNode(TContext context, double value);
+    TNode NumberNode(TContext context, SymbolRange range, double value);
 
     /// <summary>
     /// Create a node with a text value.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the text.</param>
     /// <param name="text">The text. The characters of text are already unescaped.</param>
-    TNode TextNode(TContext context, string text);
+    TNode TextNode(TContext context, SymbolRange range, string text);
 
     /// <summary>
     /// Create a node for a reference to cells without a worksheet.

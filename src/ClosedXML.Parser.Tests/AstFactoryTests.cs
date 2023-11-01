@@ -3,6 +3,51 @@
 public class AstFactoryTests
 {
     [Theory]
+    [InlineData("1+TRUE", 2, 6)]
+    public void LogicalRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new LogicalVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("A1:#REF!", 3, 8)]
+    public void ErrorRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ErrorVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("JOIN(1.15)", 5, 9)]
+    public void NumberRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new NumberVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("JOIN(\"A b c\")", 5, 12)]
+    public void TextRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new TextVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
+    [InlineData("SUM( {1,2,3})", 5, 12)]
+    public void ArrayRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new ArrayVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
     [InlineData("A1", 0, 2)]
     [InlineData("A1 ", 0, 2)]
     [InlineData(" A1 ", 1, 3)]
@@ -188,6 +233,51 @@ public class AstFactoryTests
         var result = new List<SymbolRange>();
         FormulaParser<object?, string, List<SymbolRange>>.CellFormulaA1("-( 1 + (2))+8%", result, new NestedOperationVisitor());
         Assert.Equal(new[] { new SymbolRange(7, 10), new SymbolRange(1, 11) }, result);
+    }
+
+    private class LogicalVisitor : BaseVisitor
+    {
+        public override string LogicalNode(Result context, SymbolRange range, bool logical)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ErrorVisitor : BaseVisitor
+    {
+        public override string ErrorNode(Result context, SymbolRange range, ReadOnlySpan<char> error)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class NumberVisitor : BaseVisitor
+    {
+        public override string NumberNode(Result context, SymbolRange range, double number)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class TextVisitor : BaseVisitor
+    {
+        public override string TextNode(Result context, SymbolRange range, string text)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class ArrayVisitor : BaseVisitor
+    {
+        public override string ArrayNode(Result context, SymbolRange range, int rows, int columns, IReadOnlyList<object?> elements)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
     }
 
     private class ReferenceVisitor : BaseVisitor
@@ -425,32 +515,33 @@ public class AstFactoryTests
             return _defaultScalar;
         }
 
-        public virtual TNode ArrayNode(TContext context, int rows, int columns, IReadOnlyList<TScalarValue> elements)
+        public virtual TNode ArrayNode(TContext context, SymbolRange range, int rows, int columns,
+            IReadOnlyList<TScalarValue> elements)
         {
             return _defaultNode;
         }
 
-        public virtual TNode BlankNode(TContext context)
+        public virtual TNode BlankNode(TContext context, SymbolRange range)
         {
             return _defaultNode;
         }
 
-        public virtual TNode LogicalNode(TContext context, bool value)
+        public virtual TNode LogicalNode(TContext context, SymbolRange range, bool value)
         {
             return _defaultNode;
         }
 
-        public virtual TNode ErrorNode(TContext context, ReadOnlySpan<char> error)
+        public virtual TNode ErrorNode(TContext context, SymbolRange range, ReadOnlySpan<char> error)
         {
             return _defaultNode;
         }
 
-        public virtual TNode NumberNode(TContext context, double value)
+        public virtual TNode NumberNode(TContext context, SymbolRange range, double value)
         {
             return _defaultNode;
         }
 
-        public virtual TNode TextNode(TContext context, string text)
+        public virtual TNode TextNode(TContext context, SymbolRange range, string text)
         {
             return _defaultNode;
         }

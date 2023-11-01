@@ -24,32 +24,32 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new ScalarValue("Error", error.ToString());
     }
 
-    public AstNode BlankNode(Ctx _)
+    public AstNode BlankNode(Ctx _, SymbolRange range)
     {
         return new ValueNode("Blank", string.Empty);
     }
 
-    public AstNode LogicalNode(Ctx _, bool value)
+    public AstNode LogicalNode(Ctx _, SymbolRange range, bool value)
     {
         return new ValueNode("Logical", value);
     }
 
-    public AstNode ErrorNode(Ctx _, ReadOnlySpan<char> error)
+    public AstNode ErrorNode(Ctx _, SymbolRange range, ReadOnlySpan<char> error)
     {
         return new ValueNode("Error", error.ToString());
     }
 
-    public AstNode NumberNode(Ctx _, double value)
+    public AstNode NumberNode(Ctx _, SymbolRange range, double value)
     {
         return new ValueNode("Number", value);
     }
 
-    public AstNode TextNode(Ctx _, string text)
+    public AstNode TextNode(Ctx _, SymbolRange range, string text)
     {
         return new ValueNode("Text", text);
     }
 
-    public AstNode ArrayNode(Ctx _, int rows, int columns, IReadOnlyList<ScalarValue> array)
+    public AstNode ArrayNode(Ctx _, SymbolRange range, int rows, int columns, IReadOnlyList<ScalarValue> array)
     {
         return new ArrayNode(rows, columns, array);
     }

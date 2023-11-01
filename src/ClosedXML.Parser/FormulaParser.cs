@@ -619,9 +619,9 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
                     if (_la == Token.REF_CONSTANT)
                     {
-                        var errorReference = _factory.ErrorNode(_context, GetCurrentToken()); // Sheet1!#REF! is a valid
+                        var error = GetCurrentToken(); // Sheet1!#REF! is a valid
                         Consume();
-                        return errorReference;
+                        return _factory.ErrorNode(_context, new SymbolRange(start, _tokenSource.StartIndex), error);
                     }
 
                     // name_reference
@@ -688,41 +688,42 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
     private TNode ErrorNode()
     {
+        var start = _tokenSource.StartIndex;
         var errorToken = GetCurrentToken();
         Span<char> normalizedError = stackalloc char[errorToken.Length];
         errorToken.ToUpperInvariant(normalizedError);
-        var refError = _factory.ErrorNode(_context, normalizedError);
         Consume();
-        return refError;
+        return _factory.ErrorNode(_context, new SymbolRange(start, _tokenSource.StartIndex), normalizedError);
     }
 
     private TNode Constant()
     {
+        var start = _tokenSource.StartIndex;
         switch (_la)
         {
             case Token.NONREF_ERRORS:
                 return ErrorNode();
 
             case Token.LOGICAL_CONSTANT:
-                var logicalNode = ConvertLogical();
+                var logical = ConvertLogical();
                 Consume();
-                return logicalNode;
+                return _factory.LogicalNode(_context, new SymbolRange(start, _tokenSource.StartIndex), logical);
 
             case Token.NUMERICAL_CONSTANT:
-                var numberNode = ConvertNumber();
+                var number = ConvertNumber();
                 Consume();
-                return numberNode;
+                return _factory.NumberNode(_context, new SymbolRange(start, _tokenSource.StartIndex), number);
 
             case Token.STRING_CONSTANT:
-                var textNode = ConvertText();
+                var text = ConvertText();
                 Consume();
-                return textNode;
+                return _factory.TextNode(_context, new SymbolRange(start, _tokenSource.StartIndex), text);
 
             case Token.OPEN_CURLY:
                 Consume();
                 var arrayElements = ConstantListRows(out var rows, out var columns);
                 Match(Token.CLOSE_CURLY);
-                return _factory.ArrayNode(_context, rows, columns, arrayElements);
+                return _factory.ArrayNode(_context, new SymbolRange(start, _tokenSource.StartIndex), rows, columns, arrayElements);
 
             default:
                 throw UnexpectedTokenError();
@@ -827,16 +828,18 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             {
                 // If there is a comma, it means there are
                 // two commas in a row and thus a blank argument.
-                args.Add(_factory.BlankNode(_context));
+                var start = _tokenSource.StartIndex;
                 Consume();
+                args.Add(_factory.BlankNode(_context, new SymbolRange(start, _tokenSource.StartIndex)));
             }
             else if (_la == Token.CLOSE_BRACE)
             {
                 // if there is a brace, it means the previous
                 // comma is immediately followed by a brace `,)`
                 // thus there is a blank node and end of args.
-                args.Add(_factory.BlankNode(_context));
+                var start = _tokenSource.StartIndex;
                 Consume();
+                args.Add(_factory.BlankNode(_context, new SymbolRange(start, _tokenSource.StartIndex)));
                 return args;
             }
             else
@@ -888,9 +891,9 @@ public class FormulaParser<TScalarValue, TNode, TContext>
             CultureInfo.InvariantCulture);
     }
 
-    private TNode ConvertLogical()
+    private bool ConvertLogical()
     {
-        return _factory.LogicalNode(_context, GetTokenLogicalValue());
+        return GetTokenLogicalValue();
     }
 
     private bool GetTokenLogicalValue()
@@ -898,20 +901,18 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         return _input[_tokenSource.StartIndex] is 'T' or 't';
     }
 
-    private TNode ConvertNumber()
+    private double ConvertNumber()
     {
-        var number = ParseNumber(GetCurrentToken());
-        var numberNode = _factory.NumberNode(_context, number);
-        return numberNode;
+        return ParseNumber(GetCurrentToken());
     }
 
-    private TNode ConvertText()
+    private string ConvertText()
     {
         var token = GetCurrentToken();
         Span<char> buffer = stackalloc char[token.Length];
         return ConvertTextValue(token, out var slice, ref buffer)
-            ? _factory.TextNode(_context, slice.ToString())
-            : _factory.TextNode(_context, buffer.ToString());
+            ? slice.ToString()
+            : buffer.ToString();
     }
 
     private TScalarValue ConvertTextValue()
