@@ -909,7 +909,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     {
         var token = GetCurrentToken();
         Span<char> buffer = stackalloc char[token.Length];
-        return ConvertTextValue(GetCurrentToken(), out var slice, ref buffer)
+        return ConvertTextValue(token, out var slice, ref buffer)
             ? _factory.TextNode(_context, slice.ToString())
             : _factory.TextNode(_context, buffer.ToString());
     }
@@ -918,7 +918,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     {
         var token = GetCurrentToken();
         Span<char> buffer = stackalloc char[token.Length];
-        return ConvertTextValue(GetCurrentToken(), out var slice, ref buffer)
+        return ConvertTextValue(token, out var slice, ref buffer)
             ? _factory.TextValue(_context, slice.ToString())
             : _factory.TextValue(_context, buffer.ToString());
     }
