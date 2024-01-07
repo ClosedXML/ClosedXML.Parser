@@ -45,7 +45,7 @@ public readonly struct ReferenceArea
     /// <summary>
     /// Create an area for a single reference.
     /// </summary>
-    internal ReferenceArea(RowCol rowCol)
+    public ReferenceArea(RowCol rowCol)
         : this(rowCol, rowCol)
     {
     }
@@ -58,7 +58,7 @@ public readonly struct ReferenceArea
     /// <param name="columnType">Column axis type of a reference.</param>
     /// <param name="columnPosition">Column position.</param>
     /// <param name="style">Semantic of the reference.</param>
-    internal ReferenceArea(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType,
+    public ReferenceArea(ReferenceAxisType rowType, int rowPosition, ReferenceAxisType columnType,
         int columnPosition, ReferenceStyle style)
         : this(new RowCol(rowType, rowPosition, columnType, columnPosition, style))
     {
