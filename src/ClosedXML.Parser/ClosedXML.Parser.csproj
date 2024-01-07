@@ -21,7 +21,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <!--
+    For some reason, the dotnet pack fails: https://github.com/dotnet/sdk/issues/10335
+    This is a workaround.
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    -->
     <Optimize>true</Optimize>
   </PropertyGroup>
 
@@ -51,7 +55,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Lexer isn't CLS compliant thus neither should be the assembly.  -->
