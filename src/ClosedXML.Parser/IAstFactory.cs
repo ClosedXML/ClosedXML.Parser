@@ -16,7 +16,6 @@ namespace ClosedXML.Parser;
 /// <typeparam name="TNode">Type of a node used in the AST.</typeparam>
 /// <typeparam name="TContext">A context of the parsing. It's passed to every factory method and can contain global info that doesn't belong individual nodes.</typeparam>
 public interface IAstFactory<TScalarValue, TNode, in TContext>
-    where TNode : class
 {
     /// <summary>
     /// Create a logical value for an array item.
