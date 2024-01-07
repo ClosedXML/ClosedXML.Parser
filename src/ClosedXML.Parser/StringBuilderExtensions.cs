@@ -45,7 +45,7 @@ internal static class StringBuilderExtensions
         return sb.Append('[').Append(bookIndex).Append(']');
     }
 
-    public static StringBuilder AppendFunction(this StringBuilder sb, ReadOnlySpan<char> functionName, IReadOnlyList<string> arguments)
+    public static StringBuilder AppendFunction(this StringBuilder sb, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
         // netstandard 2.0 doesn't have span API for StringBuilder.
         foreach (var c in functionName)
@@ -54,14 +54,14 @@ internal static class StringBuilderExtensions
         return AppendArguments(sb, arguments);
     }
 
-    public static StringBuilder AppendArguments(this StringBuilder sb, IReadOnlyList<string> arguments)
+    public static StringBuilder AppendArguments(this StringBuilder sb, IReadOnlyList<TransformedSymbol> arguments)
     {
         sb.Append('(');
         if (arguments.Count > 0)
-            sb.Append(arguments[0]);
+            sb.Append(arguments[0].AsSpan());
 
         for (var i = 1; i < arguments.Count; ++i)
-            sb.Append(',').Append(arguments[i]);
+            sb.Append(',').Append(arguments[i].AsSpan());
 
         return sb.Append(')');
     }
@@ -77,4 +77,17 @@ internal static class StringBuilderExtensions
         rowCol.Append(sb);
         return sb;
     }
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Compatibility method for NETStandard 2.0, which doesn't have methods with <c>Span</c> arguments.
+    /// </summary>
+    public static StringBuilder Append(this StringBuilder sb, ReadOnlySpan<char> span)
+    {
+        foreach (var c in span)
+            sb.Append(c);
+
+        return sb;
+    }
+#endif
 }

@@ -16,7 +16,6 @@ namespace ClosedXML.Parser;
 /// <typeparam name="TNode">Type of a node used in the AST.</typeparam>
 /// <typeparam name="TContext">A context of the parsing. It's passed to every factory method and can contain global info that doesn't belong individual nodes.</typeparam>
 public class FormulaParser<TScalarValue, TNode, TContext>
-    where TNode : class
 {
     private readonly string _input;
     private readonly List<Token> _tokens;
@@ -378,7 +377,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         }
     }
 
-    private TNode RefExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    private TNode RefExpression(bool replaceFirstAtom = false, TNode? refAtom = default)
     {
         var start = _tokenSource.StartIndex;
         var leftNode = RefImplicitExpression(replaceFirstAtom, refAtom);
@@ -400,7 +399,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     ///        ;
     /// </code>
     /// </summary>
-    private TNode RefImplicitExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    private TNode RefImplicitExpression(bool replaceFirstAtom = false, TNode? refAtom = default)
     {
         var start = _tokenSource.StartIndex;
         if (_la == Token.INTERSECT)
@@ -413,7 +412,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         return RefIntersectionExpression(replaceFirstAtom, refAtom);
     }
 
-    private TNode RefIntersectionExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    private TNode RefIntersectionExpression(bool replaceFirstAtom = false, TNode? refAtom = default)
     {
         var start = _tokenSource.StartIndex;
         var leftNode = RefRangeExpression(replaceFirstAtom, refAtom);
@@ -427,7 +426,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         return leftNode;
     }
 
-    private TNode RefRangeExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    private TNode RefRangeExpression(bool replaceFirstAtom = false, TNode? refAtom = default)
     {
         var start = _tokenSource.StartIndex;
         var leftNode = RefSpillExpression(replaceFirstAtom, refAtom);
@@ -449,7 +448,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     ///     ;
     /// </c>
     /// </summary>
-    private TNode RefSpillExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    private TNode RefSpillExpression(bool replaceFirstAtom = false, TNode? refAtom = default)
     {
         var start = _tokenSource.StartIndex;
         var refAtomNode = RefAtomExpression(replaceFirstAtom, refAtom);
@@ -462,7 +461,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         return refAtomNode;
     }
 
-    private TNode RefAtomExpression(bool replaceFirstAtom = false, TNode? refAtom = null)
+    private TNode RefAtomExpression(bool replaceFirstAtom = false, TNode? refAtom = default)
     {
         // A backtracking of an incorrect detection whether an expression in a braces is value expression or ref expression.
         if (replaceFirstAtom)
@@ -779,21 +778,26 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 var errorToken = GetCurrentToken();
                 Span<char> normalizedError = stackalloc char[errorToken.Length];
                 errorToken.ToUpperInvariant(normalizedError);
+                Consume();
                 symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
                 value = _factory.ErrorValue(_context, symbolRange, normalizedError);
                 break;
 
             case Token.LOGICAL_CONSTANT:
+                var logicalValue = GetTokenLogicalValue();
+                Consume();
                 symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
-                value = _factory.LogicalValue(_context, symbolRange, GetTokenLogicalValue());
+                value = _factory.LogicalValue(_context, symbolRange, logicalValue);
                 break;
             case Token.MINUS:
                 Consume();
                 if (_la != Token.NUMERICAL_CONSTANT)
                     throw UnexpectedTokenError(Token.NUMERICAL_CONSTANT);
 
+                var negativeNumberValue = -ParseNumber(GetCurrentToken());
+                Consume();
                 symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
-                value = _factory.NumberValue(_context, symbolRange, -ParseNumber(GetCurrentToken()));
+                value = _factory.NumberValue(_context, symbolRange, negativeNumberValue);
                 break;
 
             case Token.PLUS:
@@ -801,18 +805,23 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 if (_la != Token.NUMERICAL_CONSTANT)
                     throw UnexpectedTokenError(Token.NUMERICAL_CONSTANT);
 
+                var positiveNumberValue = ParseNumber(GetCurrentToken());
+                Consume();
                 symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
-                value = _factory.NumberValue(_context, symbolRange, ParseNumber(GetCurrentToken()));
+                value = _factory.NumberValue(_context, symbolRange, positiveNumberValue);
                 break;
 
             case Token.NUMERICAL_CONSTANT:
+                var numberValue = ParseNumber(GetCurrentToken());
+                Consume();
                 symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
-                value = _factory.NumberValue(_context, symbolRange, ParseNumber(GetCurrentToken()));
+                value = _factory.NumberValue(_context, symbolRange, numberValue);
                 break;
 
             case Token.STRING_CONSTANT:
                 var token = GetCurrentToken();
                 Span<char> buffer = stackalloc char[token.Length];
+                Consume();
                 symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
                 value = ConvertTextValue(token, out var slice, ref buffer)
                     ? _factory.TextValue(_context, symbolRange, slice.ToString())
@@ -823,7 +832,6 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 throw UnexpectedTokenError();
         }
 
-        Consume();
         return value;
     }
 
@@ -847,7 +855,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 // two commas in a row and thus a blank argument.
                 var start = _tokenSource.StartIndex;
                 Consume();
-                args.Add(_factory.BlankNode(_context, new SymbolRange(start, _tokenSource.StartIndex)));
+                args.Add(_factory.BlankNode(_context, new SymbolRange(start, start)));
             }
             else if (_la == Token.CLOSE_BRACE)
             {
@@ -856,7 +864,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 // thus there is a blank node and end of args.
                 var start = _tokenSource.StartIndex;
                 Consume();
-                args.Add(_factory.BlankNode(_context, new SymbolRange(start, _tokenSource.StartIndex)));
+                args.Add(_factory.BlankNode(_context, new SymbolRange(start, start)));
                 return args;
             }
             else

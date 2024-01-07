@@ -18,7 +18,9 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToR1C1(string formulaA1, int row, int col)
     {
-        return FormulaParser<string, string, (int Row, int Col)>.CellFormulaA1(formulaA1, (row, col), s_visitorR1C1);
+        var ctx = new TransformContext(formulaA1, row, col);
+        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaA1(formulaA1, ctx, s_visitorR1C1);
+        return transformedFormula.AsSpan().ToString();
     }
 
     /// <summary>
@@ -31,32 +33,34 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToA1(string formulaR1C1, int row, int col)
     {
-        return FormulaParser<string, string, (int Row, int Col)>.CellFormulaR1C1(formulaR1C1, (row, col), s_visitorA1);
+        var ctx = new TransformContext(formulaR1C1, row, col);
+        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaR1C1(formulaR1C1, ctx, s_visitorA1);
+        return transformedFormula.AsSpan().ToString();
     }
 
     private class TextVisitorR1C1 : FormulaGeneratorVisitor
     {
-        protected override ReferenceArea ModifyRef(ReferenceArea reference, (int Row, int Col) point)
+        protected override ReferenceArea ModifyRef(TransformContext ctx, ReferenceArea reference)
         {
-            return reference.ToR1C1(point.Row, point.Col);
+            return reference.ToR1C1(ctx.Row, ctx.Col);
         }
 
-        protected override RowCol ModifyCellFunction(RowCol cell, (int Row, int Col) point)
+        protected override RowCol ModifyCellFunction(TransformContext ctx, RowCol cell)
         {
-            return cell.ToR1C1(point.Row, point.Col);
+            return cell.ToR1C1(ctx.Row, ctx.Col);
         }
     }
 
     private class TextVisitorA1 : FormulaGeneratorVisitor
     {
-        protected override ReferenceArea ModifyRef(ReferenceArea reference, (int Row, int Col) point)
+        protected override ReferenceArea ModifyRef(TransformContext ctx, ReferenceArea reference)
         {
-            return reference.ToA1(point.Row, point.Col);
+            return reference.ToA1(ctx.Row, ctx.Col);
         }
 
-        protected override RowCol ModifyCellFunction(RowCol cell, (int Row, int Col) point)
+        protected override RowCol ModifyCellFunction(TransformContext ctx, RowCol cell)
         {
-            return cell.ToA1(point.Row, point.Col);
+            return cell.ToA1(ctx.Row, ctx.Col);
         }
     }
 }

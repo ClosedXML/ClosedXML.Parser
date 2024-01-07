@@ -3,7 +3,7 @@
 public class FormulaConverterToR1C1Tests
 {
     [Theory]
-    [InlineData("true", "TRUE")]
+    [InlineData("true", "true")]
     [InlineData("FALSE", "FALSE")]
     [InlineData("1", "1")]
     [InlineData("\"Text\"", "\"Text\"")]
