@@ -1,4 +1,3 @@
-/* Needed for Github Actions to set up .NET SDK */
 {
   "sdk": {
     "rollForward": "feature",
