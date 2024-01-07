@@ -19,22 +19,22 @@ public class FormulaGeneratorVisitor : IAstFactory<string, string, (int Row, int
     private const int BOOK_PREFIX_LEN = 3;
     private const int MAX_R1_C1_LEN = 20;
 
-    string IAstFactory<string, string, (int Row, int Col)>.LogicalValue((int, int) _, bool value)
+    string IAstFactory<string, string, (int Row, int Col)>.LogicalValue((int, int) _, SymbolRange range, bool value)
     {
         return value ? "TRUE" : "FALSE";
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.NumberValue((int, int) _, double value)
+    string IAstFactory<string, string, (int Row, int Col)>.NumberValue((int, int) _, SymbolRange range, double value)
     {
         return value.ToString(CultureInfo.InvariantCulture);
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.TextValue((int, int) _, string text)
+    string IAstFactory<string, string, (int Row, int Col)>.TextValue((int, int) _, SymbolRange range, string text)
     {
         return "\"" + text.Replace("\"", "\"\"") + "\"";
     }
 
-    string IAstFactory<string, string, (int Row, int Col)>.ErrorValue((int, int) _, ReadOnlySpan<char> error)
+    string IAstFactory<string, string, (int Row, int Col)>.ErrorValue((int, int) _, SymbolRange range, ReadOnlySpan<char> error)
     {
         return error.ToString();
     }

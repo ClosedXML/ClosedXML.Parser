@@ -495,22 +495,22 @@ public class AstFactoryTests
             _defaultNode = defaultNode;
         }
 
-        public virtual TScalarValue LogicalValue(TContext context, bool value)
+        public virtual TScalarValue LogicalValue(TContext context, SymbolRange range, bool value)
         {
             return _defaultScalar;
         }
 
-        public virtual TScalarValue NumberValue(TContext context, double value)
+        public virtual TScalarValue NumberValue(TContext context, SymbolRange range, double value)
         {
             return _defaultScalar;
         }
 
-        public virtual TScalarValue TextValue(TContext context, string text)
+        public virtual TScalarValue TextValue(TContext context, SymbolRange range, string text)
         {
             return _defaultScalar;
         }
 
-        public virtual TScalarValue ErrorValue(TContext context, ReadOnlySpan<char> error)
+        public virtual TScalarValue ErrorValue(TContext context, SymbolRange range, ReadOnlySpan<char> error)
         {
             return _defaultScalar;
         }

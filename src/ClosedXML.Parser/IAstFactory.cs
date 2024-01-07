@@ -21,35 +21,39 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// Create a logical value for an array item.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Symbol range of the logical token in the formula.</param>
     /// <param name="value">The logical value of an array.</param>
-    TScalarValue LogicalValue(TContext context, bool value);
+    TScalarValue LogicalValue(TContext context, SymbolRange range, bool value);
 
     /// <summary>
     /// Create a numerical value for an array item.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Symbol range of the number token in the formula.</param>
     /// <param name="value">The numeric value of an array. Never <c>NaN</c> or <c>Infinity</c>.</param>
-    TScalarValue NumberValue(TContext context, double value);
+    TScalarValue NumberValue(TContext context, SymbolRange range, double value);
 
     /// <summary>
     /// Create a text value for an array item.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Symbol range of the text token in the formula.</param>
     /// <param name="text">The text. The characters of text are already unescaped.</param>
-    TScalarValue TextValue(TContext context, string text);
+    TScalarValue TextValue(TContext context, SymbolRange range, string text);
 
     /// <summary>
     /// Create an error for an array item.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Symbol range of the error token in the formula.</param>
     /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace, converted to upper case, no matter the input..</param>
-    TScalarValue ErrorValue(TContext context, ReadOnlySpan<char> error);
+    TScalarValue ErrorValue(TContext context, SymbolRange range, ReadOnlySpan<char> error);
 
     /// <summary>
     /// Create an array for scalar values.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
-    /// <param name="range"></param>
+    /// <param name="range">Symbol range of the array symbol in the formula.</param>
     /// <param name="rows">Number of rows of an array. At least 1.</param>
     /// <param name="columns">Number of column of an array. At least 1.</param>
     /// <param name="elements">Elements of an array, row by row. The number of elements is <paramref name="rows"/>*<paramref name="columns"/>.</param>

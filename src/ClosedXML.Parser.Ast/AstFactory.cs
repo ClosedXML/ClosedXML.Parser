@@ -4,22 +4,22 @@ public record Ctx;
 
 public class F : IAstFactory<ScalarValue, AstNode, Ctx>
 {
-    public ScalarValue LogicalValue(Ctx _, bool value)
+    public ScalarValue LogicalValue(Ctx _, SymbolRange range, bool value)
     {
         return new ScalarValue("Logical", value);
     }
 
-    public ScalarValue NumberValue(Ctx _, double value)
+    public ScalarValue NumberValue(Ctx _, SymbolRange range, double value)
     {
         return new ScalarValue("Number", value);
     }
 
-    public ScalarValue TextValue(Ctx _, string input)
+    public ScalarValue TextValue(Ctx _, SymbolRange range, string input)
     {
         return new ScalarValue("Text", input);
     }
 
-    public ScalarValue ErrorValue(Ctx _, ReadOnlySpan<char> error)
+    public ScalarValue ErrorValue(Ctx _, SymbolRange range, ReadOnlySpan<char> error)
     {
         return new ScalarValue("Error", error.ToString());
     }

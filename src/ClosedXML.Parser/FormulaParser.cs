@@ -769,6 +769,8 @@ public class FormulaParser<TScalarValue, TNode, TContext>
     private TScalarValue ArrayConstant()
     {
         TScalarValue value;
+        SymbolRange symbolRange;
+        var start = _tokenSource.StartIndex;
         switch (_la)
         {
             case Token.REF_CONSTANT:
@@ -777,31 +779,46 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                 var errorToken = GetCurrentToken();
                 Span<char> normalizedError = stackalloc char[errorToken.Length];
                 errorToken.ToUpperInvariant(normalizedError);
-                value = _factory.ErrorValue(_context, normalizedError);
+                symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
+                value = _factory.ErrorValue(_context, symbolRange, normalizedError);
                 break;
+
             case Token.LOGICAL_CONSTANT:
-                value = _factory.LogicalValue(_context, GetTokenLogicalValue());
+                symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
+                value = _factory.LogicalValue(_context, symbolRange, GetTokenLogicalValue());
                 break;
             case Token.MINUS:
                 Consume();
                 if (_la != Token.NUMERICAL_CONSTANT)
                     throw UnexpectedTokenError(Token.NUMERICAL_CONSTANT);
 
-                value = _factory.NumberValue(_context, -ParseNumber(GetCurrentToken()));
+                symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
+                value = _factory.NumberValue(_context, symbolRange, -ParseNumber(GetCurrentToken()));
                 break;
+
             case Token.PLUS:
                 Consume();
                 if (_la != Token.NUMERICAL_CONSTANT)
                     throw UnexpectedTokenError(Token.NUMERICAL_CONSTANT);
 
-                value = _factory.NumberValue(_context, ParseNumber(GetCurrentToken()));
+                symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
+                value = _factory.NumberValue(_context, symbolRange, ParseNumber(GetCurrentToken()));
                 break;
+
             case Token.NUMERICAL_CONSTANT:
-                value = _factory.NumberValue(_context, ParseNumber(GetCurrentToken()));
+                symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
+                value = _factory.NumberValue(_context, symbolRange, ParseNumber(GetCurrentToken()));
                 break;
+
             case Token.STRING_CONSTANT:
-                value = ConvertTextValue();
+                var token = GetCurrentToken();
+                Span<char> buffer = stackalloc char[token.Length];
+                symbolRange = new SymbolRange(start, _tokenSource.StartIndex);
+                value = ConvertTextValue(token, out var slice, ref buffer)
+                    ? _factory.TextValue(_context, symbolRange, slice.ToString())
+                    : _factory.TextValue(_context, symbolRange, buffer.ToString());
                 break;
+
             default:
                 throw UnexpectedTokenError();
         }
@@ -913,15 +930,6 @@ public class FormulaParser<TScalarValue, TNode, TContext>
         return ConvertTextValue(token, out var slice, ref buffer)
             ? slice.ToString()
             : buffer.ToString();
-    }
-
-    private TScalarValue ConvertTextValue()
-    {
-        var token = GetCurrentToken();
-        Span<char> buffer = stackalloc char[token.Length];
-        return ConvertTextValue(token, out var slice, ref buffer)
-            ? _factory.TextValue(_context, slice.ToString())
-            : _factory.TextValue(_context, buffer.ToString());
     }
 
     private static bool ConvertTextValue(ReadOnlySpan<char> token, out ReadOnlySpan<char> copy, ref Span<char> buffer)
