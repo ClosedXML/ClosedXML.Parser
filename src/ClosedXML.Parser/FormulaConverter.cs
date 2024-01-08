@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace ClosedXML.Parser;
 
@@ -23,7 +24,7 @@ public static class FormulaConverter
     {
         var ctx = new TransformContext(formulaA1, row, col);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaA1(formulaA1, ctx, s_visitorR1C1);
-        return transformedFormula.AsSpan().ToString();
+        return Normalize(transformedFormula, formulaA1);
     }
 
     /// <summary>
@@ -38,7 +39,17 @@ public static class FormulaConverter
     {
         var ctx = new TransformContext(formulaR1C1, row, col);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaR1C1(formulaR1C1, ctx, s_visitorA1);
-        return transformedFormula.AsSpan().ToString();
+        return Normalize(transformedFormula, formulaR1C1);
+    }
+
+    private static string Normalize(TransformedSymbol transformedFormula, string originalFormula)
+    {
+        // Because of intersection operator, we trim the whitespaces at the end before sending
+        // formula to the parser. Add them back, if necessary.
+        var trimmed = originalFormula.TrimEnd();
+        var endLength = originalFormula.Length - trimmed.Length;
+        var trimmedEnd = originalFormula.AsSpan().Slice(trimmed.Length, endLength);
+        return transformedFormula.ToString(trimmedEnd);
     }
 
     private class TextVisitorR1C1 : FormulaGeneratorVisitor

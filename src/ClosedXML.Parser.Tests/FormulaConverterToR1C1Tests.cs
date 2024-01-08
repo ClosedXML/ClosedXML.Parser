@@ -15,14 +15,14 @@ public class FormulaConverterToR1C1Tests
     }
 
     [Theory]
-    [InlineData(" { 1 } ", "{1}")]
-    [InlineData("{1,2} ", "{1,2}")]
-    [InlineData("{1;2} ", "{1;2}")]
-    [InlineData("{1,2;3,4} ", "{1,2;3,4}")]
-    [InlineData("{TRUE} ", "{TRUE}")]
-    [InlineData("{#DIV/0!} ", "{#DIV/0!}")]
-    [InlineData("{\"\"} ", "{\"\"}")]
-    [InlineData("{\"Hello world\"} ", "{\"Hello world\"}")]
+    [InlineData(" { 1 }   ", " { 1 }   ")]
+    [InlineData("{1,2}", "{1,2}")]
+    [InlineData("{1;2}", "{1;2}")]
+    [InlineData("{ 1, 2;  3, 4 }", "{ 1, 2;  3, 4 }")]
+    [InlineData("{TRUE}", "{TRUE}")]
+    [InlineData("{ #DIV/0! } ", "{ #DIV/0! } ")]
+    [InlineData("{ \"\"}", "{ \"\"}")]
+    [InlineData("{ \"Hello world\" }", "{ \"Hello world\" }")]
     public void Array(string a1, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, 1, 1));
@@ -79,8 +79,9 @@ public class FormulaConverterToR1C1Tests
 
     [Theory]
     [InlineData("RAND()", 4, 1, "RAND()")]
-    [InlineData("SIN(F8)", 2, 3, "SIN(R[6]C[3])")]
-    [InlineData("MOD(F8, $A$1)", 2, 3, "MOD(R[6]C[3],R1C1)")]
+    [InlineData("RAND(   )  ", 4, 1, "RAND(   )  ")]
+    [InlineData("SIN( F8 ) ", 2, 3, "SIN( R[6]C[3] ) ")]
+    [InlineData("MOD(F8 ,  $A$1)", 2, 3, "MOD(R[6]C[3] ,  R1C1)")]
     [InlineData("IF(TRUE,,)", 2, 3, "IF(TRUE,,)")]
     public void Function(string a1, int row, int col, string r1c1)
     {
@@ -90,6 +91,7 @@ public class FormulaConverterToR1C1Tests
     [Theory]
     [InlineData("Sheet1!UDF.SHEET.FUNC($F$1)", 4, 1, "Sheet1!UDF.SHEET.FUNC(R1C6)")]
     [InlineData("'Johnny''s'!UDF.SHEET.FUNC($F$1)", 4, 1, "'Johnny''s'!UDF.SHEET.FUNC(R1C6)")]
+    [InlineData("Sheet1!UDF.SHEET.FUNC( $F$1  ) ", 4, 1, "Sheet1!UDF.SHEET.FUNC( R1C6  ) ")]
     public void SheetFunction(string a1, int row, int col, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
@@ -97,6 +99,7 @@ public class FormulaConverterToR1C1Tests
 
     [Theory]
     [InlineData("[4]!UDF.SHEET.FUNC($F$1)", 4, 1, "[4]!UDF.SHEET.FUNC(R1C6)")]
+    [InlineData("[4]!UDF.SHEET.FUNC( $F$1  )", 4, 1, "[4]!UDF.SHEET.FUNC( R1C6  )")]
     public void ExternalFunction(string a1, int row, int col, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
@@ -105,13 +108,16 @@ public class FormulaConverterToR1C1Tests
     [Theory]
     [InlineData("[4]Sheet1!UDF.SHEET.FUNC($F$1)", 4, 1, "[4]Sheet1!UDF.SHEET.FUNC(R1C6)")]
     [InlineData("'[7]Johnny''s'!UDF.SHEET.FUNC($F$1)", 4, 1, "'[7]Johnny''s'!UDF.SHEET.FUNC(R1C6)")]
+    [InlineData("[2]Sheet1!F(  ) ", 4, 1, "[2]Sheet1!F(  ) ")]
+    [InlineData("[2]Sheet1!F(  $A$2,$F$1 ) ", 4, 1, "[2]Sheet1!F(  R2C1,R1C6 ) ")]
     public void ExternalSheetFunction(string a1, int row, int col, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
     }
 
     [Theory]
-    [InlineData("$A$5(TRUE, 7)", 10, 15, "R5C1(TRUE,7)")]
+    [InlineData("$A$5(TRUE,7)", 10, 15, "R5C1(TRUE,7)")]
+    [InlineData("$A$5(TRUE ,  7)", 10, 15, "R5C1(TRUE ,  7)")]
     public void CellFunction(string a1, int row, int col, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
@@ -154,7 +160,7 @@ public class FormulaConverterToR1C1Tests
     }
 
     [Theory]
-    [InlineData(" some_name + other_name", 1, 1, "some_name+other_name")]
+    [InlineData(" some_name + other_name", 1, 1, "some_name + other_name")]
     public void Name(string a1, int row, int col, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
@@ -186,7 +192,8 @@ public class FormulaConverterToR1C1Tests
     [Theory]
     [InlineData("+B3", 1, 1, "+R[2]C[1]")]
     [InlineData("-8", 1, 1, "-8")]
-    [InlineData("100 %", 1, 1, "100%")]
+    [InlineData(" - 8 ", 1, 1, " - 8 ")]
+    [InlineData("100 %", 1, 1, "100 %")]
     [InlineData("@D8", 2, 5, "@R[6]C[-1]")]
     [InlineData("D8#", 2, 5, "R[6]C[-1]#")]
     public void Unary(string a1, int row, int col, string r1c1)
@@ -195,8 +202,18 @@ public class FormulaConverterToR1C1Tests
     }
 
     [Theory]
-    [InlineData("(1 + 2) / 4", 1, 1, "(1+2)/4")]
-    [InlineData("(1+((3 + A4)))", 1, 1, "(1+((3+R[3]C)))")]
+    [InlineData("5+1", 1, 1, "5+1")]
+    [InlineData("5 +  1 ", 1, 1, "5 +  1 ")]
+    [InlineData("B3 +  $D$8 ", 1, 1, "R[2]C[1] +  R8C4 ")]
+    [InlineData("B3 /  $D$8 ", 1, 1, "R[2]C[1] /  R8C4 ")]
+    public void Binary(string a1, int row, int col, string r1c1)
+    {
+        Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
+    }
+
+    [Theory]
+    [InlineData(" ( 1 + 2 ) / 4", 1, 1, " ( 1 + 2 ) / 4")]
+    [InlineData("(1+((3 + A4)))", 1, 1, "(1+((3 + R[3]C)))")]
     public void Nested(string a1, int row, int col, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
