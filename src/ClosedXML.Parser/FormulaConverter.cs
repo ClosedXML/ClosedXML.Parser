@@ -1,8 +1,11 @@
-﻿namespace ClosedXML.Parser;
+﻿using JetBrains.Annotations;
+
+namespace ClosedXML.Parser;
 
 /// <summary>
 /// Convert between <em>A1</em> and <em>R1C1</em> style formulas.
 /// </summary>
+[PublicAPI]
 public static class FormulaConverter
 {
     private static readonly TextVisitorR1C1 s_visitorR1C1 = new();
