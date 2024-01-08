@@ -41,21 +41,27 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     public virtual TransformedSymbol ArrayNode(TransformContext ctx, SymbolRange range, int rows, int columns, IReadOnlyList<TransformedSymbol> elements)
     {
         var sb = new StringBuilder(2 + elements.Sum(x => x.Length) + elements.Count);
-        sb.Append('{');
+        sb.AppendStartFragment(ctx, range, elements[0]);
         var i = 0;
         sb.Append(elements[i++].AsSpan());
         for (var col = 1; col < columns; ++col)
-            sb.Append(',').Append(elements[i++].AsSpan());
+        {
+            sb.AppendMiddleFragment(ctx, elements[i - 1], elements[i]);
+            sb.Append(elements[i++].AsSpan());
+        }
 
         for (var row = 1; row < rows; ++row)
         {
-            sb.Append(';');
+            sb.AppendMiddleFragment(ctx, elements[i - 1], elements[i]);
             sb.Append(elements[i++].AsSpan());
             for (var col = 1; col < columns; ++col)
-                sb.Append(',').Append(elements[i++].AsSpan());
+            {
+                sb.AppendMiddleFragment(ctx, elements[i - 1], elements[i]);
+                sb.Append(elements[i++].AsSpan());
+            }
         }
 
-        sb.Append('}');
+        sb.AppendEndFragment(ctx, range, elements[elements.Count - 1]);
         var nodeText = sb.ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -176,9 +182,9 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol Function(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        var sb = new StringBuilder(functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var transformedFunction = ModifyFunction(ctx, functionName);
-        var nodeText = sb.AppendFunction(transformedFunction, arguments).ToString();
+        var sb = new StringBuilder(functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
+        var nodeText = sb.Append(transformedFunction).AppendArguments(ctx, range, arguments).ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
 
@@ -188,7 +194,7 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
         var nodeText = sb
             .AppendBookIndex(workbookIndex)
             .AppendReferenceSeparator()
-            .AppendFunction(ModifyFunction(ctx, functionName), arguments)
+            .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -199,7 +205,7 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
         var nodeText = sb
             .AppendSheetName(ModifySheet(ctx, sheetName))
             .AppendReferenceSeparator()
-            .AppendFunction(ModifyFunction(ctx, functionName), arguments)
+            .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -210,7 +216,7 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
         var nodeText = sb
             .AppendExternalSheetName(workbookIndex, ModifySheet(ctx, sheetName))
             .AppendReferenceSeparator()
-            .AppendFunction(ModifyFunction(ctx, functionName), arguments)
+            .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -220,7 +226,7 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
         var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
         var nodeText = sb
             .AppendRef(ModifyCellFunction(ctx, cell))
-            .AppendArguments(arguments)
+            .AppendArguments(ctx, range, arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -290,49 +296,23 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol BinaryNode(TransformContext ctx, SymbolRange range, BinaryOperation operation, TransformedSymbol leftNode, TransformedSymbol rightNode)
     {
-        var operand = operation switch
-        {
-            BinaryOperation.Concat => "&",
-            BinaryOperation.Addition => "+",
-            BinaryOperation.Subtraction => "-",
-            BinaryOperation.Multiplication => "*",
-            BinaryOperation.Division => "/",
-            BinaryOperation.Power => "^",
-            BinaryOperation.GreaterOrEqualThan => ">=",
-            BinaryOperation.LessOrEqualThan => "<=",
-            BinaryOperation.LessThan => "<",
-            BinaryOperation.GreaterThan => ">",
-            BinaryOperation.NotEqual => "<>",
-            BinaryOperation.Equal => "=",
-            BinaryOperation.Union => ",",
-            BinaryOperation.Intersection => " ",
-            BinaryOperation.Range => ":",
-            _ => throw new NotSupportedException()
-        };
-        var nodeText = new StringBuilder(leftNode.Length + operand.Length + rightNode.Length)
+        var sb = new StringBuilder(leftNode.Length + rightNode.OriginalRange.Start - leftNode.OriginalRange.End + rightNode.Length)
+            .AppendStartFragment(ctx, range, leftNode)
             .Append(leftNode.AsSpan())
-            .Append(operand)
+            .AppendMiddleFragment(ctx, leftNode, rightNode)
             .Append(rightNode.AsSpan())
-            .ToString();
+            .AppendEndFragment(ctx, range, rightNode);
+
+        var nodeText = sb.ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
 
     public virtual TransformedSymbol Unary(TransformContext ctx, SymbolRange range, UnaryOperation operation, TransformedSymbol node)
     {
-        var (isPrefix, opChar) = operation switch
-        {
-            UnaryOperation.Plus => (true, '+'),
-            UnaryOperation.Minus => (true, '-'),
-            UnaryOperation.Percent => (false, '%'),
-            UnaryOperation.ImplicitIntersection => (true, '@'),
-            UnaryOperation.SpillRange => (false, '#'),
-            _ => throw new NotSupportedException()
-        };
-        var sb = new StringBuilder(node.Length + 1);
-        if (isPrefix)
-            sb.Append(opChar).Append(node.AsSpan());
-        else
-            sb.Append(node.AsSpan()).Append(opChar);
+        var sb = new StringBuilder(node.Length + 1)
+            .AppendStartFragment(ctx, range, node)
+            .Append(node.AsSpan())
+            .AppendEndFragment(ctx, range, node);
 
         var nodeText = sb.ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);

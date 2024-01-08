@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace ClosedXML.Parser;
 
@@ -61,4 +62,16 @@ internal readonly struct TransformedSymbol
 
         return _formulaText.AsSpan(_range.Start, _range.End - _range.Start);
     }
-};
+
+    internal string ToString(ReadOnlySpan<char> append)
+    {
+        if (append.Length == 0 && _transformedText is not null)
+            return _transformedText;
+
+        var text = AsSpan();
+        return new StringBuilder(text.Length + append.Length)
+            .Append(text)
+            .Append(append)
+            .ToString();
+    }
+}
