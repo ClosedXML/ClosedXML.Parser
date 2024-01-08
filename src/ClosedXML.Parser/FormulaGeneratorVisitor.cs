@@ -341,8 +341,9 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     public virtual TransformedSymbol Nested(TransformContext ctx, SymbolRange range, TransformedSymbol node)
     {
         var nodeText = new StringBuilder(node.Length + 2)
-            .Append('(').Append(node.AsSpan())
-            .Append(')')
+            .AppendStartFragment(ctx, range, node)
+            .Append(node.AsSpan())
+            .AppendEndFragment(ctx, range, node)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }

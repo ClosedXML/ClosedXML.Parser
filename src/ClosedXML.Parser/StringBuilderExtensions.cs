@@ -78,6 +78,24 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
+    public static StringBuilder AppendStartFragment(this StringBuilder sb, TransformContext ctx, SymbolRange symbolRange, TransformedSymbol nestedNode)
+    {
+        var formula = ctx.Formula;
+        for (var i = symbolRange.Start; i < nestedNode.OriginalRange.Start; ++i)
+            sb.Append(formula[i]);
+
+        return sb;
+    }
+
+    public static StringBuilder AppendEndFragment(this StringBuilder sb, TransformContext ctx, SymbolRange symbolRange, TransformedSymbol nestedNode)
+    {
+        var formula = ctx.Formula;
+        for (var i = nestedNode.OriginalRange.End; i < symbolRange.End; ++i)
+            sb.Append(formula[i]);
+
+        return sb;
+    }
+
 #if NETSTANDARD2_0
     /// <summary>
     /// Compatibility method for NETStandard 2.0, which doesn't have methods with <c>Span</c> arguments.
