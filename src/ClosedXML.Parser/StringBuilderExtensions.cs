@@ -50,15 +50,17 @@ internal static class StringBuilderExtensions
         return sb.Append(functionName).AppendArguments(ctx, range, arguments);
     }
 
-    public static StringBuilder AppendRef(this StringBuilder sb, ReferenceArea reference)
+    public static StringBuilder AppendRef(this StringBuilder sb, ReferenceArea? reference)
     {
-        reference.Append(sb);
-        return sb;
+        return reference is null ? sb.Append("#REF!") : reference.Value.Append(sb);
     }
 
-    public static StringBuilder AppendRef(this StringBuilder sb, RowCol rowCol)
+    public static StringBuilder AppendRef(this StringBuilder sb, RowCol? rowCol)
     {
-        rowCol.Append(sb);
+        if (rowCol is null)
+            return sb.Append("#REF!");
+
+        rowCol.Value.Append(sb);
         return sb;
     }
 

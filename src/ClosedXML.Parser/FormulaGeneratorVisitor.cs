@@ -414,8 +414,8 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     /// </summary>
     /// <param name="ctx">The origin of formula.</param>
     /// <param name="reference">Area reference.</param>
-    /// <returns>Modified reference.</returns>
-    protected virtual ReferenceArea ModifyRef(TransformContext ctx, ReferenceArea reference)
+    /// <returns>Modified reference or null if <c>#REF!</c>.</returns>
+    protected virtual ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
     {
         return reference;
     }
@@ -425,8 +425,8 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     /// </summary>
     /// <param name="ctx">The transformation context.</param>
     /// <param name="cell">Original cell containing function.</param>
-    /// <returns>Modified reference.</returns>
-    protected virtual RowCol ModifyCellFunction(TransformContext ctx, RowCol cell)
+    /// <returns>Modified reference or null if <c>#REF!</c>.</returns>
+    protected virtual RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
     {
         return cell;
     }
