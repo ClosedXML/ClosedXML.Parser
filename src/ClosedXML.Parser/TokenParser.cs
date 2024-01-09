@@ -5,9 +5,6 @@ namespace ClosedXML.Parser;
 
 internal static class TokenParser
 {
-    private const int MaxCol = 16384;
-    private const int MaxRow = 1048576;
-
     /// <summary>
     /// Parse <see cref="Token.SINGLE_SHEET_PREFIX"/> token.
     /// </summary>
@@ -256,7 +253,7 @@ internal static class TokenParser
             var row2 = ReadRow(input, ref i);
             return new ReferenceArea(
                 new RowCol(abs1, row1, true, 1, A1),
-                new RowCol(absRow2, row2, true, MaxCol, A1));
+                new RowCol(absRow2, row2, true, RowCol.MaxCol, A1));
         }
 
         var col = ReadColumn(input, ref i);
@@ -271,7 +268,7 @@ internal static class TokenParser
             var col2 = ReadColumn(input, ref i);
             return new ReferenceArea(
                 new RowCol(true, 1, abs1, col, A1),
-                new RowCol(true, MaxRow, absCol2, col2, A1));
+                new RowCol(true, RowCol.MaxRow, absCol2, col2, A1));
         }
 
         var secondAbsolute = IsAbsolute(input, i);

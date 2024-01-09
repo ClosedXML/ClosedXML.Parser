@@ -31,6 +31,9 @@ namespace ClosedXML.Parser;
 /// </summary>
 public readonly struct RowCol : IEquatable<RowCol>
 {
+    internal const int MaxRow = 1048576;
+    internal const int MaxCol = 16384;
+
     // keep at 0, so default ctor creates is A1
     private readonly int _rowIndex;
     private readonly int _columnIndex;
@@ -171,10 +174,10 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <exception cref="ArgumentOutOfRangeException">Row or col is out of valid row or column number.</exception>
     public RowCol ToR1C1(int anchorRow, int anchorCol)
     {
-        if (anchorRow is < 1 or > 1048576)
+        if (anchorRow is < 1 or > MaxRow)
             throw new ArgumentOutOfRangeException(nameof(anchorRow));
 
-        if (anchorCol is < 1 or > 16384)
+        if (anchorCol is < 1 or > MaxCol)
             throw new ArgumentOutOfRangeException(nameof(anchorCol));
 
         if (IsR1C1)
@@ -207,10 +210,10 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <exception cref="ArgumentOutOfRangeException">Row or col is out of valid row or column number.</exception>
     public RowCol ToA1(int anchorRow, int anchorCol)
     {
-        if (anchorRow is < 1 or > 1048576)
+        if (anchorRow is < 1 or > MaxRow)
             throw new ArgumentOutOfRangeException(nameof(anchorRow));
 
-        if (anchorCol is < 1 or > 16384)
+        if (anchorCol is < 1 or > MaxCol)
             throw new ArgumentOutOfRangeException(nameof(anchorCol));
 
         if (IsA1)

@@ -7,9 +7,6 @@ namespace ClosedXML.Parser.Tests.Rules;
 /// </summary>
 public class CellReferenceRuleTests
 {
-    private const int MaxCol = 16384;
-    private const int MaxRow = 1048576;
-
     [Theory]
     [MemberData(nameof(TokenCombinationsA1))]
     public void A1_possible_token_combinations_are_converted_to_node(string formula, AstNode expectedNode)
@@ -52,8 +49,8 @@ public class CellReferenceRuleTests
                 "$XFC$1048575:$XFD$1048576",
                 new ReferenceNode(
                     new ReferenceArea(
-                        new RowCol(true, MaxRow - 1, true, MaxCol - 1, A1),
-                        new RowCol(true, MaxRow, true, MaxCol, A1)))
+                        new RowCol(true, RowCol.MaxRow - 1, true, RowCol.MaxCol - 1, A1),
+                        new RowCol(true, RowCol.MaxRow, true, RowCol.MaxCol, A1)))
             };
 
             // "MS-XLSX 2.2.2.1: The formula MUST NOT use the bang-reference or bang-name.
