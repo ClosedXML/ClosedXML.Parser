@@ -54,12 +54,12 @@ public static class FormulaConverter
 
     private class TextVisitorR1C1 : FormulaGeneratorVisitor
     {
-        protected override ReferenceArea ModifyRef(TransformContext ctx, ReferenceArea reference)
+        protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
         {
             return reference.ToR1C1(ctx.Row, ctx.Col);
         }
 
-        protected override RowCol ModifyCellFunction(TransformContext ctx, RowCol cell)
+        protected override RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
         {
             return cell.ToR1C1(ctx.Row, ctx.Col);
         }
@@ -67,12 +67,12 @@ public static class FormulaConverter
 
     private class TextVisitorA1 : FormulaGeneratorVisitor
     {
-        protected override ReferenceArea ModifyRef(TransformContext ctx, ReferenceArea reference)
+        protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
         {
             return reference.ToA1(ctx.Row, ctx.Col);
         }
 
-        protected override RowCol ModifyCellFunction(TransformContext ctx, RowCol cell)
+        protected override RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
         {
             return cell.ToA1(ctx.Row, ctx.Col);
         }
