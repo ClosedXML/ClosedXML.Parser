@@ -69,12 +69,12 @@ public static class FormulaConverter
     {
         protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
         {
-            return reference.ToA1(ctx.Row, ctx.Col);
+            return reference.ToA1OrError(ctx.Row, ctx.Col);
         }
 
         protected override RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
         {
-            return cell.ToA1(ctx.Row, ctx.Col);
+            return cell.ToA1OrError(ctx.Row, ctx.Col);
         }
     }
 }

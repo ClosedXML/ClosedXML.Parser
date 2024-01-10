@@ -20,4 +20,35 @@ public class FormulaConverterToA1Tests
     {
         Assert.Equal(a1, FormulaConverter.ToA1(r1c1, row, col));
     }
+
+    [Theory]
+    [InlineData("R[-4]C", 4, 1, "#REF!")]
+    [InlineData("R[1048575]C", 2, 1, "#REF!")]
+    [InlineData("RC[-4]", 1, 4, "#REF!")]
+    [InlineData("RC[5]", 1, 16380, "#REF!")]
+    public void Out_of_bounds_references(string r1c1, int row, int col, string a1)
+    {
+        Assert.Equal(a1, FormulaConverter.ToA1(r1c1, row, col));
+    }
+
+    [Theory]
+    [InlineData("C2:C4", 1, 1, "$B:$D")]
+    [InlineData("C[-2]:C4", 1, 4, "B:$D")]
+    [InlineData("C2:C[3]", 1, 4, "$B:G")]
+    [InlineData("C[2]:C[3]", 1, 4, "F:G")]
+    public void Columns_reference(string r1c1, int row, int col, string a1)
+    {
+        Assert.Equal(a1, FormulaConverter.ToA1(r1c1, row, col));
+    }
+
+    [Theory]
+    [InlineData("R2:R4", 1, 1, "$2:$4")]
+    [InlineData("R[-2]:R4", 4, 1, "2:$4")]
+    [InlineData("R2:R[3]", 4, 1, "$2:7")]
+    [InlineData("R[2]:R[3]", 4, 1, "6:7")]
+    public void Rows_reference(string r1c1, int row, int col, string a1)
+    {
+        Assert.Equal(a1, FormulaConverter.ToA1(r1c1, row, col));
+    }
+
 }
