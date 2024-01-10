@@ -218,5 +218,4 @@ public class FormulaConverterToR1C1Tests
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, row, col));
     }
-
 }
