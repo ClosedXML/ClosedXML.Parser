@@ -129,16 +129,17 @@ public readonly struct ReferenceArea
     /// Convert R1C1 reference to A1.
     /// </summary>
     /// <remarks>Assumes reference is in R1C1.</remarks>
-    internal ReferenceArea ToA1(int anchorRow, int anchorCol)
+    internal ReferenceArea? ToA1OrError(int anchorRow, int anchorCol)
     {
-        var first = First.ToA1(anchorRow, anchorCol);
-        if (First != Second)
-        {
-            var second = Second.ToA1(anchorRow, anchorCol);
-            return new ReferenceArea(first, second);
-        }
+        var first = First.ToA1OrError(anchorRow, anchorCol);
+        if (first is null)
+            return null;
 
-        return new ReferenceArea(first, first);
+        var second = First != Second ? Second.ToA1OrError(anchorRow, anchorCol) : first;
+        if (second is null)
+            return null;
+
+        return new ReferenceArea(first.Value, second.Value);
     }
 
     internal StringBuilder Append(StringBuilder sb)

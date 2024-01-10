@@ -235,6 +235,18 @@ public readonly struct RowCol : IEquatable<RowCol>
         return new RowCol(RowType, newRowPosition, ColumnType, newColPosition, A1);
     }
 
+    internal RowCol? ToA1OrError(int anchorRow, int anchorCol)
+    {
+        var (newRowPosition, newColPosition) = ToA1Positions(anchorRow, anchorCol);
+        if (RowType == Relative && newRowPosition is < 1 or > MaxRow)
+            return null;
+
+        if (ColumnType == Relative && newColPosition is < 1 or > MaxCol)
+            return null;
+
+        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition, A1);
+    }
+
     private (int Row, int Col) ToA1Positions(int anchorRow, int anchorCol)
     {
         if (anchorRow is < 1 or > MaxRow)
