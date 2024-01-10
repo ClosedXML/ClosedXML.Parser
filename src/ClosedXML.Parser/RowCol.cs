@@ -203,12 +203,39 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <summary>
     /// Convert <c>RowCol</c> to <em>A1</em>.
     /// </summary>
-    /// <remarks>If <c>RowCol</c> already is in <em>A1</em>, return it directly.</remarks>
+    /// <remarks>
+    /// If <c>RowCol</c> already is in <em>A1</em>, return it directly. If converted <c>RowCol</c>
+    /// is out of sheet bounds, loop it.
+    /// </remarks>
     /// <param name="anchorRow">A row coordinate that should be used as an anchor for relative <em>R1C1</em> reference.</param>
     /// <param name="anchorCol">A column coordinate that should be used as an anchor for relative <em>R1C1</em> reference.</param>
     /// <returns>RowCol with R1C1 semantic.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Row or col is out of valid row or column number.</exception>
     public RowCol ToA1(int anchorRow, int anchorCol)
+    {
+        var (newRowPosition, newColPosition) = ToA1Positions(anchorRow, anchorCol);
+
+        // Modulo is expensive and because of grammar and row/col constraints, we can't go out of 1 range on each side.
+        if (RowType == Relative)
+        {
+            if (newRowPosition < 1)
+                newRowPosition += MaxRow;
+            if (newRowPosition > MaxRow)
+                newRowPosition -= MaxRow;
+        }
+
+        if (ColumnType == Relative)
+        {
+            if (newColPosition < 1)
+                newColPosition += MaxCol;
+            if (newColPosition > MaxCol)
+                newColPosition -= MaxCol;
+        }
+
+        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition, A1);
+    }
+
+    private (int Row, int Col) ToA1Positions(int anchorRow, int anchorCol)
     {
         if (anchorRow is < 1 or > MaxRow)
             throw new ArgumentOutOfRangeException(nameof(anchorRow));
@@ -217,12 +244,12 @@ public readonly struct RowCol : IEquatable<RowCol>
             throw new ArgumentOutOfRangeException(nameof(anchorCol));
 
         if (IsA1)
-            return this;
+            return (RowValue, ColumnValue);
 
         var newRowPosition = ConvertAxis(RowType, RowValue, anchorRow);
         var newColPosition = ConvertAxis(ColumnType, ColumnValue, anchorCol);
 
-        return new RowCol(RowType, newRowPosition, ColumnType, newColPosition, A1);
+        return (newRowPosition, newColPosition);
 
         static int ConvertAxis(ReferenceAxisType axisType, int axisValue, int anchorPosition)
         {
