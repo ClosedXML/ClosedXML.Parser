@@ -22,7 +22,7 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToR1C1(string formulaA1, int row, int col)
     {
-        var ctx = new TransformContext(formulaA1, row, col);
+        var ctx = new TransformContext(formulaA1, row, col, isA1: true);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaA1(formulaA1, ctx, s_visitorR1C1);
         return Normalize(transformedFormula, formulaA1);
     }
@@ -37,7 +37,7 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToA1(string formulaR1C1, int row, int col)
     {
-        var ctx = new TransformContext(formulaR1C1, row, col);
+        var ctx = new TransformContext(formulaR1C1, row, col, isA1: false);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaR1C1(formulaR1C1, ctx, s_visitorA1);
         return Normalize(transformedFormula, formulaR1C1);
     }

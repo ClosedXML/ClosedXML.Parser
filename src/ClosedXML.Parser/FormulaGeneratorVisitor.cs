@@ -17,6 +17,7 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     private const int SHEET_SEPARATOR_LEN = 1;
     private const int BOOK_PREFIX_LEN = 3;
     private const int MAX_R1_C1_LEN = 20;
+    private const string REF_ERROR = "#REF!";
 
     public virtual TransformedSymbol LogicalValue(TransformContext ctx, SymbolRange range, bool value)
     {
@@ -78,7 +79,38 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol ErrorNode(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> error)
     {
-        return TransformedSymbol.CopyOriginal(ctx.Formula, range);
+        if (range.Length == error.Length)
+            return TransformedSymbol.CopyOriginal(ctx.Formula, range);
+
+        // Deal with `Sheet!REF!`, `#REF!A1` and `#REF!#REF!`
+        var symbol = ctx.Formula.AsSpan().Slice(range.Start, range.Length);
+        var sheetIsRefError = symbol.StartsWith(REF_ERROR.AsSpan(), StringComparison.OrdinalIgnoreCase);
+        var referenceIsRefError = symbol.EndsWith(REF_ERROR.AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        if (sheetIsRefError && referenceIsRefError)
+            return TransformedSymbol.CopyOriginal(ctx.Formula, range);
+
+        if (sheetIsRefError)
+        {
+            var referenceSymbol = symbol.Slice(REF_ERROR.Length);
+            var reference = TokenParser.ParseReference(referenceSymbol, ctx.IsA1);
+            var modifiedReference = ModifyRef(ctx, reference);
+            var nodeText = new StringBuilder()
+                .Append(symbol.Slice(0, REF_ERROR.Length))
+                .AppendRef(modifiedReference)
+                .ToString();
+            return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
+        }
+        else
+        {
+            var sheet = symbol.Slice(0, symbol.Length - REF_ERROR.Length - 1);
+            var modifiedSheet = ModifySheet(ctx, sheet.ToString());
+            var nodeText = new StringBuilder()
+                .Append(modifiedSheet)
+                .Append(symbol.Slice(REF_ERROR.Length))
+                .ToString();
+            return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
+        }
     }
 
     public virtual TransformedSymbol NumberNode(TransformContext ctx, SymbolRange range, double value)

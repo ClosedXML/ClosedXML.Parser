@@ -471,8 +471,47 @@ public class FormulaParser<TScalarValue, TNode, TContext>
 
         switch (_la)
         {
+            // REF_CONSTANT (a1_reference | REF_CONSTANT)?
+            // -> REF_CONSTANT
+            // -> REF_CONSTANT REF_CONSTANT
+            // -> REF_CONSTANT A1_CELL
+            // -> REF_CONSTANT A1_CELL COLON A1_CELL
+            // -> REF_CONSTANT A1_SPAN_REFERENCE
+            // Happens when sheet is deleted, e.g. `#REF!A1`. Note that #REF is actually a valid
+            // name of a sheet, but it must be escaped to be usable ('#REF'!B3) because of '#'.
             case Token.REF_CONSTANT:
-                return ErrorNode();
+                {
+                    // In all cases, it is a #REF! error from AST PoV, just with weird tokens.
+                    var start = _tokenSource.StartIndex;
+                    var errorToken = GetCurrentToken();
+                    Span<char> normalizedError = stackalloc char[errorToken.Length];
+                    errorToken.ToUpperInvariant(normalizedError);
+                    Match(Token.REF_CONSTANT);
+
+                    if (_la == Token.REF_CONSTANT)
+                    {
+                        // -> REF_CONSTANT REF_CONSTANT
+                        Match(Token.REF_CONSTANT);
+                    }
+                    else if (_la == Token.A1_CELL)
+                    {
+                        // -> REF_CONSTANT A1_CELL
+                        Match(Token.A1_CELL);
+                        if (_la == Token.COLON && LL(1) == Token.A1_CELL)
+                        {
+                            // -> REF_CONSTANT A1_CELL COLON A1_CELL
+                            Match(Token.COLON);
+                            Match(Token.A1_CELL);
+                        }
+                    }
+                    else if (_la == Token.A1_SPAN_REFERENCE)
+                    {
+                        // -> REF_CONSTANT A1_SPAN_REFERENCE
+                        Match(Token.A1_SPAN_REFERENCE);
+                    }
+
+                    return _factory.ErrorNode(_context, new SymbolRange(start, _tokenSource.StartIndex), normalizedError);
+                }
 
             case Token.OPEN_BRACE:
                 {
