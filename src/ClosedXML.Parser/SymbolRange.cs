@@ -26,6 +26,11 @@ public readonly struct SymbolRange
     public int End { get; }
 
     /// <summary>
+    /// Length of a symbol.
+    /// </summary>
+    public int Length => End - Start;
+
+    /// <summary>
     /// Get range indexes.
     /// </summary>
     public override string ToString()

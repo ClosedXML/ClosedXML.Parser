@@ -48,7 +48,7 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
     /// <param name="range">Symbol range of the error token in the formula.</param>
-    /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace, converted to upper case, no matter the input..</param>
+    /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace, converted to upper case, no matter the input.</param>
     TScalarValue ErrorValue(TContext context, SymbolRange range, ReadOnlySpan<char> error);
 
     /// <summary>
@@ -79,6 +79,11 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     /// <summary>
     /// Create a node with an error value.
     /// </summary>
+    /// <remarks>
+    /// Sheet related ref errors (e.g. <c>Sheet!REF!</c> or <c>#REF!$A$4</c>) are also use this node. In that case,
+    /// the <paramref name="range"/> contains whole section used to create the error, but <paramref name="error"/>
+    /// contains normalized <c>#REF!</c> error.
+    /// </remarks>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
     /// <param name="range">Range in a formula that contains the error.</param>
     /// <param name="error">The error text, string with <c>#</c> until the end of an error. No whitespace. In upper case format.</param>

@@ -87,10 +87,12 @@ ref_spill_expression
 
 /*
  * name_reference and structure_reference are not very unambiguous, e.g.
- * BOOK_PREFIX NAME are a prefix for both
+ * BOOK_PREFIX NAME are a prefix for both.
+ * Although #REF!A1 and such is not a valid according to grammar, it is a
+ * result of sheet deletion in actual formulas.
  */
 ref_atom_expression
-        : REF_CONSTANT
+        : REF_CONSTANT (a1_reference | REF_CONSTANT)?
         | OPEN_BRACE ref_expression CLOSE_BRACE
         | cell_reference
         | ref_function_call

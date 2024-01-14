@@ -8,6 +8,22 @@ public class RefAtomExpressionRuleTests
         VerifyNode("#REF!", new ValueNode("Error", "#REF!"));
     }
 
+    [Theory]
+    [InlineData("#REF!A1")]
+    [InlineData("#REF!$B$7")]
+    [InlineData("#REF!A1:B5")]
+    [InlineData("#REF!$D7:G$15")]
+    [InlineData("#REF!7:15")]
+    [InlineData("#REF!$7:$15")]
+    [InlineData("#REF!B:AG")]
+    [InlineData("#REF!$ABC:$ADD")]
+    [InlineData("Sheet!#REF!")]
+    [InlineData("#REF!#REF!")]
+    public void Ref_error_with_reference(string refError)
+    {
+        VerifyNode(refError, new ValueNode("Error", "#REF!"));
+    }
+
     [Fact]
     public void Nested_ref_expression()
     {
