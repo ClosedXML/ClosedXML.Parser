@@ -160,7 +160,7 @@ internal static class TokenParser
         {
             // Token is COLUMN. ROW must be after column, so there can't be one.
             var loneCol = ReadR1C1Axis(token, ref i);
-            return new RowCol(ReferenceAxisType.None, 0, loneCol.Type, loneCol.Value, R1C1);
+            return new RowCol(None, 0, loneCol.Type, loneCol.Value, R1C1);
         }
 
         // It must be a row.
@@ -171,7 +171,7 @@ internal static class TokenParser
 
         // Token is ROW. Either it has ended or it is followed by :
         if (i == token.Length || token[i] is not ('C' or 'c'))
-            return new RowCol(row.Type, row.Value, ReferenceAxisType.None, 0, R1C1);
+            return new RowCol(row.Type, row.Value, None, 0, R1C1);
 
         // Token is ROW COLUMN
         var col = ReadR1C1Axis(token, ref i);
@@ -191,7 +191,7 @@ internal static class TokenParser
         {
             // We are at the end of a formula and the only thing that was left was C/R, an alias for C[0]/R[0]
             currentIdx = i;
-            return (ReferenceAxisType.Relative, 0);
+            return (Relative, 0);
         }
 
         if (token[i] == '[')
@@ -212,7 +212,7 @@ internal static class TokenParser
 
             // Index is at the last character that has to be ']'
             currentIdx = ++i;
-            return (ReferenceAxisType.Relative, isNegative ? -position : position);
+            return (Relative, isNegative ? -position : position);
         }
 
         // Axis is absolute or relative [0] without explicit number.
@@ -224,9 +224,9 @@ internal static class TokenParser
 
         // There is no number after 'C'/'R' => it's a shorthand for `C[0]`/`R[0]`
         if (absoluteNumber == 0)
-            return (ReferenceAxisType.Relative, 0);
+            return (Relative, 0);
 
-        return (ReferenceAxisType.Absolute, absoluteNumber);
+        return (Absolute, absoluteNumber);
     }
 
     /// <summary>
