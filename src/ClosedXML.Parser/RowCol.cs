@@ -74,6 +74,16 @@ public readonly struct RowCol : IEquatable<RowCol>
     public ReferenceStyle Style { get; }
 
     /// <summary>
+    /// Is RowCol a part (start or end) of row span?
+    /// </summary>
+    public bool IsRow => ColumnType == None;
+
+    /// <summary>
+    /// Is RowCol a part (start or end) of column span?
+    /// </summary>
+    public bool IsColumn => RowType == None;
+
+    /// <summary>
     /// Create a new <see cref="RowCol"/> with both row and columns specified.
     /// </summary>
     /// <param name="rowType">The type used to interpret the row position.</param>
