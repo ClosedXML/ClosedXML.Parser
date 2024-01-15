@@ -82,7 +82,7 @@ public readonly struct ReferenceArea
     /// </summary>
     public string GetDisplayStringA1()
     {
-        if (First == Second)
+        if (First == Second && !First.IsColumn && !First.IsRow)
             return First.GetDisplayStringA1();
 
         return new StringBuilder()

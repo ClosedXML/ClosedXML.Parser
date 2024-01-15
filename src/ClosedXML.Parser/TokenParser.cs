@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using static ClosedXML.Parser.ReferenceAxisType;
 
 namespace ClosedXML.Parser;
 
@@ -252,8 +253,8 @@ internal static class TokenParser
 
             var row2 = ReadRow(input, ref i);
             return new ReferenceArea(
-                new RowCol(abs1, row1, true, 1, A1),
-                new RowCol(absRow2, row2, true, RowCol.MaxCol, A1));
+                new RowCol(abs1 ? Absolute : Relative, row1, None, 0, A1),
+                new RowCol(absRow2 ? Absolute : Relative, row2, None, 0, A1));
         }
 
         var col = ReadColumn(input, ref i);
@@ -267,8 +268,8 @@ internal static class TokenParser
 
             var col2 = ReadColumn(input, ref i);
             return new ReferenceArea(
-                new RowCol(true, 1, abs1, col, A1),
-                new RowCol(true, RowCol.MaxRow, absCol2, col2, A1));
+                new RowCol(None, 0, abs1 ? Absolute : Relative, col, A1),
+                new RowCol(None, 0, absCol2 ? Absolute : Relative, col2, A1));
         }
 
         var secondAbsolute = IsAbsolute(input, i);
