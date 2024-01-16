@@ -9,12 +9,7 @@ namespace ClosedXML.Parser;
 /// </summary>
 internal static class StringBuilderExtensions
 {
-    public static StringBuilder AppendSheetName(this StringBuilder sb, string sheetName)
-    {
-        return NameUtils.EscapeName(sb, sheetName);
-    }
-
-    public static StringBuilder AppendSheetNameWithSeparator(this StringBuilder sb, string? sheetName)
+    public static StringBuilder AppendSheetReference(this StringBuilder sb, string? sheetName)
     {
         if (sheetName is null)
             return sb.Append("#REF!");
@@ -22,7 +17,7 @@ internal static class StringBuilderExtensions
         return NameUtils.EscapeName(sb, sheetName).AppendReferenceSeparator();
     }
 
-    public static StringBuilder AppendExternalSheetName(this StringBuilder sb, int workbookIndex, string sheetName)
+    public static StringBuilder AppendExternalSheetReference(this StringBuilder sb, int workbookIndex, string sheetName)
     {
         if (NameUtils.ShouldQuote(sheetName.AsSpan()))
         {
@@ -30,12 +25,13 @@ internal static class StringBuilderExtensions
                 .Append('\'')
                 .AppendBookIndex(workbookIndex)
                 .AppendEscapedSheetName(sheetName)
-                .Append('\'');
+                .Append('\'')
+                .AppendReferenceSeparator();
         }
 
         return sb
             .AppendBookIndex(workbookIndex)
-            .AppendSheetName(sheetName);
+            .AppendSheetReference(sheetName);
     }
     public static StringBuilder AppendEscapedSheetName(this StringBuilder sb, string sheetName)
     {
