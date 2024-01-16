@@ -106,8 +106,8 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
             var sheet = symbol.Slice(0, symbol.Length - REF_ERROR.Length - 1);
             var modifiedSheet = ModifySheet(ctx, sheet.ToString());
             var nodeText = new StringBuilder()
-                .Append(modifiedSheet)
-                .Append(symbol.Slice(REF_ERROR.Length))
+                .AppendSheetNameWithSeparator(modifiedSheet)
+                .Append(symbol.Slice(symbol.Length - REF_ERROR.Length))
                 .ToString();
             return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
         }
@@ -135,8 +135,7 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     {
         var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         var nodeText = sb
-            .AppendSheetName(ModifySheet(ctx, sheet))
-            .AppendReferenceSeparator()
+            .AppendSheetNameWithSeparator(ModifySheet(ctx, sheet))
             .AppendRef(ModifyRef(ctx, reference))
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -144,23 +143,26 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol Reference3D(TransformContext ctx, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
     {
+        var modifiedFirstSheet = ModifySheet(ctx, firstSheet);
+        var modifiedLastSheet = ModifySheet(ctx, lastSheet);
+        if (modifiedFirstSheet is null || modifiedLastSheet is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
         var sb = new StringBuilder(firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-        firstSheet = ModifySheet(ctx, firstSheet);
-        lastSheet = ModifySheet(ctx, lastSheet);
-        if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
+        if (NameUtils.ShouldQuote(modifiedFirstSheet.AsSpan()) || NameUtils.ShouldQuote(modifiedLastSheet.AsSpan()))
         {
             sb
                 .Append('\'')
-                .AppendEscapedSheetName(firstSheet)
+                .AppendEscapedSheetName(modifiedFirstSheet)
                 .Append(':')
-                .AppendEscapedSheetName(lastSheet)
+                .AppendEscapedSheetName(modifiedLastSheet)
                 .Append('\'');
         }
         else
         {
-            sb.Append(firstSheet)
+            sb.Append(modifiedFirstSheet)
                 .Append(':')
-                .Append(lastSheet);
+                .Append(modifiedLastSheet);
         }
 
         var nodeText = sb
@@ -172,9 +174,13 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol ExternalSheetReference(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference)
     {
-        var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
+        var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
+        if (modifiedSheet is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
+        var sb = new StringBuilder(BOOK_PREFIX_LEN + modifiedSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         var nodeText = sb
-            .AppendExternalSheetName(workbookIndex, ModifySheet(ctx, sheet))
+            .AppendExternalSheetName(workbookIndex, modifiedSheet)
             .AppendReferenceSeparator()
             .AppendRef(ModifyRef(ctx, reference))
             .ToString();
@@ -184,8 +190,6 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     public virtual TransformedSymbol ExternalReference3D(TransformContext ctx, SymbolRange range, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         var sb = new StringBuilder(BOOK_PREFIX_LEN + firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-        firstSheet = ModifySheet(ctx, firstSheet);
-        lastSheet = ModifySheet(ctx, lastSheet);
         if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
         {
             sb
@@ -233,10 +237,13 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol Function(TransformContext ctx, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
+        var modifiedSheet = ModifySheet(ctx, sheetName);
+        if (modifiedSheet is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
         var sb = new StringBuilder(sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var nodeText = sb
-            .AppendSheetName(ModifySheet(ctx, sheetName))
-            .AppendReferenceSeparator()
+            .AppendSheetNameWithSeparator(modifiedSheet)
             .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -244,9 +251,13 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol ExternalFunction(TransformContext ctx, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        var sb = new StringBuilder(BOOK_PREFIX_LEN + sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
+        var modifiedSheetName = ModifyExternalSheet(ctx, workbookIndex, sheetName);
+        if (modifiedSheetName is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
+        var sb = new StringBuilder(BOOK_PREFIX_LEN + modifiedSheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var nodeText = sb
-            .AppendExternalSheetName(workbookIndex, ModifySheet(ctx, sheetName))
+            .AppendExternalSheetName(workbookIndex, modifiedSheetName)
             .AppendReferenceSeparator()
             .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
@@ -295,10 +306,13 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol SheetName(TransformContext ctx, SymbolRange range, string sheet, string name)
     {
-        var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
+        var modifiedSheet = ModifySheet(ctx, sheet);
+        if (modifiedSheet is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
+        var sb = new StringBuilder(modifiedSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         var nodeText = sb
-            .AppendSheetName(ModifySheet(ctx, sheet))
-            .AppendReferenceSeparator()
+            .AppendSheetNameWithSeparator(modifiedSheet)
             .Append(name)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -317,9 +331,13 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
 
     public virtual TransformedSymbol ExternalSheetName(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, string name)
     {
-        var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
+        var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
+        if (modifiedSheet is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
+        var sb = new StringBuilder(BOOK_PREFIX_LEN + modifiedSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         var nodeText = sb
-            .AppendExternalSheetName(workbookIndex, ModifySheet(ctx, sheet))
+            .AppendExternalSheetName(workbookIndex, modifiedSheet)
             .AppendReferenceSeparator()
             .Append(name)
             .ToString();
@@ -468,8 +486,13 @@ internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, Transfor
     /// </summary>
     /// <param name="ctx">The transformation context.</param>
     /// <param name="sheetName">Original sheet name.</param>
-    /// <returns>New sheet name.</returns>
-    protected virtual string ModifySheet(TransformContext ctx, string sheetName)
+    /// <returns>New sheet name. If null, it indicates sheet has been deleted and should be replaced with <c>#REF!</c></returns>
+    protected virtual string? ModifySheet(TransformContext ctx, string sheetName)
+    {
+        return sheetName;
+    }
+
+    protected virtual string? ModifyExternalSheet(TransformContext ctx, int bookIndex, string sheetName)
     {
         return sheetName;
     }
