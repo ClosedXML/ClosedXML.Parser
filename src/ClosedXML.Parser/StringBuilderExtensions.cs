@@ -14,6 +14,14 @@ internal static class StringBuilderExtensions
         return NameUtils.EscapeName(sb, sheetName);
     }
 
+    public static StringBuilder AppendSheetNameWithSeparator(this StringBuilder sb, string? sheetName)
+    {
+        if (sheetName is null)
+            return sb.Append("#REF!");
+
+        return NameUtils.EscapeName(sb, sheetName).AppendReferenceSeparator();
+    }
+
     public static StringBuilder AppendExternalSheetName(this StringBuilder sb, int workbookIndex, string sheetName)
     {
         if (NameUtils.ShouldQuote(sheetName.AsSpan()))
