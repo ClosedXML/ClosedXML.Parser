@@ -103,7 +103,7 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
     {
         var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         var nodeText = sb
-            .AppendSheetReference(ModifySheet(ctx, sheet))
+            .AppendSheetReference(sheet)
             .AppendRef(reference)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -111,26 +111,21 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol Reference3D(TransformContext ctx, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
     {
-        var modifiedFirstSheet = ModifySheet(ctx, firstSheet);
-        var modifiedLastSheet = ModifySheet(ctx, lastSheet);
-        if (modifiedFirstSheet is null || modifiedLastSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
         var sb = new StringBuilder(firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
-        if (NameUtils.ShouldQuote(modifiedFirstSheet.AsSpan()) || NameUtils.ShouldQuote(modifiedLastSheet.AsSpan()))
+        if (NameUtils.ShouldQuote(firstSheet.AsSpan()) || NameUtils.ShouldQuote(lastSheet.AsSpan()))
         {
             sb
                 .Append('\'')
-                .AppendEscapedSheetName(modifiedFirstSheet)
+                .AppendEscapedSheetName(firstSheet)
                 .Append(':')
-                .AppendEscapedSheetName(modifiedLastSheet)
+                .AppendEscapedSheetName(lastSheet)
                 .Append('\'');
         }
         else
         {
-            sb.Append(modifiedFirstSheet)
+            sb.Append(firstSheet)
                 .Append(':')
-                .Append(modifiedLastSheet);
+                .Append(lastSheet);
         }
 
         var nodeText = sb
@@ -142,13 +137,9 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol ExternalSheetReference(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference)
     {
-        var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
-        if (modifiedSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
-        var sb = new StringBuilder(BOOK_PREFIX_LEN + modifiedSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
+        var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
         var nodeText = sb
-            .AppendExternalSheetReference(workbookIndex, modifiedSheet)
+            .AppendExternalSheetReference(workbookIndex, sheet)
             .AppendRef(reference)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -204,13 +195,9 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol Function(TransformContext ctx, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        var modifiedSheet = ModifySheet(ctx, sheetName);
-        if (modifiedSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
         var sb = new StringBuilder(sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var nodeText = sb
-            .AppendSheetReference(modifiedSheet)
+            .AppendSheetReference(sheetName)
             .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -218,13 +205,9 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol ExternalFunction(TransformContext ctx, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        var modifiedSheetName = ModifyExternalSheet(ctx, workbookIndex, sheetName);
-        if (modifiedSheetName is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
-        var sb = new StringBuilder(BOOK_PREFIX_LEN + modifiedSheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
+        var sb = new StringBuilder(BOOK_PREFIX_LEN + sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var nodeText = sb
-            .AppendExternalSheetReference(workbookIndex, modifiedSheetName)
+            .AppendExternalSheetReference(workbookIndex, sheetName)
             .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -272,13 +255,9 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol SheetName(TransformContext ctx, SymbolRange range, string sheet, string name)
     {
-        var modifiedSheet = ModifySheet(ctx, sheet);
-        if (modifiedSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
-        var sb = new StringBuilder(modifiedSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
+        var sb = new StringBuilder(sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         var nodeText = sb
-            .AppendSheetReference(modifiedSheet)
+            .AppendSheetReference(sheet)
             .Append(name)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -297,13 +276,9 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol ExternalSheetName(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, string name)
     {
-        var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
-        if (modifiedSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
-        var sb = new StringBuilder(BOOK_PREFIX_LEN + modifiedSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
+        var sb = new StringBuilder(BOOK_PREFIX_LEN + sheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + name.Length);
         var nodeText = sb
-            .AppendExternalSheetReference(workbookIndex, modifiedSheet)
+            .AppendExternalSheetReference(workbookIndex, sheet)
             .Append(name)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -433,22 +408,6 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
     protected virtual RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
     {
         return cell;
-    }
-
-    /// <summary>
-    /// An extension to modify sheet name, e.g. rename.
-    /// </summary>
-    /// <param name="ctx">The transformation context.</param>
-    /// <param name="sheetName">Original sheet name.</param>
-    /// <returns>New sheet name. If null, it indicates sheet has been deleted and should be replaced with <c>#REF!</c></returns>
-    protected virtual string? ModifySheet(TransformContext ctx, string sheetName)
-    {
-        return sheetName;
-    }
-
-    protected virtual string? ModifyExternalSheet(TransformContext ctx, int bookIndex, string sheetName)
-    {
-        return sheetName;
     }
 
     /// <summary>
