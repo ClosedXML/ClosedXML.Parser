@@ -84,6 +84,7 @@ public class CopyVisitorTests
         var factory = new FormulaFactory { ExternalSheetMap = { { oldSheetName, newSheetName } } };
         AssertChangesA1(formula, factory, modifiedFormula);
     }
+
     private static void AssertChangesA1(string formula, ReferenceModificationVisitor factory, string expected)
     {
         var ctx = new TransformContext(formula, 1, 1, isA1: true);

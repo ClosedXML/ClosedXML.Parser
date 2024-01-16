@@ -117,11 +117,8 @@ internal class ReferenceModificationVisitor : IAstFactory<TransformedSymbol, Tra
     {
         var modifiedFirstSheet = ModifySheet(ctx, firstSheet);
         var modifiedLastSheet = ModifySheet(ctx, lastSheet);
-        if (modifiedFirstSheet is null || modifiedLastSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
         var modifiedReference = ModifyRef(ctx, reference);
-        if (modifiedReference is null)
+        if (modifiedFirstSheet is null || modifiedLastSheet is null || modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
         return s_copyVisitor.Reference3D(ctx, range, modifiedFirstSheet, modifiedLastSheet, modifiedReference.Value);
@@ -130,12 +127,8 @@ internal class ReferenceModificationVisitor : IAstFactory<TransformedSymbol, Tra
     public TransformedSymbol ExternalSheetReference(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference)
     {
         var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
-        if (modifiedSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
-
         var modifiedReference = ModifyRef(ctx, reference);
-        if (modifiedReference is null)
+        if (modifiedSheet is null || modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
         return s_copyVisitor.ExternalSheetReference(ctx, range, workbookIndex, modifiedSheet, modifiedReference.Value);
@@ -145,11 +138,8 @@ internal class ReferenceModificationVisitor : IAstFactory<TransformedSymbol, Tra
     {
         var modifiedFirstSheet = ModifySheet(ctx, firstSheet);
         var modifiedLastSheet = ModifySheet(ctx, lastSheet);
-        if (modifiedFirstSheet is null || modifiedLastSheet is null)
-            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
-
         var modifiedReference = ModifyRef(ctx, reference);
-        if (modifiedReference is null)
+        if (modifiedFirstSheet is null || modifiedLastSheet is null || modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
         return s_copyVisitor.ExternalReference3D(ctx, range, workbookIndex, modifiedFirstSheet, modifiedLastSheet, modifiedReference.Value);
@@ -228,8 +218,7 @@ internal class ReferenceModificationVisitor : IAstFactory<TransformedSymbol, Tra
         return s_copyVisitor.ExternalName(ctx, range, workbookIndex, name);
     }
 
-    public TransformedSymbol ExternalSheetName(TransformContext ctx, SymbolRange range, int workbookIndex,
-        string sheet, string name)
+    public TransformedSymbol ExternalSheetName(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, string name)
     {
         var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
         if (modifiedSheet is null)
