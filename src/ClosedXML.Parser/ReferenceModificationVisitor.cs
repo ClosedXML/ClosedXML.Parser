@@ -127,6 +127,15 @@ internal class ReferenceModificationVisitor : CopyVisitor
         return base.ExternalFunction(ctx, range, workbookIndex, modifiedSheetName, functionName, arguments);
     }
 
+    public override TransformedSymbol CellFunction(TransformContext ctx, SymbolRange range, RowCol cell, IReadOnlyList<TransformedSymbol> arguments)
+    {
+        var modifiedCell = ModifyCellFunction(ctx, cell);
+        if (modifiedCell is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
+
+        return base.CellFunction(ctx, range, modifiedCell.Value, arguments);
+    }
+
     public override TransformedSymbol SheetName(TransformContext ctx, SymbolRange range, string sheet, string name)
     {
         var modifiedSheet = ModifySheet(ctx, sheet);
@@ -171,5 +180,16 @@ internal class ReferenceModificationVisitor : CopyVisitor
     protected virtual ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
     {
         return reference;
+    }
+
+    /// <summary>
+    /// Modify reference to a cell function.
+    /// </summary>
+    /// <param name="ctx">The transformation context.</param>
+    /// <param name="cell">Original cell containing function.</param>
+    /// <returns>Modified reference or null if <c>#REF!</c>.</returns>
+    protected virtual RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
+    {
+        return cell;
     }
 }

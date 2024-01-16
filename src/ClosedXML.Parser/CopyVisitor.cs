@@ -17,7 +17,6 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
     private const int SHEET_SEPARATOR_LEN = 1;
     private const int BOOK_PREFIX_LEN = 3;
     private const int MAX_R1_C1_LEN = 20;
-    private const string REF_ERROR = "#REF!";
 
     public virtual TransformedSymbol LogicalValue(TransformContext ctx, SymbolRange range, bool value)
     {
@@ -217,7 +216,7 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
     {
         var sb = new StringBuilder(MAX_R1_C1_LEN + SHEET_SEPARATOR_LEN + arguments.Sum(static x => x.Length));
         var nodeText = sb
-            .AppendRef(ModifyCellFunction(ctx, cell))
+            .AppendRef(cell)
             .AppendArguments(ctx, range, arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
@@ -397,17 +396,6 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
                 _ => throw new NotSupportedException(),
             };
         }
-    }
-
-    /// <summary>
-    /// Modify reference to a cell function.
-    /// </summary>
-    /// <param name="ctx">The transformation context.</param>
-    /// <param name="cell">Original cell containing function.</param>
-    /// <returns>Modified reference or null if <c>#REF!</c>.</returns>
-    protected virtual RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
-    {
-        return cell;
     }
 
     /// <summary>
