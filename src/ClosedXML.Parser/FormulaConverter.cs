@@ -52,7 +52,7 @@ public static class FormulaConverter
         return transformedFormula.ToString(trimmedEnd);
     }
 
-    private class TextVisitorR1C1 : FormulaGeneratorVisitor
+    private class TextVisitorR1C1 : CopyVisitor
     {
         protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
         {
@@ -65,7 +65,7 @@ public static class FormulaConverter
         }
     }
 
-    private class TextVisitorA1 : FormulaGeneratorVisitor
+    private class TextVisitorA1 : CopyVisitor
     {
         protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
         {

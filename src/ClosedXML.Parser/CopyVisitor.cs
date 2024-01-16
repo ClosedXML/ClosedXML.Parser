@@ -10,7 +10,7 @@ namespace ClosedXML.Parser;
 /// designed to allow modifications of references, e.g. renaming, moving references
 /// and so on. Just inherit it and override one of <c>virtual Modify*</c> methods.
 /// </summary>
-internal class FormulaGeneratorVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, TransformContext>
+internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, TransformContext>
 {
     // 1 quote on left, 1 quote on right size and at most 4 quotes inside.
     private const int QUOTE_RESERVE = 6;
