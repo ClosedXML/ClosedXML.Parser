@@ -22,7 +22,7 @@ public class CopyVisitorTests
     }
 
     [Theory]
-    [InlineData("Old!B$5", "Old", null, "#REF!B$5")]
+    [InlineData("Old!B$5", "Old", null, "#REF!")]
     [InlineData("Old!B:D", "Old", "Shiny", "Shiny!B:D")]
     public void SheetReference_can_modify_sheet(string formula, string oldSheetName, string? newSheetName, string modifiedFormula)
     {
@@ -91,7 +91,7 @@ public class CopyVisitorTests
         Assert.Equal(expected, modifiedFormula.ToString(string.Empty.AsSpan()));
     }
 
-    private class FormulaFactory : CopyVisitor
+    private class FormulaFactory : ReferenceModificationVisitor
     {
         public Dictionary<string, string?> SheetMap { get; } = new();
         public Dictionary<string, string?> ExternalSheetMap { get; } = new();

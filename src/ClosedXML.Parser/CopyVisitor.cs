@@ -6,9 +6,7 @@ using System.Text;
 namespace ClosedXML.Parser;
 
 /// <summary>
-/// A visitor that generates the identical formula for the parsed formula. It's
-/// designed to allow modifications of references, e.g. renaming, moving references
-/// and so on. Just inherit it and override one of <c>virtual Modify*</c> methods.
+/// A visitor that generates the identical formula for the parsed formula based on passed arguments.
 /// </summary>
 internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, TransformContext>
 {
@@ -175,9 +173,8 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
 
     public virtual TransformedSymbol Function(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        var transformedFunction = ModifyFunction(ctx, functionName);
         var sb = new StringBuilder(functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
-        var nodeText = sb.Append(transformedFunction).AppendArguments(ctx, range, arguments).ToString();
+        var nodeText = sb.Append(functionName).AppendArguments(ctx, range, arguments).ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
 
@@ -187,7 +184,7 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
         var nodeText = sb
             .AppendBookIndex(workbookIndex)
             .AppendReferenceSeparator()
-            .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
+            .AppendFunction(ctx, range, functionName, arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -197,7 +194,7 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
         var sb = new StringBuilder(sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var nodeText = sb
             .AppendSheetReference(sheetName)
-            .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
+            .AppendFunction(ctx, range, functionName, arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -207,7 +204,7 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
         var sb = new StringBuilder(BOOK_PREFIX_LEN + sheetName.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + functionName.Length + 2 + arguments.Sum(static x => x.Length) + arguments.Count);
         var nodeText = sb
             .AppendExternalSheetReference(workbookIndex, sheetName)
-            .AppendFunction(ctx, range, ModifyFunction(ctx, functionName), arguments)
+            .AppendFunction(ctx, range, functionName, arguments)
             .ToString();
         return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
     }
@@ -396,16 +393,5 @@ internal class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, T
                 _ => throw new NotSupportedException(),
             };
         }
-    }
-
-    /// <summary>
-    /// An extension to modify name of a function.
-    /// </summary>
-    /// <param name="ctx">The transformation context.</param>
-    /// <param name="functionName">Original name of function.</param>
-    /// <returns>New name of a function.</returns>
-    protected virtual ReadOnlySpan<char> ModifyFunction(TransformContext ctx, ReadOnlySpan<char> functionName)
-    {
-        return functionName;
     }
 }

@@ -4,6 +4,10 @@ using System.Text;
 
 namespace ClosedXML.Parser;
 
+/// <summary>
+/// It's designed to allow modifications of references, e.g. renaming, moving references
+/// and so on. Just inherit it and override one of <c>virtual Modify*</c> methods.
+/// </summary>
 internal class ReferenceModificationVisitor : CopyVisitor
 {
     private const string REF_ERROR = "#REF!";
@@ -110,21 +114,23 @@ internal class ReferenceModificationVisitor : CopyVisitor
     public override TransformedSymbol Function(TransformContext ctx, SymbolRange range, string sheetName,
         ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
+        var modifiedFunction = ModifyFunction(ctx, functionName);
         var modifiedSheet = ModifySheet(ctx, sheetName);
         if (modifiedSheet is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.Function(ctx, range, modifiedSheet, functionName, arguments);
+        return base.Function(ctx, range, modifiedSheet, modifiedFunction, arguments);
     }
 
     public override TransformedSymbol ExternalFunction(TransformContext ctx, SymbolRange range, int workbookIndex,
         string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
+        var modifiedFunction = ModifyFunction(ctx, functionName);
         var modifiedSheetName = ModifyExternalSheet(ctx, workbookIndex, sheetName);
         if (modifiedSheetName is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.ExternalFunction(ctx, range, workbookIndex, modifiedSheetName, functionName, arguments);
+        return base.ExternalFunction(ctx, range, workbookIndex, modifiedSheetName, modifiedFunction, arguments);
     }
 
     public override TransformedSymbol CellFunction(TransformContext ctx, SymbolRange range, RowCol cell, IReadOnlyList<TransformedSymbol> arguments)
@@ -180,6 +186,17 @@ internal class ReferenceModificationVisitor : CopyVisitor
     protected virtual ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
     {
         return reference;
+    }
+
+    /// <summary>
+    /// An extension to modify name of a function.
+    /// </summary>
+    /// <param name="ctx">The transformation context.</param>
+    /// <param name="functionName">Original name of function.</param>
+    /// <returns>New name of a function.</returns>
+    protected virtual ReadOnlySpan<char> ModifyFunction(TransformContext ctx, ReadOnlySpan<char> functionName)
+    {
+        return functionName;
     }
 
     /// <summary>
