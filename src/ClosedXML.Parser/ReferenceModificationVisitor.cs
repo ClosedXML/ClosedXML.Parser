@@ -8,11 +8,47 @@ namespace ClosedXML.Parser;
 /// It's designed to allow modifications of references, e.g. renaming, moving references
 /// and so on. Just inherit it and override one of <c>virtual Modify*</c> methods.
 /// </summary>
-internal class ReferenceModificationVisitor : CopyVisitor
+internal class ReferenceModificationVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, TransformContext>
 {
     private const string REF_ERROR = "#REF!";
+    private static readonly CopyVisitor s_copyVisitor = new();
 
-    public override TransformedSymbol ErrorNode(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> error)
+    public TransformedSymbol LogicalValue(TransformContext ctx, SymbolRange range, bool value)
+    {
+        return s_copyVisitor.LogicalValue(ctx, range, value);
+    }
+
+    public TransformedSymbol NumberValue(TransformContext ctx, SymbolRange range, double value)
+    {
+        return s_copyVisitor.NumberValue(ctx, range, value);
+    }
+
+    public TransformedSymbol TextValue(TransformContext ctx, SymbolRange range, string text)
+    {
+        return s_copyVisitor.TextValue(ctx, range, text);
+    }
+
+    public TransformedSymbol ErrorValue(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> error)
+    {
+        return s_copyVisitor.ErrorValue(ctx, range, error);
+    }
+
+    public TransformedSymbol ArrayNode(TransformContext ctx, SymbolRange range, int rows, int columns, IReadOnlyList<TransformedSymbol> elements)
+    {
+        return s_copyVisitor.ArrayNode(ctx, range, rows, columns, elements);
+    }
+
+    public TransformedSymbol BlankNode(TransformContext ctx, SymbolRange range)
+    {
+        return s_copyVisitor.BlankNode(ctx, range);
+    }
+
+    public TransformedSymbol LogicalNode(TransformContext ctx, SymbolRange range, bool value)
+    {
+        return s_copyVisitor.LogicalNode(ctx, range, value);
+    }
+
+    public TransformedSymbol ErrorNode(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> error)
     {
         if (range.Length == error.Length)
             return TransformedSymbol.CopyOriginal(ctx.Formula, range);
@@ -48,26 +84,36 @@ internal class ReferenceModificationVisitor : CopyVisitor
         }
     }
 
-    public override TransformedSymbol Reference(TransformContext ctx, SymbolRange range, ReferenceArea reference)
+    public TransformedSymbol NumberNode(TransformContext ctx, SymbolRange range, double value)
+    {
+        return s_copyVisitor.NumberNode(ctx, range, value);
+    }
+
+    public TransformedSymbol TextNode(TransformContext ctx, SymbolRange range, string text)
+    {
+        return s_copyVisitor.TextNode(ctx, range, text);
+    }
+
+    public TransformedSymbol Reference(TransformContext ctx, SymbolRange range, ReferenceArea reference)
     {
         var modifiedReference = ModifyRef(ctx, reference);
         if (modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.Reference(ctx, range, modifiedReference.Value);
+        return s_copyVisitor.Reference(ctx, range, modifiedReference.Value);
     }
 
-    public override TransformedSymbol SheetReference(TransformContext ctx, SymbolRange range, string sheet, ReferenceArea reference)
+    public TransformedSymbol SheetReference(TransformContext ctx, SymbolRange range, string sheet, ReferenceArea reference)
     {
         var modifiedSheet = ModifySheet(ctx, sheet);
         var modifiedReference = ModifyRef(ctx, reference);
         if (modifiedSheet is null || modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.SheetReference(ctx, range, modifiedSheet, modifiedReference.Value);
+        return s_copyVisitor.SheetReference(ctx, range, modifiedSheet, modifiedReference.Value);
     }
 
-    public override TransformedSymbol Reference3D(TransformContext ctx, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
+    public TransformedSymbol Reference3D(TransformContext ctx, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         var modifiedFirstSheet = ModifySheet(ctx, firstSheet);
         var modifiedLastSheet = ModifySheet(ctx, lastSheet);
@@ -78,11 +124,10 @@ internal class ReferenceModificationVisitor : CopyVisitor
         if (modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.Reference3D(ctx, range, modifiedFirstSheet, modifiedLastSheet, modifiedReference.Value);
+        return s_copyVisitor.Reference3D(ctx, range, modifiedFirstSheet, modifiedLastSheet, modifiedReference.Value);
     }
 
-    public override TransformedSymbol ExternalSheetReference(TransformContext ctx, SymbolRange range, int workbookIndex,
-        string sheet, ReferenceArea reference)
+    public TransformedSymbol ExternalSheetReference(TransformContext ctx, SymbolRange range, int workbookIndex, string sheet, ReferenceArea reference)
     {
         var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
         if (modifiedSheet is null)
@@ -93,11 +138,10 @@ internal class ReferenceModificationVisitor : CopyVisitor
         if (modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.ExternalSheetReference(ctx, range, workbookIndex, modifiedSheet, modifiedReference.Value);
+        return s_copyVisitor.ExternalSheetReference(ctx, range, workbookIndex, modifiedSheet, modifiedReference.Value);
     }
 
-    public override TransformedSymbol ExternalReference3D(TransformContext ctx, SymbolRange range, int workbookIndex,
-        string firstSheet, string lastSheet, ReferenceArea reference)
+    public TransformedSymbol ExternalReference3D(TransformContext ctx, SymbolRange range, int workbookIndex, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         var modifiedFirstSheet = ModifySheet(ctx, firstSheet);
         var modifiedLastSheet = ModifySheet(ctx, lastSheet);
@@ -108,57 +152,105 @@ internal class ReferenceModificationVisitor : CopyVisitor
         if (modifiedReference is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.ExternalReference3D(ctx, range, workbookIndex, modifiedFirstSheet, modifiedLastSheet, modifiedReference.Value);
+        return s_copyVisitor.ExternalReference3D(ctx, range, workbookIndex, modifiedFirstSheet, modifiedLastSheet, modifiedReference.Value);
     }
 
-    public override TransformedSymbol Function(TransformContext ctx, SymbolRange range, string sheetName,
-        ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
+    public TransformedSymbol Function(TransformContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
+    {
+        return s_copyVisitor.Function(ctx, range, functionName, arguments);
+    }
+
+    public TransformedSymbol Function(TransformContext ctx, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
         var modifiedFunction = ModifyFunction(ctx, functionName);
         var modifiedSheet = ModifySheet(ctx, sheetName);
         if (modifiedSheet is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.Function(ctx, range, modifiedSheet, modifiedFunction, arguments);
+        return s_copyVisitor.Function(ctx, range, modifiedSheet, modifiedFunction, arguments);
     }
 
-    public override TransformedSymbol ExternalFunction(TransformContext ctx, SymbolRange range, int workbookIndex,
-        string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
+    public TransformedSymbol ExternalFunction(TransformContext ctx, SymbolRange range, int workbookIndex, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
         var modifiedFunction = ModifyFunction(ctx, functionName);
         var modifiedSheetName = ModifyExternalSheet(ctx, workbookIndex, sheetName);
         if (modifiedSheetName is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.ExternalFunction(ctx, range, workbookIndex, modifiedSheetName, modifiedFunction, arguments);
+        return s_copyVisitor.ExternalFunction(ctx, range, workbookIndex, modifiedSheetName, modifiedFunction, arguments);
     }
 
-    public override TransformedSymbol CellFunction(TransformContext ctx, SymbolRange range, RowCol cell, IReadOnlyList<TransformedSymbol> arguments)
+    public TransformedSymbol ExternalFunction(TransformContext ctx, SymbolRange range, int workbookIndex, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
+    {
+        return s_copyVisitor.ExternalFunction(ctx, range, workbookIndex, functionName, arguments);
+    }
+
+    public TransformedSymbol CellFunction(TransformContext ctx, SymbolRange range, RowCol cell, IReadOnlyList<TransformedSymbol> arguments)
     {
         var modifiedCell = ModifyCellFunction(ctx, cell);
         if (modifiedCell is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.CellFunction(ctx, range, modifiedCell.Value, arguments);
+        return s_copyVisitor.CellFunction(ctx, range, modifiedCell.Value, arguments);
     }
 
-    public override TransformedSymbol SheetName(TransformContext ctx, SymbolRange range, string sheet, string name)
+    public TransformedSymbol StructureReference(TransformContext ctx, SymbolRange range, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    {
+        return s_copyVisitor.StructureReference(ctx, range, area, firstColumn, lastColumn);
+    }
+
+    public TransformedSymbol StructureReference(TransformContext ctx, SymbolRange range, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    {
+        return s_copyVisitor.StructureReference(ctx, range, table, area, firstColumn, lastColumn);
+    }
+
+    public TransformedSymbol ExternalStructureReference(TransformContext ctx, SymbolRange range, int workbookIndex, string table, StructuredReferenceArea area, string? firstColumn, string? lastColumn)
+    {
+        return s_copyVisitor.ExternalStructureReference(ctx, range, workbookIndex, table, area, firstColumn, lastColumn);
+    }
+
+    public TransformedSymbol Name(TransformContext ctx, SymbolRange range, string name)
+    {
+        return s_copyVisitor.Name(ctx, range, name);
+    }
+
+    public TransformedSymbol SheetName(TransformContext ctx, SymbolRange range, string sheet, string name)
     {
         var modifiedSheet = ModifySheet(ctx, sheet);
         if (modifiedSheet is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.SheetName(ctx, range, modifiedSheet, name);
+        return s_copyVisitor.SheetName(ctx, range, modifiedSheet, name);
     }
 
-    public override TransformedSymbol ExternalSheetName(TransformContext ctx, SymbolRange range, int workbookIndex,
+    public TransformedSymbol ExternalName(TransformContext ctx, SymbolRange range, int workbookIndex, string name)
+    {
+        return s_copyVisitor.ExternalName(ctx, range, workbookIndex, name);
+    }
+
+    public TransformedSymbol ExternalSheetName(TransformContext ctx, SymbolRange range, int workbookIndex,
         string sheet, string name)
     {
         var modifiedSheet = ModifyExternalSheet(ctx, workbookIndex, sheet);
         if (modifiedSheet is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return base.ExternalSheetName(ctx, range, workbookIndex, modifiedSheet, name);
+        return s_copyVisitor.ExternalSheetName(ctx, range, workbookIndex, modifiedSheet, name);
+    }
+
+    public TransformedSymbol BinaryNode(TransformContext ctx, SymbolRange range, BinaryOperation operation, TransformedSymbol leftNode, TransformedSymbol rightNode)
+    {
+        return s_copyVisitor.BinaryNode(ctx, range, operation, leftNode, rightNode);
+    }
+
+    public TransformedSymbol Unary(TransformContext ctx, SymbolRange range, UnaryOperation operation, TransformedSymbol node)
+    {
+        return s_copyVisitor.Unary(ctx, range, operation, node);
+    }
+
+    public TransformedSymbol Nested(TransformContext ctx, SymbolRange range, TransformedSymbol node)
+    {
+        return s_copyVisitor.Nested(ctx, range, node);
     }
 
     /// <summary>
