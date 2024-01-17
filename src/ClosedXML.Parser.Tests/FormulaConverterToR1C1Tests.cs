@@ -29,9 +29,9 @@ public class FormulaConverterToR1C1Tests
     }
 
     [Theory]
-    [InlineData("SUM(#REF!$B$7)", "SUM(#REF!R7C2)")]
+    [InlineData("SUM(#REF!$B$7)", "SUM(#REF!)")]
     [InlineData("SUM(Sheet!#REF!)", "SUM(Sheet!#REF!)")]
-    [InlineData("SUM(#REF!#REF!)", "SUM(#REF!#REF!)")]
+    [InlineData("SUM(#REF!#REF!)", "SUM(#REF!)")]
     public void ErrorNode(string a1, string r1c1)
     {
         Assert.Equal(r1c1, FormulaConverter.ToR1C1(a1, 1, 1));

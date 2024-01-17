@@ -49,7 +49,7 @@ internal static class StringBuilderExtensions
         return sb.Append('[').Append(bookIndex).Append(']');
     }
 
-    public static StringBuilder AppendFunction(this StringBuilder sb, TransformContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
+    public static StringBuilder AppendFunction(this StringBuilder sb, ModContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
         return sb.Append(functionName).AppendArguments(ctx, range, arguments);
     }
@@ -68,7 +68,7 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
-    public static StringBuilder AppendStartFragment(this StringBuilder sb, TransformContext ctx, SymbolRange symbolRange, TransformedSymbol nestedNode)
+    public static StringBuilder AppendStartFragment(this StringBuilder sb, ModContext ctx, SymbolRange symbolRange, TransformedSymbol nestedNode)
     {
         var formula = ctx.Formula;
         for (var i = symbolRange.Start; i < nestedNode.OriginalRange.Start; ++i)
@@ -77,7 +77,7 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
-    public static StringBuilder AppendMiddleFragment(this StringBuilder sb, TransformContext ctx, TransformedSymbol beforeNode, TransformedSymbol afterNode)
+    public static StringBuilder AppendMiddleFragment(this StringBuilder sb, ModContext ctx, TransformedSymbol beforeNode, TransformedSymbol afterNode)
     {
         var formula = ctx.Formula;
         for (var i = beforeNode.OriginalRange.End; i < afterNode.OriginalRange.Start; ++i)
@@ -86,7 +86,7 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
-    public static StringBuilder AppendEndFragment(this StringBuilder sb, TransformContext ctx, SymbolRange symbolRange, TransformedSymbol nestedNode)
+    public static StringBuilder AppendEndFragment(this StringBuilder sb, ModContext ctx, SymbolRange symbolRange, TransformedSymbol nestedNode)
     {
         var formula = ctx.Formula;
         for (var i = nestedNode.OriginalRange.End; i < symbolRange.End; ++i)
@@ -95,7 +95,7 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
-    public static StringBuilder AppendArguments(this StringBuilder sb, TransformContext ctx, SymbolRange range, IReadOnlyList<TransformedSymbol> arguments)
+    public static StringBuilder AppendArguments(this StringBuilder sb, ModContext ctx, SymbolRange range, IReadOnlyList<TransformedSymbol> arguments)
     {
         if (arguments.Count == 0)
         {
@@ -114,7 +114,7 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
-    private static StringBuilder AppendStartBrace(this StringBuilder sb, TransformContext ctx, SymbolRange range, TransformedSymbol firstNode)
+    private static StringBuilder AppendStartBrace(this StringBuilder sb, ModContext ctx, SymbolRange range, TransformedSymbol firstNode)
     {
         var firstNodeStart = firstNode.OriginalRange.Start;
         var braceIdx = GetStartBraceIndex(ctx, range, firstNodeStart);
@@ -124,7 +124,7 @@ internal static class StringBuilderExtensions
         return sb;
     }
 
-    private static int GetStartBraceIndex(TransformContext ctx, SymbolRange range, int nodeStart)
+    private static int GetStartBraceIndex(ModContext ctx, SymbolRange range, int nodeStart)
     {
         var formula = ctx.Formula;
         var braceIdx = nodeStart - 1;
@@ -137,7 +137,7 @@ internal static class StringBuilderExtensions
         throw new InvalidOperationException("No opening brace found.");
     }
 
-    private static StringBuilder AppendArguments(this StringBuilder sb, TransformContext ctx, IReadOnlyList<TransformedSymbol> arguments)
+    private static StringBuilder AppendArguments(this StringBuilder sb, ModContext ctx, IReadOnlyList<TransformedSymbol> arguments)
     {
         if (arguments.Count > 0)
             sb.Append(arguments[0].AsSpan());

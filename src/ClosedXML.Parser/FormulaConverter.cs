@@ -22,8 +22,8 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToR1C1(string formulaA1, int row, int col)
     {
-        var ctx = new TransformContext(formulaA1, row, col, isA1: true);
-        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaA1(formulaA1, ctx, s_visitorR1C1);
+        var ctx = new ModContext(formulaA1, row, col, isA1: true);
+        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaA1(formulaA1, ctx, s_visitorR1C1);
         return Normalize(transformedFormula, formulaA1);
     }
 
@@ -37,9 +37,23 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToA1(string formulaR1C1, int row, int col)
     {
-        var ctx = new TransformContext(formulaR1C1, row, col, isA1: false);
-        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, TransformContext>.CellFormulaR1C1(formulaR1C1, ctx, s_visitorA1);
+        var ctx = new ModContext(formulaR1C1, row, col, isA1: false);
+        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaR1C1(formulaR1C1, ctx, s_visitorA1);
         return Normalize(transformedFormula, formulaR1C1);
+    }
+
+    /// <summary>
+    /// Modify the formula using the passed <paramref name="factory"/>.
+    /// </summary>
+    /// <param name="formulaA1">Original formula in A1 style.</param>
+    /// <param name="row">Row number of formula.</param>
+    /// <param name="col">Column number of formula.</param>
+    /// <param name="factory">Visitor to transform the formula.</param>
+    public static string ModifyA1(string formulaA1, int row, int col, IAstFactory<TransformedSymbol, TransformedSymbol, ModContext> factory)
+    {
+        var ctx = new ModContext(formulaA1, row, col, isA1: true);
+        var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaA1(formulaA1, ctx, factory);
+        return Normalize(transformedFormula, formulaA1);
     }
 
     private static string Normalize(TransformedSymbol transformedFormula, string originalFormula)
@@ -52,27 +66,27 @@ public static class FormulaConverter
         return transformedFormula.ToString(trimmedEnd);
     }
 
-    private class TextVisitorR1C1 : ReferenceModificationVisitor
+    private class TextVisitorR1C1 : RefModVisitor
     {
-        protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
+        internal override ReferenceArea? ModifyRef(ModContext ctx, ReferenceArea reference)
         {
             return reference.ToR1C1(ctx.Row, ctx.Col);
         }
 
-        protected override RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
+        internal override RowCol? ModifyCellFunction(ModContext ctx, RowCol cell)
         {
             return cell.ToR1C1(ctx.Row, ctx.Col);
         }
     }
 
-    private class TextVisitorA1 : ReferenceModificationVisitor
+    private class TextVisitorA1 : RefModVisitor
     {
-        protected override ReferenceArea? ModifyRef(TransformContext ctx, ReferenceArea reference)
+        internal override ReferenceArea? ModifyRef(ModContext ctx, ReferenceArea reference)
         {
             return reference.ToA1OrError(ctx.Row, ctx.Col);
         }
 
-        protected override RowCol? ModifyCellFunction(TransformContext ctx, RowCol cell)
+        internal override RowCol? ModifyCellFunction(ModContext ctx, RowCol cell)
         {
             return cell.ToA1OrError(ctx.Row, ctx.Col);
         }
