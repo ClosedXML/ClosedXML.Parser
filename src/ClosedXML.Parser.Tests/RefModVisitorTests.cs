@@ -60,7 +60,7 @@ public class RefModVisitorTests
     
     private static void AssertChangesA1(string formula, RefModVisitor visitor, string expected)
     {
-        var ctx = new ModContext(formula, 1, 1, isA1: true);
+        var ctx = new ModContext(formula, "Sheet", 1, 1, isA1: true);
         var modifiedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaA1(formula, ctx, visitor);
         Assert.Equal(expected, modifiedFormula.ToString(string.Empty.AsSpan()));
     }

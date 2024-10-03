@@ -10,7 +10,16 @@ public class ModContext
     /// <summary>
     /// Create a context for modifying formulas. 
     /// </summary>
+    [Obsolete("Use overload with sheet parameter.")]
     public ModContext(string formula, int row, int col, bool isA1)
+        : this(formula, string.Empty, row, col, isA1)
+    {
+    }
+
+    /// <summary>
+    /// Create a context for modifying formulas. 
+    /// </summary>
+    public ModContext(string formula, string sheet, int row, int col, bool isA1)
     {
         if (string.IsNullOrWhiteSpace(formula))
             throw new ArgumentException(nameof(formula));
@@ -22,6 +31,7 @@ public class ModContext
             throw new ArgumentOutOfRangeException(nameof(row));
 
         Formula = formula;
+        Sheet = sheet;
         Row = row;
         Col = col;
         IsA1 = isA1;
@@ -31,6 +41,11 @@ public class ModContext
     /// The original formula without any modifications.
     /// </summary>
     public string Formula { get; }
+
+    /// <summary>
+    /// Name of the current sheet.
+    /// </summary>
+    public string Sheet { get; }
 
     /// <summary>
     /// Absolute row number in a sheet.
