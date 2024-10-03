@@ -62,6 +62,73 @@ public class ReferenceAreaTests
         Assert.Equal(default, area);
     }
 
+    [Theory]
+    [MemberData(nameof(ParseSheetA1TestCases))]
+    public void TryParseSheetA1_accepts_area_or_rowspan_or_colspan_with_sheet(string text, string expectedSheet, ReferenceArea expectedArea)
+    {
+        var success = ReferenceArea.TryParseSheetA1(text, out var sheet, out var area);
+        Assert.True(success);
+        Assert.Equal(expectedSheet, sheet);
+        Assert.Equal(expectedArea, area);
+    }
+
+    [Fact]
+    public void TryParseSheetA1_cant_parse_workbook_index()
+    {
+        var success = ReferenceArea.TryParseSheetA1("[1]Sheet!A1", out _, out _);
+        Assert.False(success);
+    }
+
+    [Fact]
+    public void TryParseSheetA1_cant_parse_reference_without_sheet()
+    {
+        var success = ReferenceArea.TryParseSheetA1("A1", out _, out _);
+        Assert.False(success);
+    }
+
+    [Fact]
+    public void TryParseSheetA1_requires_argument()
+    {
+        Assert.Throws<ArgumentNullException>(() => ReferenceArea.TryParseSheetA1(null!, out _, out _));
+    }
+
+    public static IEnumerable<object[]> ParseSheetA1TestCases
+    {
+        get
+        {
+            yield return new object[]
+            {
+                "Sheet!$C$2",
+                "Sheet",
+                new ReferenceArea(new RowCol(Absolute, 2, Absolute, 3, A1)),
+            };
+            yield return new object[]
+            {
+                "' ''John''s'' Shop! '!C2",
+                " 'John's' Shop! ",
+                new ReferenceArea(new RowCol(Relative, 2, Relative, 3, A1)),
+            };
+            yield return new object[]
+            {
+                "Sheet!A1:B2",
+                "Sheet",
+                new ReferenceArea(new RowCol(Relative, 1, Relative, 1, A1), new RowCol(Relative, 2, Relative, 2, A1)),
+            };
+            yield return new object[]
+            {
+                "'Some Sheet'!C:D",
+                "Some Sheet",
+                new ReferenceArea(new RowCol(None, 0, Relative, 3, A1), new RowCol(None, 0, Relative, 4, A1)),
+            };
+            yield return new object[]
+            {
+                "'!!WARN'!10:$15",
+                "!!WARN",
+                new ReferenceArea(new RowCol(Relative, 10, None, 0, A1), new RowCol(Absolute, 15, None, 0, A1)),
+            };
+        }
+    }
+
     public static IEnumerable<object[]> ParseA1TestCases
     {
         get
