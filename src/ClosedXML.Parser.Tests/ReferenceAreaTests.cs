@@ -39,6 +39,29 @@ public class ReferenceAreaTests
         Assert.Throws<ParsingException>(() => ReferenceArea.ParseA1("HELLO"));
     }
 
+    [Theory]
+    [MemberData(nameof(ParseA1TestCases))]
+    public void TryParseA1_parses_cell_area_or_rowspan_or_colspan(string text, ReferenceArea expectedReference)
+    {
+        var success = ReferenceArea.TryParseA1(text, out var area);
+        Assert.True(success);
+        Assert.Equal(expectedReference, area);
+    }
+
+    [Fact]
+    public void TryParseA1_requires_argument()
+    {
+        Assert.Throws<ArgumentNullException>(() => ReferenceArea.TryParseA1(null!, out _));
+    }
+
+    [Fact]
+    public void ParseA1_returns_false_on_non_references()
+    {
+        var success = ReferenceArea.TryParseA1("HELLO", out var area);
+        Assert.False(success);
+        Assert.Equal(default, area);
+    }
+
     public static IEnumerable<object[]> ParseA1TestCases
     {
         get
