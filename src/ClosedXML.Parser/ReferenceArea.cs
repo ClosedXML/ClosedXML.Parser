@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClosedXML.Parser.Rolex;
+using System;
 using System.Text;
 
 namespace ClosedXML.Parser;
@@ -107,6 +108,42 @@ public readonly struct ReferenceArea
             .Append(':')
             .Append(Second.GetDisplayStringR1C1())
             .ToString();
+    }
+
+    /// <summary>
+    /// Parses area reference in A1 form. The possibilities are
+    /// <list type="bullet">
+    ///   <item>Cell (e.g. <c>F8</c>).</item>
+    ///   <item>Area (e.g. <c>B2:$D7</c>).</item>
+    ///   <item>Colspan (e.g. <c>$D:$G</c>).</item>
+    ///   <item>Rowspan (e.g. <c>14:$15</c>).</item>
+    /// </list>
+    /// Doesn't allow any whitespaces or extra values inside.
+    /// </summary>
+    /// <exception cref="ParsingException">Invalid input.</exception>
+    public static ReferenceArea ParseA1(string text)
+    {
+        if (text is null)
+            throw new ArgumentNullException();
+
+        // a1_reference : A1_CELL
+        //              | A1_CELL COLON A1_CELL
+        //              | A1_SPAN_REFERENCE
+        var tokens = RolexLexer.GetTokensA1(text.AsSpan());
+        var isValid = tokens.Count switch
+        {
+            2 => tokens[0].SymbolId is Token.A1_CELL or Token.A1_SPAN_REFERENCE &&
+                 tokens[1].SymbolId == Token.EofSymbolId,
+            4 => tokens[0].SymbolId == Token.A1_CELL &&
+                 tokens[1].SymbolId == Token.COLON &&
+                 tokens[2].SymbolId == Token.A1_CELL &&
+                 tokens[3].SymbolId == Token.EofSymbolId,
+            _ => false,
+        };
+        if (!isValid)
+            throw new ParsingException($"Unable to parse '{text}'.");
+
+        return TokenParser.ParseReference(text.AsSpan(), isA1: true);
     }
 
     /// <summary>
