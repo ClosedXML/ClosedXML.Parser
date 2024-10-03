@@ -22,7 +22,7 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToR1C1(string formulaA1, int row, int col)
     {
-        var ctx = new ModContext(formulaA1, row, col, isA1: true);
+        var ctx = new ModContext(formulaA1, string.Empty, row, col, isA1: true);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaA1(formulaA1, ctx, s_visitorR1C1);
         return Normalize(transformedFormula, formulaA1);
     }
@@ -37,7 +37,7 @@ public static class FormulaConverter
     /// <exception cref="ParsingException">The formula is not parseable.</exception>
     public static string ToA1(string formulaR1C1, int row, int col)
     {
-        var ctx = new ModContext(formulaR1C1, row, col, isA1: false);
+        var ctx = new ModContext(formulaR1C1, string.Empty, row, col, isA1: false);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaR1C1(formulaR1C1, ctx, s_visitorA1);
         return Normalize(transformedFormula, formulaR1C1);
     }
@@ -49,9 +49,23 @@ public static class FormulaConverter
     /// <param name="row">Row number of formula.</param>
     /// <param name="col">Column number of formula.</param>
     /// <param name="factory">Visitor to transform the formula.</param>
+    [Obsolete("Use overload with sheet parameter.")]
     public static string ModifyA1(string formulaA1, int row, int col, IAstFactory<TransformedSymbol, TransformedSymbol, ModContext> factory)
     {
-        var ctx = new ModContext(formulaA1, row, col, isA1: true);
+        return ModifyA1(formulaA1, string.Empty, row, col, factory);
+    }
+
+    /// <summary>
+    /// Modify the formula using the passed <paramref name="factory"/>.
+    /// </summary>
+    /// <param name="formulaA1">Original formula in A1 style.</param>
+    /// <param name="sheet">Name of the sheet where is the formula.</param>
+    /// <param name="row">Row number of formula.</param>
+    /// <param name="col">Column number of formula.</param>
+    /// <param name="factory">Visitor to transform the formula.</param>
+    public static string ModifyA1(string formulaA1, string sheet, int row, int col, IAstFactory<TransformedSymbol, TransformedSymbol, ModContext> factory)
+    {
+        var ctx = new ModContext(formulaA1, sheet, row, col, isA1: true);
         var transformedFormula = FormulaParser<TransformedSymbol, TransformedSymbol, ModContext>.CellFormulaA1(formulaA1, ctx, factory);
         return Normalize(transformedFormula, formulaA1);
     }
