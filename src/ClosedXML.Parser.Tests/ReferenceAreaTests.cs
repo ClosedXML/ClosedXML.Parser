@@ -20,6 +20,57 @@ public class ReferenceAreaTests
         Assert.Equal(reference, TokenParser.ParseReference(expectedString, false));
     }
 
+    [Theory]
+    [MemberData(nameof(ParseA1TestCases))]
+    public void ParseA1_parses_cell_area_or_rowspan_or_colspan(string text, ReferenceArea expectedReference)
+    {
+        Assert.Equal(expectedReference, ReferenceArea.ParseA1(text));
+    }
+
+    [Fact]
+    public void ParseA1_requires_argument()
+    {
+        Assert.Throws<ArgumentNullException>(() => ReferenceArea.ParseA1(null!));
+    }
+
+    [Fact]
+    public void ParseA1_throws_on_non_references()
+    {
+        Assert.Throws<ParsingException>(() => ReferenceArea.ParseA1("HELLO"));
+    }
+
+    public static IEnumerable<object[]> ParseA1TestCases
+    {
+        get
+        {
+            yield return new object[]
+            {
+                "$C$2",
+                new ReferenceArea(new RowCol(Absolute, 2, Absolute, 3, A1)),
+            };
+            yield return new object[]
+            {
+                "AB123",
+                new ReferenceArea(new RowCol(Relative, 123, Relative, 28, A1)),
+            };
+            yield return new object[]
+            {
+                "$C$2:E7",
+                new ReferenceArea(new RowCol(Absolute, 2, Absolute, 3, A1), new RowCol(Relative, 7, Relative, 5, A1)),
+            };
+            yield return new object[]
+            {
+                "$C:F",
+                new ReferenceArea(new RowCol(None, 0, Absolute, 3, A1), new RowCol(None, 0, Relative, 6, A1)),
+            };
+            yield return new object[]
+            {
+                "10:$15",
+                new ReferenceArea(new RowCol(Relative, 10, None, 0, A1), new RowCol(Absolute, 15, None, 0, A1)),
+            };
+        }
+    }
+
     public static IEnumerable<object[]> DisplayStringA1
     {
         get
