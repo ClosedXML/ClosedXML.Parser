@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Parser.Rolex;
 using System;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace ClosedXML.Parser;
 
@@ -120,8 +121,11 @@ public readonly struct ReferenceArea
     /// </list>
     /// Doesn't allow any whitespaces or extra values inside.
     /// </summary>
-    /// <exception cref="ParsingException">Invalid input.</exception>
-    public static ReferenceArea ParseA1(string text)
+    /// <param name="text">Text to parse.</param>
+    /// <param name="area">Parsed area.</param>
+    /// <returns><c>true</c> if parsing was a success, <c>false</c> otherwise.</returns>
+    [PublicAPI]
+    public static bool TryParseA1(string text, out ReferenceArea area)
     {
         if (text is null)
             throw new ArgumentNullException();
@@ -141,9 +145,33 @@ public readonly struct ReferenceArea
             _ => false,
         };
         if (!isValid)
+        {
+            area = default;
+            return false;
+        }
+
+        area = TokenParser.ParseReference(text.AsSpan(), isA1: true);
+        return true;
+    }
+
+    /// <summary>
+    /// Parses area reference in A1 form. The possibilities are
+    /// <list type="bullet">
+    ///   <item>Cell (e.g. <c>F8</c>).</item>
+    ///   <item>Area (e.g. <c>B2:$D7</c>).</item>
+    ///   <item>Colspan (e.g. <c>$D:$G</c>).</item>
+    ///   <item>Rowspan (e.g. <c>14:$15</c>).</item>
+    /// </list>
+    /// Doesn't allow any whitespaces or extra values inside.
+    /// </summary>
+    /// <exception cref="ParsingException">Invalid input.</exception>
+    [PublicAPI]
+    public static ReferenceArea ParseA1(string text)
+    {
+        if (!TryParseA1(text, out var area))
             throw new ParsingException($"Unable to parse '{text}'.");
 
-        return TokenParser.ParseReference(text.AsSpan(), isA1: true);
+        return area;
     }
 
     /// <summary>
