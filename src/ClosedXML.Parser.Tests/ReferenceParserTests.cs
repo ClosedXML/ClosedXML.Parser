@@ -76,6 +76,35 @@ public class ReferenceParserTests
         Assert.Throws<ArgumentNullException>(() => ReferenceParser.TryParseSheetA1(null!, out _, out _));
     }
 
+    [Theory]
+    [InlineData("Sheet!Name", "Sheet", "Name")]
+    [InlineData("'Hello World'!Name", "Hello World", "Name")]
+    [InlineData("' John''s World! '!Name", " John's World! ", "Name")]
+    public void TryParseSheetName_parses_sheet_and_name(string text, string expectedSheet, string expectedName)
+    {
+        var success = ReferenceParser.TryParseSheetName(text, out var sheet, out var name);
+
+        Assert.True(success);
+        Assert.Equal(expectedSheet, sheet);
+        Assert.Equal(expectedName, name);
+    }
+
+    [Fact]
+    public void TryParseSheetName_requires_text()
+    {
+        Assert.Throws<ArgumentNullException>(() => ReferenceParser.TryParseSheetName(null!, out _, out _));
+    }
+
+    [Theory]
+    [InlineData("Name")]
+    [InlineData("some_name")]
+    [InlineData("A1")]
+    public void TryParseSheetName_cant_parse_pure_name(string text)
+    {
+        var success = ReferenceParser.TryParseSheetName(text, out _, out _);
+        Assert.False(success);
+    }
+
     public static IEnumerable<object[]> ParseSheetA1TestCases
     {
         get
