@@ -119,6 +119,50 @@ public static class ReferenceParser
         return true;
     }
 
+    /// <summary>
+    /// Try to parse a text as a sheet name (e.g. <c>Sheet!Name</c>). Doesn't accept pure name
+    /// without sheet (e.g. <c>name</c>).
+    /// </summary>
+    /// <param name="text">Text to parse.</param>
+    /// <param name="sheetName">Parsed sheet name, unescaped.</param>
+    /// <param name="name">Parsed defined name.</param>
+    /// <returns><c>true</c> if parsing was a success, <c>false</c> otherwise.</returns>
+    [PublicAPI]
+    public static bool TryParseSheetName(string text, out string sheetName, out string name)
+    {
+        if (text is null)
+            throw new ArgumentNullException(nameof(text));
+
+        var tokens = RolexLexer.GetTokensA1(text.AsSpan());
+        var isValid = tokens.Count switch
+        {
+            3 => tokens[0].SymbolId == Token.SINGLE_SHEET_PREFIX &&
+                 tokens[1].SymbolId == Token.NAME &&
+                 tokens[2].SymbolId == Token.EofSymbolId,
+            _ => false,
+        };
+        if (!isValid)
+        {
+            sheetName = string.Empty;
+            name = string.Empty;
+            return false;
+        }
+
+        var sheetPrefixToken = tokens[0];
+        var sheetPrefix = text.AsSpan(sheetPrefixToken.StartIndex, sheetPrefixToken.Length);
+        TokenParser.ParseSingleSheetPrefix(sheetPrefix, out int? workbookIndex, out sheetName);
+        if (workbookIndex is not null)
+        {
+            sheetName = string.Empty;
+            name = string.Empty;
+            return false;
+        }
+
+        var nameToken = tokens[1];
+        name = text.AsSpan().Slice(nameToken.StartIndex, nameToken.Length).ToString();
+        return true;
+    }
+
     private static bool IsA1Reference(IReadOnlyList<Token> tokens)
     {
         var isValid = tokens.Count switch
