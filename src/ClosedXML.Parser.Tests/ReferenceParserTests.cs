@@ -106,6 +106,47 @@ public class ReferenceParserTests
     }
 
     [Theory]
+    [InlineData("Sheet!Name", "Sheet", "Name")]
+    [InlineData("'Hello World'!Data", "Hello World", "Data")]
+    [InlineData("' John''s World! '!Quarter1", " John's World! ", "Quarter1")]
+    public void TryParseName_parses_sheet_and_name(string text, string expectedSheet, string expectedName)
+    {
+        var success = ReferenceParser.TryParseName(text, out var sheet, out var name);
+        Assert.True(success);
+        Assert.Equal(expectedSheet, sheet);
+        Assert.Equal(expectedName, name);
+    }
+
+    [Fact]
+    public void TryParseName_requires_text()
+    {
+        Assert.Throws<ArgumentNullException>(() => ReferenceParser.TryParseName(null!, out _, out _));
+    }
+
+    [Theory]
+    [InlineData("Name")]
+    [InlineData("some_name")]
+    public void TryParseName_parses_name(string text)
+    {
+        var success = ReferenceParser.TryParseName(text, out var sheet, out var name);
+        Assert.True(success);
+        Assert.Null(sheet);
+        Assert.Equal(text, name);
+    }
+
+    [Theory]
+    [InlineData("A1")]
+    [InlineData("$BC$1")]
+    [InlineData("Sheet!A1")]
+    [InlineData("14")]
+    [InlineData("\"Text\"")]
+    public void TryParseName_cant_parse_anything_but_name(string text)
+    {
+        var success = ReferenceParser.TryParseName(text, out _, out _);
+        Assert.False(success);
+    }
+
+    [Theory]
     [MemberData(nameof(ParseA1TestCases))]
     public void TryParseA1_unified_can_parse_local_reference(string text, ReferenceArea expectedReference)
     {
