@@ -11,6 +11,38 @@ namespace ClosedXML.Parser;
 public static class ReferenceParser
 {
     /// <summary>
+    /// <para>
+    /// Try to parse <paramref name="text"/> as a sheet reference (<c>Sheet!A5</c>) or a local
+    /// reference (<c>A1</c>). If the <paramref name="text"/> is a local reference, the output
+    /// value of the <paramref name="sheetName"/> is <c>null</c>.
+    /// </para>
+    /// <para>
+    /// Unlike the <see cref="TryParseA1(string,out ReferenceArea)"/> or <see cref="TryParseSheetA1"/>,
+    /// this method can parse both sheet reference or local reference.
+    /// </para>
+    /// </summary>
+    /// <param name="text">Text to parse.</param>
+    /// <param name="sheetName">The unescaped name of a sheet for sheet reference, <c>null</c> for local reference.</param>
+    /// <param name="area">The parsed reference area.</param>
+    /// <returns><c>true</c> if parsing was a success, <c>false</c> otherwise.</returns>
+    [PublicAPI]
+    public static bool TryParseA1(string text, out string? sheetName, out ReferenceArea area)
+    {
+        if (text is null)
+            throw new ArgumentNullException();
+
+        sheetName = null;
+        var tokens = RolexLexer.GetTokensA1(text.AsSpan());
+        if (TryParseA1(tokens, text, out area))
+            return true;
+
+        if (TryParseSheetA1(tokens, text, out sheetName, out area))
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
     /// Parses area reference in A1 form. The possibilities are
     /// <list type="bullet">
     ///   <item>Cell (e.g. <c>F8</c>).</item>
@@ -29,19 +61,8 @@ public static class ReferenceParser
         if (text is null)
             throw new ArgumentNullException();
 
-        // a1_reference : A1_CELL
-        //              | A1_CELL COLON A1_CELL
-        //              | A1_SPAN_REFERENCE
         var tokens = RolexLexer.GetTokensA1(text.AsSpan());
-        var isValid = IsA1Reference(tokens);
-        if (!isValid)
-        {
-            area = default;
-            return false;
-        }
-
-        area = TokenParser.ParseReference(text.AsSpan(), isA1: true);
-        return true;
+        return TryParseA1(tokens, text, out area);
     }
 
     /// <summary>
@@ -88,35 +109,7 @@ public static class ReferenceParser
             throw new ArgumentNullException(nameof(text));
 
         var tokens = RolexLexer.GetTokensA1(text.AsSpan());
-        if (tokens.Count == 0 ||
-            tokens[0].SymbolId != Token.SINGLE_SHEET_PREFIX)
-        {
-            sheetName = string.Empty;
-            area = default;
-            return false;
-        }
-
-        var sheetPrefixToken = tokens[0];
-        var sheetPrefix = text.AsSpan(sheetPrefixToken.StartIndex, sheetPrefixToken.Length);
-        TokenParser.ParseSingleSheetPrefix(sheetPrefix, out int? workbookIndex, out sheetName);
-        if (workbookIndex is not null)
-        {
-            sheetName = string.Empty;
-            area = default;
-            return false;
-        }
-
-        tokens.RemoveAt(0);
-        if (!IsA1Reference(tokens))
-        {
-            sheetName = string.Empty;
-            area = default;
-            return false;
-        }
-
-        var referenceArea = text.AsSpan().Slice(sheetPrefixToken.Length);
-        area = TokenParser.ParseReference(referenceArea, isA1: true);
-        return true;
+        return TryParseSheetA1(tokens, text, out sheetName, out area);
     }
 
     /// <summary>
@@ -163,8 +156,57 @@ public static class ReferenceParser
         return true;
     }
 
+    private static bool TryParseA1(List<Token> tokens, string text, out ReferenceArea area)
+    {
+        var isValid = IsA1Reference(tokens);
+        if (!isValid)
+        {
+            area = default;
+            return false;
+        }
+
+        area = TokenParser.ParseReference(text.AsSpan(), isA1: true);
+        return true;
+    }
+
+    private static bool TryParseSheetA1(List<Token> tokens, string text, out string sheetName, out ReferenceArea area)
+    {
+        if (tokens.Count == 0 ||
+            tokens[0].SymbolId != Token.SINGLE_SHEET_PREFIX)
+        {
+            sheetName = string.Empty;
+            area = default;
+            return false;
+        }
+
+        var sheetPrefixToken = tokens[0];
+        var sheetPrefix = text.AsSpan(sheetPrefixToken.StartIndex, sheetPrefixToken.Length);
+        TokenParser.ParseSingleSheetPrefix(sheetPrefix, out int? workbookIndex, out sheetName);
+        if (workbookIndex is not null)
+        {
+            sheetName = string.Empty;
+            area = default;
+            return false;
+        }
+
+        tokens.RemoveAt(0);
+        if (!IsA1Reference(tokens))
+        {
+            sheetName = string.Empty;
+            area = default;
+            return false;
+        }
+
+        var referenceArea = text.AsSpan().Slice(sheetPrefixToken.Length);
+        area = TokenParser.ParseReference(referenceArea, isA1: true);
+        return true;
+    }
+
     private static bool IsA1Reference(IReadOnlyList<Token> tokens)
     {
+        // a1_reference : A1_CELL
+        //              | A1_CELL COLON A1_CELL
+        //              | A1_SPAN_REFERENCE
         var isValid = tokens.Count switch
         {
             2 => tokens[0].SymbolId is Token.A1_CELL or Token.A1_SPAN_REFERENCE &&

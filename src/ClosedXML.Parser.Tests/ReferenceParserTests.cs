@@ -105,6 +105,42 @@ public class ReferenceParserTests
         Assert.False(success);
     }
 
+    [Theory]
+    [MemberData(nameof(ParseA1TestCases))]
+    public void TryParseA1_unified_can_parse_local_reference(string text, ReferenceArea expectedReference)
+    {
+        var success = ReferenceParser.TryParseA1(text, out var sheet, out var reference);
+        Assert.True(success);
+        Assert.Null(sheet);
+        Assert.Equal(expectedReference, reference);
+    }
+
+    [Theory]
+    [MemberData(nameof(ParseSheetA1TestCases))]
+    public void TryParseA1_unified_can_parse_sheet_reference(string text, string expectedSheet, ReferenceArea expectedReference)
+    {
+        var success = ReferenceParser.TryParseA1(text, out var sheet, out var reference);
+        Assert.True(success);
+        Assert.Equal(expectedSheet, sheet);
+        Assert.Equal(expectedReference, reference);
+    }
+
+    [Theory]
+    [InlineData("Sheet!Name")]
+    [InlineData("Name")]
+    [InlineData("1")]
+    public void TryParseA1_unified_cant_parse_anything_but_reference(string text)
+    {
+        var success = ReferenceParser.TryParseA1(text, out _, out _);
+        Assert.False(success);
+    }
+
+    [Fact]
+    public void TryParseA1_unified_requires_argument()
+    {
+        Assert.Throws<ArgumentNullException>(() => ReferenceParser.TryParseA1(null!, out _, out _));
+    }
+
     public static IEnumerable<object[]> ParseSheetA1TestCases
     {
         get
