@@ -104,14 +104,7 @@ public readonly struct ReferenceArea
     /// </summary>
     public string GetDisplayStringR1C1()
     {
-        if (First == Second)
-            return First.GetDisplayStringR1C1();
-
-        return new StringBuilder()
-            .Append(First.GetDisplayStringR1C1())
-            .Append(':')
-            .Append(Second.GetDisplayStringR1C1())
-            .ToString();
+        return AppendR1C1(new StringBuilder()).ToString();
     }
 
     /// <summary>
