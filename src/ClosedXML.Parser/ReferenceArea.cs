@@ -32,6 +32,16 @@ public readonly struct ReferenceArea
     public ReferenceStyle Style => First.Style;
 
     /// <summary>
+    /// Is area a row span (e.g. <c>$5:7</c> in A1 or <c>R[7]</c>, <c>R7:R[9]</c>)?
+    /// </summary>
+    internal bool IsRowSpan => First.IsRow && Second.IsRow;
+
+    /// <summary>
+    /// Is area a col span (e.g. <c>$C:Z</c> in A1 or <c>C[7]</c>, <c>C7:C[9]</c>)?
+    /// </summary>
+    internal bool IsColSpan => First.IsColumn && Second.IsColumn;
+
+    /// <summary>
     /// Create a reference symbol using the two <see cref="RowCol"/> (e.g.
     /// <c>A1:B2</c>) or two columns (e.g. <c>A:D</c>) or two rows (e.g.
     /// <c>7:8</c>).
@@ -85,14 +95,9 @@ public readonly struct ReferenceArea
     /// </summary>
     public string GetDisplayStringA1()
     {
-        if (First == Second && !First.IsColumn && !First.IsRow)
-            return First.GetDisplayStringA1();
-
-        return new StringBuilder()
-            .Append(First.GetDisplayStringA1())
-            .Append(':')
-            .Append(Second.GetDisplayStringA1())
-            .ToString();
+        var sb = new StringBuilder();
+        AppendA1(sb);
+        return sb.ToString();
     }
 
     /// <summary>
@@ -156,14 +161,13 @@ public readonly struct ReferenceArea
     /// <remarks>Assumes reference is in A1.</remarks>
     internal StringBuilder AppendA1(StringBuilder sb)
     {
+        // In A1, column and row span must have both parts specified.
+        if (First == Second && !IsColSpan && !IsRowSpan)
+            return First.AppendA1(sb);
+
         First.AppendA1(sb);
-
-        if (First != Second)
-        {
-            sb.Append(':');
-            Second.AppendA1(sb);
-        }
-
+        sb.Append(':');
+        Second.AppendA1(sb);
         return sb;
     }
 

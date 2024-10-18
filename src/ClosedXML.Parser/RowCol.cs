@@ -296,7 +296,7 @@ public readonly struct RowCol : IEquatable<RowCol>
     /// <inheritdoc cref="GetDisplayStringA1()"/>
     /// <param name="sb">String buffer where to write the output.</param>
     /// <exception cref="InvalidOperationException">When <c>RowCol</c> is not in <em>A1</em> notation.</exception>
-    internal void AppendA1(StringBuilder sb)
+    internal StringBuilder AppendA1(StringBuilder sb)
     {
         if (!IsA1)
             throw new InvalidOperationException("RowCol doesn't use A1 semantic.");
@@ -334,6 +334,8 @@ public readonly struct RowCol : IEquatable<RowCol>
             default:
                 throw new NotSupportedException();
         }
+
+        return sb;
     }
 
     /// <inheritdoc cref="GetDisplayStringR1C1()"/>
