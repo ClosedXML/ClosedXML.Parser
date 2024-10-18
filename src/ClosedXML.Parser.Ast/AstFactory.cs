@@ -64,6 +64,11 @@ public class F : IAstFactory<ScalarValue, AstNode, Ctx>
         return new SheetReferenceNode(sheet, reference);
     }
 
+    public AstNode BangReference(Ctx _, SymbolRange range, ReferenceArea reference)
+    {
+        return new BangReferenceNode(reference);
+    }
+
     public AstNode Reference3D(Ctx _, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         return new Reference3DNode(firstSheet, lastSheet, reference);

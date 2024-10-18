@@ -10,6 +10,7 @@ public class AntlrCompatibilityTests
     [Theory]
     [InlineData("./data/enron/formulas.csv")]
     [InlineData("./data/euses/formulas.csv")]
+    [InlineData("./data/contributions/formulas.csv")]
     public void Produce_same_tokens_for_data_sets(string dataSetFile)
     {
         foreach (var formula in DataSets.ReadCsv(dataSetFile))

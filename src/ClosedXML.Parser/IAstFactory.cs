@@ -123,6 +123,18 @@ public interface IAstFactory<TScalarValue, TNode, in TContext>
     TNode SheetReference(TContext context, SymbolRange range, string sheet, ReferenceArea reference);
 
     /// <summary>
+    /// Create a node that processes a bang reference in a formula (e.g <c>"Branch:" &amp; !$C$5</c>). Bang reference should
+    /// <list>
+    ///   <item>Be used only in defined names.</item>
+    ///   <item>Always be absolute (name doesn't have an anchor).</item>
+    /// </list>
+    /// </summary>
+    /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>
+    /// <param name="range">Range in a formula that contains the bang reference.</param>
+    /// <param name="reference">Area in the sheet.</param>
+    TNode BangReference(TContext context, SymbolRange range, ReferenceArea reference);
+
+    /// <summary>
     /// Create a node for a 3D reference.
     /// </summary>
     /// <param name="context">User supplied context for parsing a tree that is an argument of a parsing method.</param>

@@ -1,8 +1,5 @@
-﻿using ClosedXML.Parser.Rolex;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Text;
-using JetBrains.Annotations;
 
 namespace ClosedXML.Parser;
 
@@ -11,7 +8,7 @@ namespace ClosedXML.Parser;
 /// an area in a sheet. This is the DTO from parser to engine. Two corners make an area
 /// for A1 notation, but not for R1C1 (has several edge cases).
 /// </summary>
-public readonly struct ReferenceArea
+public readonly record struct ReferenceArea
 {
     /// <summary>
     /// First reference. First in terms of position in formula, not position

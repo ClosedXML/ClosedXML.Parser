@@ -73,6 +73,16 @@ public class AstFactoryTests
     }
 
     [Theory]
+    [InlineData("name + !$A$1:$B4 ", 7, 16)]
+    [InlineData("1+!$Z$26", 2, 8)]
+    public void BangReferenceRange(string formula, int start, int end)
+    {
+        var result = new Result();
+        FormulaParser<object?, string, Result>.CellFormulaA1(formula, result, new BangReferenceVisitor());
+        Assert.Equal(new SymbolRange(start, end), result.Value);
+    }
+
+    [Theory]
     [InlineData("Jan:Feb!A1", 0, 10)]
     [InlineData("1+Zara:Beta!$A$1:$B4+4", 2, 20)]
     [InlineData("1+'2022 Q1:2024 Q1'!Z26", 2, 23)]
@@ -292,6 +302,15 @@ public class AstFactoryTests
     private class SheetReferenceVisitor : BaseVisitor
     {
         public override string SheetReference(Result context, SymbolRange range, string sheet, ReferenceArea reference)
+        {
+            context.Value = range;
+            return string.Empty;
+        }
+    }
+
+    private class BangReferenceVisitor : BaseVisitor
+    {
+        public override string BangReference(Result context, SymbolRange range, ReferenceArea reference)
         {
             context.Value = range;
             return string.Empty;
@@ -552,6 +571,11 @@ public class AstFactoryTests
         }
 
         public virtual TNode SheetReference(TContext context, SymbolRange range, string sheet, ReferenceArea reference)
+        {
+            return _defaultNode;
+        }
+
+        public virtual TNode BangReference(TContext context, SymbolRange range, ReferenceArea reference)
         {
             return _defaultNode;
         }

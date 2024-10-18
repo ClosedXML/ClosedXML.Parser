@@ -11,6 +11,7 @@ namespace ClosedXML.Parser;
 public class RefModVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, ModContext>
 {
     private const string REF_ERROR = "#REF!";
+    private const string BANG_REF_ERROR = "!#REF!";
     private static readonly CopyVisitor s_copyVisitor = new();
 
     /// <inheritdoc />
@@ -114,6 +115,16 @@ public class RefModVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, M
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
         return s_copyVisitor.SheetReference(ctx, range, modifiedSheet, modifiedReference.Value);
+    }
+
+    /// <inheritdoc />
+    public TransformedSymbol BangReference(ModContext ctx, SymbolRange range, ReferenceArea reference)
+    {
+        var modifiedReference = ModifyRef(ctx, reference);
+        if (modifiedReference is null)
+            return TransformedSymbol.ToText(ctx.Formula, range, BANG_REF_ERROR);
+
+        return s_copyVisitor.BangReference(ctx, range, modifiedReference.Value);
     }
 
     /// <inheritdoc />
