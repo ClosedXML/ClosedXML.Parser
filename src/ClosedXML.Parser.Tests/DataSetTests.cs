@@ -36,6 +36,12 @@ public class DataSetTests
             });
     }
 
+    [Fact]
+    public void Contributions_data_set_is_parseable()
+    {
+        Assert_formulas_parsed_or_not_as_expected("./data/contributions/formulas.csv", Array.Empty<string>());
+    }
+
     private void Assert_formulas_parsed_or_not_as_expected(string input, string[] badFormulaPaths)
     {
         var badFormulas = new HashSet<string>();

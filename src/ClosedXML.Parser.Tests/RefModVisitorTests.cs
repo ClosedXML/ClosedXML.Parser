@@ -2,6 +2,8 @@
 
 public class RefModVisitorTests
 {
+    #region ModifySheet
+
     [Theory]
     [InlineData("Old!B7:$D$10", "Old", "New", "New!B7:$D$10")]
     [InlineData("Old!B7:$D$10", "Old", "New sheet", "'New sheet'!B7:$D$10")]
@@ -48,7 +50,7 @@ public class RefModVisitorTests
         var factory = new FormulaVisitor { SheetMap = { { oldSheetName, newSheetName } } };
         AssertChangesA1(formula, factory, modifiedFormula);
     }
-    
+
     [Theory]
     [InlineData("Sheet!Name", "Sheet", null, "#REF!")]
     [InlineData("Sheet!Name", "Sheet", "New Sheet", "'New Sheet'!Name")]
@@ -57,7 +59,18 @@ public class RefModVisitorTests
         var factory = new FormulaVisitor { SheetMap = { { oldSheetName, newSheetName } } };
         AssertChangesA1(formula, factory, modifiedFormula);
     }
-    
+
+    #endregion
+
+    [Theory]
+    [InlineData("5 + !$B1", "$B1", "$7:$9", "5 + !$7:$9")]
+    [InlineData("5 + !$B1", "$B1", null, "5 + !#REF!")]
+    public void Bang_references_is_modified(string formula, string reference, string? replacement, string modifiedFormula)
+    {
+        var factory = new ShiftReferenceVisitor { ReferenceMap = { { reference, replacement } } };
+        AssertChangesA1(formula, factory, modifiedFormula);
+    }
+
     private static void AssertChangesA1(string formula, RefModVisitor visitor, string expected)
     {
         var ctx = new ModContext(formula, "Sheet", 1, 1, isA1: true);
@@ -71,10 +84,20 @@ public class RefModVisitorTests
 
         protected override string? ModifySheet(ModContext ctx, string sheetName)
         {
-            if (SheetMap.TryGetValue(sheetName, out var replacement))
-                return replacement;
+            return SheetMap.GetValueOrDefault(sheetName, sheetName);
+        }
+    }
 
-            return sheetName;
+    private class ShiftReferenceVisitor : RefModVisitor
+    {
+        public Dictionary<string, string?> ReferenceMap { get; } = new();
+
+        internal override ReferenceArea? ModifyRef(ModContext ctx, ReferenceArea reference)
+        {
+            if (ReferenceMap.TryGetValue(reference.GetDisplayStringA1(), out var replacement))
+                return replacement is not null ? ReferenceParser.ParseA1(replacement) : null;
+
+            return reference;
         }
     }
 }

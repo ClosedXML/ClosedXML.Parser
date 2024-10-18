@@ -119,6 +119,16 @@ public class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, Mod
     }
 
     /// <inheritdoc />
+    public virtual TransformedSymbol BangReference(ModContext ctx, SymbolRange range, ReferenceArea reference)
+    {
+        var sb = new StringBuilder(SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);
+        var nodeText = sb
+            .AppendReferenceSeparator()
+            .AppendRef(reference)
+            .ToString();
+        return TransformedSymbol.ToText(ctx.Formula, range, nodeText);
+    }
+
     public virtual TransformedSymbol Reference3D(ModContext ctx, SymbolRange range, string firstSheet, string lastSheet, ReferenceArea reference)
     {
         var sb = new StringBuilder(firstSheet.Length + QUOTE_RESERVE + lastSheet.Length + QUOTE_RESERVE + SHEET_SEPARATOR_LEN + MAX_R1_C1_LEN);

@@ -17,7 +17,7 @@
     <PackageProjectUrl>https://github.com/ClosedXML/ClosedXML.Parser</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ClosedXML/ClosedXML.Parser</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageVersion>1.3.0</PackageVersion>
+    <PackageVersion>2.0.0-preview1</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

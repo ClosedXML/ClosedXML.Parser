@@ -1,0 +1,1 @@
+"OFFSET('Smelter Look-up'!$B$4,MATCH(!$B1,'Smelter Look-up'!$A:$A,0)-4,0,COUNTIF('Smelter Look-up'!$A:$A,!$B1),1)"

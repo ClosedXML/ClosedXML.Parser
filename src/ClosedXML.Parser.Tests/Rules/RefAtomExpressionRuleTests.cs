@@ -62,6 +62,18 @@ public class RefAtomExpressionRuleTests
     }
 
     [Fact]
+    public void Bang_reference()
+    {
+        VerifyNode("!$A7:$D$9", new BangReferenceNode(ReferenceParser.ParseA1("$A7:$D$9")));
+    }
+
+    [Fact]
+    public void Bang_reference_error()
+    {
+        VerifyNode("!#REF!", new ValueNode("Error", "#REF!"));
+    }
+
+    [Fact]
     public void Sheet_reference_can_have_whitespace_after_exclamation_mark()
     {
         VerifyNode("Sheet2!  A1", new SheetReferenceNode("Sheet2", new ReferenceArea(1, 1, A1)));

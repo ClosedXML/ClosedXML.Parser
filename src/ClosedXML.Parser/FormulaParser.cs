@@ -19,6 +19,7 @@ namespace ClosedXML.Parser;
 [PublicAPI]
 public class FormulaParser<TScalarValue, TNode, TContext>
 {
+    private const string REF_ERROR = "#REF!";
     private readonly string _input;
     private readonly List<Token> _tokens;
     private readonly IAstFactory<TScalarValue, TNode, TContext> _factory;
@@ -555,8 +556,24 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     return reference;
                 }
 
-            // external_cell_reference
-            // case FormulaLexer.BANG_REFERENCE: Formula shouldn't contain BANG_REFERENCE, see grammar
+            // cell_reference:
+            //     BANG_REFERENCE
+            case Token.BANG_REFERENCE:
+                {
+                    // Slice away '!' from the bang reference so it can be parsed.
+                    var referenceToken = GetCurrentToken().Slice(1);
+                    var start = _tokenSource.StartIndex;
+                    if (referenceToken.Equals(REF_ERROR.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        Consume();
+                        return _factory.ErrorNode(_context, new SymbolRange(start, _tokenSource.StartIndex), REF_ERROR.AsSpan());
+                    }
+
+                    var reference = TokenParser.ParseReference(referenceToken, _a1Mode);
+                    Consume();
+                    return _factory.BangReference(_context, new SymbolRange(start, _tokenSource.StartIndex), reference);
+                }
+        
             // external_cell_reference: SHEET_RANGE_PREFIX (A1_CELL | A1_CELL COLON A1_CELL | A1_SPAN_REFERENCE)
             case Token.SHEET_RANGE_PREFIX:
                 {
