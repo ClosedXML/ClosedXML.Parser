@@ -153,18 +153,18 @@ public class RefModVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, M
     /// <inheritdoc />
     public TransformedSymbol Function(ModContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        return s_copyVisitor.Function(ctx, range, functionName, arguments);
+        var modifiedFunction = ModifyFunction(ctx, functionName);
+        return s_copyVisitor.Function(ctx, range, modifiedFunction, arguments);
     }
 
     /// <inheritdoc />
     public TransformedSymbol Function(ModContext ctx, SymbolRange range, string sheetName, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
     {
-        var modifiedFunction = ModifyFunction(ctx, functionName);
         var modifiedSheet = ModifySheet(ctx, sheetName);
         if (modifiedSheet is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
 
-        return s_copyVisitor.Function(ctx, range, modifiedSheet, modifiedFunction, arguments);
+        return s_copyVisitor.Function(ctx, range, modifiedSheet, functionName, arguments);
     }
 
     /// <inheritdoc />
@@ -280,7 +280,7 @@ public class RefModVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, M
     }
 
     /// <summary>
-    /// An extension to modify name of a function.
+    /// An extension to modify name of a function. Doesn't modify the sheet/external functions.
     /// </summary>
     /// <param name="ctx">The transformation context.</param>
     /// <param name="functionName">Original name of function.</param>

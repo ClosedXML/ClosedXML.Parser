@@ -7,6 +7,8 @@ namespace ClosedXML.Parser;
 
 /// <summary>
 /// A visitor that generates the identical formula for the parsed formula based on passed arguments.
+/// CopyVisitor doesn't make any judgements if passed arguments have been modified. It just makes
+/// a newly allocated copy based on passed values.
 /// </summary>
 public class CopyVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, ModContext>
 {
