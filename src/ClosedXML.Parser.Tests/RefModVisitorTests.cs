@@ -71,6 +71,13 @@ public class RefModVisitorTests
         AssertChangesA1(formula, factory, modifiedFormula);
     }
 
+    [Fact]
+    public void Log10_is_not_interpreted_as_cell_function()
+    {
+        var factory = new ShiftReferenceVisitor { ReferenceMap = { { "LOG10", "A1"} } };
+        AssertChangesA1("LOG10(LOG10)", factory, "LOG10(A1)");
+    }
+
     private static void AssertChangesA1(string formula, RefModVisitor visitor, string expected)
     {
         var ctx = new ModContext(formula, "Sheet", 1, 1, isA1: true);
@@ -98,6 +105,14 @@ public class RefModVisitorTests
                 return replacement is not null ? ReferenceParser.ParseA1(replacement) : null;
 
             return reference;
+        }
+
+        internal override RowCol? ModifyCellFunction(ModContext ctx, RowCol cell)
+        {
+            if (ReferenceMap.TryGetValue(cell.GetDisplayStringA1(), out var replacement))
+                return replacement is not null ? ReferenceParser.ParseA1(replacement).First : null;
+
+            return cell;
         }
     }
 }

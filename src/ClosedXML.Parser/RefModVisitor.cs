@@ -193,6 +193,15 @@ public class RefModVisitor : IAstFactory<TransformedSymbol, TransformedSymbol, M
     /// <inheritdoc />
     public TransformedSymbol CellFunction(ModContext ctx, SymbolRange range, RowCol cell, IReadOnlyList<TransformedSymbol> arguments)
     {
+        // Parser doesn't detect LOG10 as a function (there is no list of functions),
+        // but as a cell function. Make sure not to transform it.
+        var functionName = ctx.Formula.AsSpan(range.Start, ctx.Formula.IndexOf('(', range.Start) - range.Start);
+        if (functionName.Equals("LOG10".AsSpan(), StringComparison.OrdinalIgnoreCase))
+        {
+            var modifiedName = ModifyFunction(ctx, functionName);
+            return s_copyVisitor.Function(ctx, range, modifiedName, arguments);
+        }
+
         var modifiedCell = ModifyCellFunction(ctx, cell);
         if (modifiedCell is null)
             return TransformedSymbol.ToText(ctx.Formula, range, REF_ERROR);
