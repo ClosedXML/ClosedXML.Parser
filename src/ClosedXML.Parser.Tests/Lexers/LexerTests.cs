@@ -316,8 +316,8 @@ public class LexerTests
     {
         var lexer = new Lexer(input);
         var token = lexer.Consume();
-        Assert.Equal(token.Type, type);
-        Assert.Equal(token.Text, input);
+        Assert.Equal(type, token.Type);
+        Assert.Equal(input, token.GetText(input).ToString());
     }
 
     private static void AssertFail(string input, string exceptionSubstring)

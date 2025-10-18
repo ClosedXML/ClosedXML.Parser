@@ -64,7 +64,7 @@ internal class Lexer
             Advance();
 
         if (IsEof)
-            return new Token(TokenType.Eof, string.Empty);
+            return new Token(TokenType.Eof, 0, 0);
 
         _start = _i;
 
@@ -412,7 +412,7 @@ internal class Lexer
 
     private Token T(TokenType type)
     {
-        return new Token(type, _input.Substring(_start, _i - _start));
+        return new Token(type, _start, _i);
     }
 
     private int Advance()
