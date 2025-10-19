@@ -104,34 +104,124 @@ internal enum TokenType
     Bang,
 
     // Operators
+    /// <summary>
+    /// <c>,</c> - argument separator in function call, range union operator, or separator of
+    /// values in a row for an array literal.
+    /// </summary>
     Comma,
+
+    /// <summary>
+    /// <c>;</c> - separator of rows in array literal.
+    /// </summary>
     Semicolon,
+
+    /// <summary>
+    /// <c>^</c> - power operator.
+    /// </summary>
     Pow,
+
+    /// <summary>
+    /// <c>*</c> - multiplication operator.
+    /// </summary>
     Mul,
+
+    /// <summary>
+    /// <c>/</c> - division operator.
+    /// </summary>
     Div,
+
+    /// <summary>
+    /// <c>-</c> - prefix or binary plus operator.
+    /// </summary>
     Plus,
+
+    /// <summary>
+    /// <c>-</c> - prefix or binary minus operator.
+    /// </summary>
     Minus,
+
+    /// <summary>
+    /// <c>&amp;</c> - text concatenation operator.
+    /// </summary>
     Concat,
+
+    /// <summary>
+    /// <c>=</c> equal comparison operator.
+    /// </summary>
     Equal,
+
+    /// <summary>
+    /// <c>&lt;&gt;</c> not equals comparison operator.
+    /// </summary>
     NotEqual,
+
+    /// <summary>
+    /// <c>&lt;</c> less than comparison operator.
+    /// </summary>
     Less,
+
+    /// <summary>
+    /// <c>&lt;=</c> less than or equal comparison operator.
+    /// </summary>
     LessEqual,
+
+    /// <summary>
+    /// <c>&gt;</c> greater than comparison operator.
+    /// </summary>
     Greater,
+
+    /// <summary>
+    /// <c>&gt;=</c> greater than or equal comparison operator.
+    /// </summary>
     GreaterEqual,
+
+    /// <summary>
+    /// <c>%</c> postfix operator.
+    /// </summary>
     Percent,
 
-    // Reference operators
+    /// <summary>
+    /// <c>:</c> - range of two references.
+    /// </summary>
     Range,
+
+    /// <summary>
+    /// <c>#</c> - postfix reference operator.
+    /// </summary>
     Spill,
+
+    /// <summary>
+    /// <c>@</c> - implicit intersection of reference.
+    /// </summary>
     Intersection,
 
-    // Misc
+    /// <summary>
+    /// <c>(</c> - a nested group operator or opening parenthesis of a function call.
+    /// </summary>
     LeftParen,
+
+    /// <summary>
+    /// <c>)</c> - a nested group operator or closing parenthesis of a function call.
+    /// </summary>
     RightParen,
+
+    /// <summary>
+    /// <c>{</c> - opening token of array literal.
+    /// </summary>
     LeftCurly,
+
+    /// <summary>
+    /// <c>}</c> - closing token of array literal.
+    /// </summary>
     RightCurly,
 
-    // Might contain even space, which is intersection operator, but depends on context
+    /// <summary>
+    /// <c> </c> - binary intersection operator or whitespace that will be ignored by parser.
+    /// </summary>
     Whitespace,
+
+    /// <summary>
+    /// End of file.
+    /// </summary>
     Eof,
 }
