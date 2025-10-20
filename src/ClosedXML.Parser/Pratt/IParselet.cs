@@ -1,8 +1,8 @@
 ﻿namespace ClosedXML.Parser.Pratt;
 
-internal interface IParselet<TNode, in TContext>
+internal interface IParselet<T, in TContext>
 {
-    TNode Parse(TContext ctx, TNode left, Token op);
+    Node<T> Parse(TContext ctx, Node<T> left, Token op);
 
     int GetBindingPower();
 }

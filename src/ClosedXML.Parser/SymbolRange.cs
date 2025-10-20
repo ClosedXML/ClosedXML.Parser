@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser;
+﻿using System;
+
+namespace ClosedXML.Parser;
 
 /// <summary>
 /// A range of a symbol in formula text.
@@ -36,5 +38,13 @@ public readonly struct SymbolRange
     public override string ToString()
     {
         return $"[{Start}:{End}]";
+    }
+
+    internal SymbolRange ExtendRight(SymbolRange rangeToRight)
+    {
+        if (End != rangeToRight.Start)
+            throw new InvalidOperationException($"The range end {End} doesn't match start of the range to the right {rangeToRight.Start}.");
+
+        return new SymbolRange(Start, rangeToRight.End);
     }
 }

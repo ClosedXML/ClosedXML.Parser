@@ -1,6 +1,6 @@
 ﻿namespace ClosedXML.Parser.Pratt;
 
-internal interface IPrefixParselet<out TNode, in TContext>
+internal interface IPrefixParselet<T, in TContext>
 {
-    TNode Parse(TContext ctx, Token token);
+    Node<T> Parse(TContext ctx, Token token);
 }

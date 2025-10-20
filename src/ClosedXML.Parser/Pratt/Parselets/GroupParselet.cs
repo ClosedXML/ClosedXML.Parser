@@ -1,18 +1,18 @@
 ﻿namespace ClosedXML.Parser.Pratt.Parselets;
 
-internal class GroupParselet<TNode, TContext> : IPrefixParselet<TNode, TContext>
+internal class GroupParselet<T, TContext> : IPrefixParselet<T, TContext>
 {
-    private readonly Parser<TNode, TContext> _parser;
+    private readonly Parser<T, TContext> _parser;
 
-    public GroupParselet(Parser<TNode, TContext> parser)
+    public GroupParselet(Parser<T, TContext> parser)
     {
         _parser = parser;
     }
 
-    public TNode Parse(TContext ctx, Token token)
+    public Node<T> Parse(TContext ctx, Token leftParen)
     {
         var node = _parser.ParseExpression(ctx, 0);
-        _parser.Consume(TokenType.RightParen);
-        return node;
+        var rightParen = _parser.Consume(TokenType.RightParen);
+        return node.ExtendLeft(leftParen).ExtendRight(rightParen);
     }
 }

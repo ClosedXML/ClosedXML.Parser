@@ -6,22 +6,22 @@ namespace ClosedXML.Parser.Pratt;
 /// <summary>
 /// Pratt parser.
 /// </summary>
-internal class Parser<TNode, TContext>
+internal class Parser<T, TContext>
 {
     private readonly Lexer _lexer = new();
-    private readonly Dictionary<TokenType, IPrefixParselet<TNode, TContext>> _prefixParselets = new();
-    private readonly Dictionary<TokenType, IParselet<TNode, TContext>> _parselets = new();
+    private readonly Dictionary<TokenType, IPrefixParselet<T, TContext>> _prefixParselets = new();
+    private readonly Dictionary<TokenType, IParselet<T, TContext>> _parselets = new();
 
     internal string Input { get; private set; } = string.Empty;
 
-    public TNode ParseFormula(string formula, TContext ctx)
+    public T ParseFormula(string formula, TContext ctx)
     {
         Input = formula;
         _lexer.Reset(formula);
-        return ParseExpression(ctx, 0);
+        return ParseExpression(ctx, 0).Value;
     }
 
-    internal TNode ParseExpression(TContext ctx, int minBp)
+    internal Node<T> ParseExpression(TContext ctx, int minBp)
     {
         var node = Prefix(ctx);
 
@@ -46,7 +46,7 @@ internal class Parser<TNode, TContext>
         return node;
     }
 
-    private TNode Prefix(TContext ctx)
+    private Node<T> Prefix(TContext ctx)
     {
         var token = _lexer.Consume();
 
@@ -65,12 +65,12 @@ internal class Parser<TNode, TContext>
         return token;
     }
 
-    internal void Register(TokenType type, IPrefixParselet<TNode, TContext> parselet)
+    internal void Register(TokenType type, IPrefixParselet<T, TContext> parselet)
     {
         _prefixParselets.Add(type, parselet);
     }
 
-    internal void Register(TokenType type, IParselet<TNode, TContext> parselet)
+    internal void Register(TokenType type, IParselet<T, TContext> parselet)
     {
         _parselets.Add(type, parselet);
     }
