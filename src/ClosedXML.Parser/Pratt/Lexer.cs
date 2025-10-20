@@ -16,8 +16,7 @@ internal class Lexer
     private static readonly bool[] IsOp;
 
     private readonly Queue<Token> _queue = new(4);
-    private readonly string _input;
-
+    private string _input = string.Empty; // Currently tokenized formula
     private int _start; // The start index of currently parsed token in Next()
     private int _i; // Index of current code point _c in _input
     private int _c; // A current code point (including astral planes) or -1 if at the EOF
@@ -30,17 +29,29 @@ internal class Lexer
             IsOp[op] = true;
     }
 
-    /// <summary>
-    /// Create a new instance of a lexer.
-    /// </summary>
-    /// <param name="input">Formula to tokenize.</param>
+    public Lexer()
+        : this(string.Empty)
+    {
+    }
+
     public Lexer(string input)
     {
-        _input = input ?? throw new ArgumentNullException();
-        _i = -1;
+        Reset(input);
     }
 
     private bool IsEof => _c == EOF;
+
+    /// <summary>
+    /// Prepare lexer to start tokenization of the <paramref name="formula"/>.
+    /// </summary>
+    /// <param name="formula">Formula to tokenize.</param>
+    public void Reset(string formula)
+    {
+        _input = formula ?? throw new ArgumentNullException();
+        _start = -1;
+        _i = -1;
+        _c = 0;
+    }
 
     public Token Consume()
     {

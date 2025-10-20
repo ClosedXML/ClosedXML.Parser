@@ -24,8 +24,8 @@ public record BinaryNode(BinaryOperation Operation) : AstNode
     public BinaryNode(BinaryOperation operation, AstNode left, AstNode right)
         : this(operation)
     {
-        Children = new[] { left, right };
+        Children = [left, right];
     }
 
     public override string GetDisplayString(ReferenceStyle style) => OpNames[Operation];
-};
+}

@@ -1,4 +1,4 @@
-﻿namespace ClosedXML.Parser;
+namespace ClosedXML.Parser;
 
 public record ValueNode(string Type, object Value) : AstNode
 {
@@ -11,4 +11,4 @@ public record ValueNode(string Type, object Value) : AstNode
     {
         return Value?.ToString() ?? "BLANK";
     }
-};
+}
