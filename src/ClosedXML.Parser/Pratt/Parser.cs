@@ -56,6 +56,11 @@ internal class Parser<T, TContext>
         return parselet.Parse(ctx, token);
     }
 
+    public Token LookAhead(int distance)
+    {
+        return _lexer.Peek(distance);
+    }
+
     internal Token Consume(TokenType expectedType)
     {
         var token = _lexer.Consume();
@@ -63,6 +68,11 @@ internal class Parser<T, TContext>
             throw new InvalidOperationException($"Expected token of type {expectedType}, but received {token.Type}.");
 
         return token;
+    }
+
+    internal Token Consume()
+    {
+        return _lexer.Consume();
     }
 
     internal void Register(TokenType type, IPrefixParselet<T, TContext> parselet)

@@ -105,6 +105,27 @@ public static class NameUtils
         return sheetName.IndexOfAny(InvalidSheetChars) == -1;
     }
 
+    internal static bool IsNameValid(ReadOnlySpan<char> name)
+    {
+        if (name.Length is < 1 or > 255)
+            return false;
+
+        // TODO: Determine what is a valid name and make the method public.
+        // Alert box says:
+        // * Starts with a letter or underscore
+        // * no space or char that is not allowed
+        if (name[0] != '_' && !char.IsLetter(name[0]))
+            return false;
+
+        foreach (var nextNameChar in name.Slice(1))
+        {
+            if (!char.IsLetter(nextNameChar))
+                return false;
+        }
+
+        return true;
+    }
+
     internal static StringBuilder EscapeName(StringBuilder sb, string sheet)
     {
         return ShouldQuote(sheet.AsSpan())

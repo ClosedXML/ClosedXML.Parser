@@ -61,12 +61,17 @@ internal class Lexer
         return _queue.Dequeue();
     }
 
-    public Token Peek()
+    public Token Peek(int distance = 1)
     {
-        if (_queue.Count == 0)
+        // TODO: Replace BCL queue with a structure that allows index access
+        while (_queue.Count < distance)
             _queue.Enqueue(Next());
 
-        return _queue.Peek();
+        var enumerator = _queue.GetEnumerator();
+        for (var i = 0; i < distance; ++i)
+            enumerator.MoveNext();
+
+        return enumerator.Current;
     }
 
     private Token Next()

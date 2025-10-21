@@ -31,7 +31,9 @@ namespace ClosedXML.Parser;
 /// </summary>
 public readonly struct RowCol : IEquatable<RowCol>
 {
+    internal const int MinRow = 1;
     internal const int MaxRow = 1048576;
+    internal const int MinCol = 1;
     internal const int MaxCol = 16384;
 
     // keep at 0, so default ctor creates is A1
