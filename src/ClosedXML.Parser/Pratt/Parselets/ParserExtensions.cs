@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using static ClosedXML.Parser.Pratt.CompatUtils;
 
 namespace ClosedXML.Parser.Pratt.Parselets;
@@ -13,9 +12,39 @@ internal static class ParserExtensions
     private const int MIN_ROW_LENGTH = 1; // 1
     private const int MAX_ROW_LENGTH = 8; // $1048576
 
+    public static bool TryReferenceA1<T, TContext>(this Parser<T, TContext> parser, Token token, out ReferenceArea area, out SymbolRange range)
+    {
+        if (token.Type is not TokenType.Ident and not TokenType.Number)
+        {
+            area = default;
+            range = default;
+            return false;
+        }
+
+        // Check for area `A1:B2` or just cell `A1`
+        if (parser.TryLocalAreaA1(token, out area, out range))
+            return true;
+
+        // Check for colspan `A:B`
+        if (parser.TryLocalColSpanA1(token, out area, out range))
+            return true;
+
+        // Check for rowspan `1:2`, can be ident or number token
+        if (parser.TryLocalRowSpanA1(token, out area, out range))
+            return true;
+
+        return false;
+    }
+
     public static bool TryLocalAreaA1<T, TContext>(this Parser<T, TContext> parser, Token identToken, out ReferenceArea area, out SymbolRange range)
     {
-        Debug.Assert(identToken.Type == TokenType.Ident);
+        if (identToken.Type != TokenType.Ident)
+        {
+            area = default;
+            range = default;
+            return false;
+        }
+
         var ident = identToken.GetText(parser.Input);
 
         if (TryGetCellA1(ident, out var cell1))
@@ -50,7 +79,13 @@ internal static class ParserExtensions
 
     public static bool TryLocalColSpanA1<T, TContext>(this Parser<T, TContext> parser, Token identToken, out ReferenceArea area, out SymbolRange range)
     {
-        Debug.Assert(identToken.Type == TokenType.Ident);
+        if (identToken.Type != TokenType.Ident)
+        {
+            area = default;
+            range = default;
+            return false;
+        }
+
         var ident = identToken.GetText(parser.Input);
 
         // Careful, 'A' can be just a name without the other column
@@ -77,7 +112,13 @@ internal static class ParserExtensions
 
     public static bool TryLocalRowSpanA1<T, TContext>(this Parser<T, TContext> parser, Token numberOrIdentToken, out ReferenceArea area, out SymbolRange range)
     {
-        Debug.Assert(numberOrIdentToken.Type is TokenType.Ident or TokenType.Number);
+        if (numberOrIdentToken.Type is not TokenType.Ident and not TokenType.Number)
+        {
+            area = default;
+            range = default;
+            return false;
+        }
+
         var numberOrIdent = numberOrIdentToken.GetText(parser.Input);
 
         if (TryGetRowA1(numberOrIdent, out var row1) &&
@@ -117,16 +158,20 @@ internal static class ParserExtensions
 
     public static bool TryGetName<T, TContext>(this Parser<T, TContext> parser, Token identToken, out ReadOnlySpan<char> name)
     {
-        Debug.Assert(identToken.Type == TokenType.Ident);
-        var text = identToken.GetText(parser.Input);
+        if (identToken.Type != TokenType.Ident)
+        {
+            name = default;
+            return false;
+        }
 
+        var text = identToken.GetText(parser.Input);
         if (NameUtils.IsNameValid(text))
         {
             name = text;
             return true;
         }
 
-        name = string.Empty.AsSpan();
+        name = default;
         return false;
     }
 
@@ -218,7 +263,7 @@ internal static class ParserExtensions
         var absRow = text[i] == '$';
         if (absRow)
         {
-            if (++i >= text.Length) 
+            if (++i >= text.Length)
                 return false;
         }
 

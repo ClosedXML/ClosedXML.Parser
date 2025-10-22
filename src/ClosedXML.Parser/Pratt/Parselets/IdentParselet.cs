@@ -28,6 +28,10 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
         // * sheet!name
         // * sheet!1:2
         // * TRUE/FALSE
+        // * sheet1:sheet2!A1:A2
+        // * sheet1:sheet2!A1
+        // * sheet1:sheet2!A:B
+        // * sheet1:sheet2!$1:2
         // * name
 
         // Check for area `A1:B2` or just cell `A1`
@@ -124,6 +128,39 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
         {
             var value = _factory.LogicalNode(ctx, token.Range, false);
             return new Node<T>(value, token.Range);
+        }
+
+        // Check for 3D reference for unquoted sheets:
+        // * Sheet1:Sheet2!A1:B2
+        // * Sheet1:Sheet2!A1
+        // * Sheet1:Sheet2!A:B
+        // * Sheet1:Sheet2!1:2
+        if (_parser.TryGetUnquotedSheet(token, out var startSheet) &&
+            _parser.LookAhead(1).Type == TokenType.Range &&
+            _parser.LookAhead(2) is { Type: TokenType.Ident } maybeEndSheetToken &&
+            _parser.TryGetUnquotedSheet(maybeEndSheetToken, out var endSheet) &&
+            _parser.LookAhead(3).Type == TokenType.Bang)
+        {
+            var sheetStartToken = token;
+            var rangeToken = _parser.Consume(TokenType.Range);
+            var sheetEndToken = _parser.Consume(TokenType.Ident);
+            var bangToken = _parser.Consume(TokenType.Bang);
+            var refToken = _parser.Consume();
+
+            if (_parser.TryReferenceA1(refToken, out var sheetRangeReference, out var sheetRangeReferenceRange))
+            {
+                var range = sheetStartToken.Range
+                    .ExtendRight(rangeToken.Range)
+                    .ExtendRight(sheetEndToken.Range)
+                    .ExtendRight(bangToken.Range)
+                    .ExtendRight(sheetRangeReferenceRange);
+                var startSheetString = startSheet.ToString(); // String allocation for the IAstFactory
+                var endSheetString = endSheet.ToString();
+                var value = _factory.Reference3D(ctx, range, startSheetString, endSheetString, sheetRangeReference);
+                return new Node<T>(value, range);
+            }
+
+            throw new ParsingException($"Unable to parse value starting from position {token.Range.Start}.");
         }
 
         // Check for rowspan `name`

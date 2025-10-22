@@ -51,6 +51,22 @@ public class ParseletIdentTests
     // name
     [InlineData("_name", typeof(NameNode))]
     [InlineData("name", typeof(NameNode))]
+
+    // sheet1:sheet2!A1:B2
+    [InlineData("sheet1:sheet2!A1:B2", typeof(Reference3DNode))]
+    [InlineData("sheet1:sheet2!$A$1:$B$2", typeof(Reference3DNode))]
+
+    // sheet1:sheet2!A1
+    [InlineData("sheet1:sheet2!A1", typeof(Reference3DNode))]
+    [InlineData("sheet1:sheet2!$A$1", typeof(Reference3DNode))]
+
+    // sheet1:sheet2!A:B
+    [InlineData("sheet1:sheet2!A:C", typeof(Reference3DNode))]
+    [InlineData("sheet1:sheet2!$A:$C", typeof(Reference3DNode))]
+
+    // sheet1:sheet2!1:2
+    [InlineData("sheet1:sheet2!1:2", typeof(Reference3DNode))]
+    [InlineData("sheet1:sheet2!$1:$2", typeof(Reference3DNode))]
     public void Can_parse_references_starting_at_ident(string formula, Type expectedNodeType)
     {
         var parser = ParserFactory.Create(new F());
@@ -81,6 +97,9 @@ public class ParseletIdentTests
     [InlineData("A0")]
     [InlineData("A1048577")]
     [InlineData("XFE1")]
+    [InlineData("sheet1:sheet2!")]
+    [InlineData("sheet1:sheet2!A")]
+    [InlineData("sheet1:sheet2!name")] // There is no such thing as 3D name
     public void Invalid_references_starting_with_ident_throw_parsing_exception(string formula)
     {
         var parser = ParserFactory.Create(new F());
