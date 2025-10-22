@@ -35,25 +35,14 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
         // * name
 
         // Check for area `A1:B2` or just cell `A1`
-        if (_parser.TryLocalAreaA1(token, out var localArea, out var localAreaRange))
+        // Check for colspan `A:B`
+        // Check for colspan `$1:2` with absolute row start, because this is an "ident" prefix parselet
+        if (_parser.TryReferenceA1(token, out var localArea, out var localAreaRange))
         {
             var value = _factory.Reference(ctx, localAreaRange, localArea);
             return new Node<T>(value, localAreaRange);
         }
 
-        // Check for colspan `A:B`
-        if (_parser.TryLocalColSpanA1(token, out var localColSpan, out var localColSpanRange))
-        {
-            var value = _factory.Reference(ctx, localColSpanRange, localColSpan);
-            return new Node<T>(value, localColSpanRange);
-        }
-
-        // Check for colspan `$1:2`
-        if (_parser.TryLocalRowSpanA1(token, out var localRowSpan, out var localRowSpanRange))
-        {
-            var value = _factory.Reference(ctx, localRowSpanRange, localRowSpan);
-            return new Node<T>(value, localRowSpanRange);
-        }
 
         if (_parser.TryGetUnquotedSheet(token, out var sheetNameSpan) && _parser.LookAhead(1).Type == TokenType.Bang)
         {
