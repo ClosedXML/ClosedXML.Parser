@@ -111,7 +111,7 @@ internal static class ParserExtensions
             return true;
         }
 
-        sheetName = string.Empty.AsSpan();
+        sheetName = default;
         return false;
     }
 

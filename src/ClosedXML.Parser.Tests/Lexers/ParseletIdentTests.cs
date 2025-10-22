@@ -61,6 +61,19 @@ public class ParseletIdentTests
     }
 
     [Theory]
+    [InlineData("TRUE", true)]
+    [InlineData("true", true)]
+    [InlineData("FALSE", false)]
+    [InlineData("false", false)]
+    public void Can_parse_logical(string formula, bool expectedValue)
+    {
+        var parser = ParserFactory.Create(new F());
+        var root = parser.ParseFormula(formula, new Ctx());
+
+        Assert.Equal(new ValueNode(expectedValue), root);
+    }
+
+    [Theory]
     [InlineData("sheet!$")]
     [InlineData("sheet!")]
     [InlineData("$")]

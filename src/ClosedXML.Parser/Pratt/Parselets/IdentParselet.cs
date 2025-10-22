@@ -1,4 +1,6 @@
-﻿namespace ClosedXML.Parser.Pratt.Parselets;
+﻿using System;
+
+namespace ClosedXML.Parser.Pratt.Parselets;
 
 internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext>
 {
@@ -25,6 +27,7 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
         // * sheet!$1:2
         // * sheet!name
         // * sheet!1:2
+        // * TRUE/FALSE
         // * name
 
         // Check for area `A1:B2` or just cell `A1`
@@ -110,6 +113,19 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
             throw new ParsingException($"Unable to parse value starting from position {token.Range.Start}.");
         }
 
+        var tokenText = token.GetText(_parser.Input);
+        if (EqualCaseInsensitive(tokenText, "TRUE"))
+        {
+            var value = _factory.LogicalNode(ctx, token.Range, true);
+            return new Node<T>(value, token.Range);
+        }
+
+        if (EqualCaseInsensitive(tokenText, "FALSE"))
+        {
+            var value = _factory.LogicalNode(ctx, token.Range, false);
+            return new Node<T>(value, token.Range);
+        }
+
         // Check for rowspan `name`
         if (_parser.TryGetName(token, out var workbookName))
         {
@@ -118,5 +134,13 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
         }
 
         throw new ParsingException($"Unable to parse value starting from position {token.Range.Start}.");
+    }
+
+    private static bool EqualCaseInsensitive(ReadOnlySpan<char> text, string other)
+    {
+        if (text.Length != other.Length)
+            return false;
+
+        return text.CompareTo(other.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
     }
 }
