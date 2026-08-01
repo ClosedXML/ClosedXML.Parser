@@ -395,6 +395,15 @@ internal static class TokenParser
             i += GetLength(listItem) + 1;
             area |= listItem;
 
+            // `INNER_REFERENCE : KEYWORD_LIST`, i.e. the keyword list is the whole inner
+            // reference and no column range follows it (e.g. '[[#All]]').
+            if (IsEndOfInnerReference(input, i))
+            {
+                firstColumn = null;
+                lastColumn = null;
+                return;
+            }
+
             i = SkipComma(input, i);
         }
 
@@ -407,6 +416,14 @@ internal static class TokenParser
             i += GetLength(listItem) + 1;
             area |= listItem;
 
+            // As above, for a two keyword list (e.g. '[[#Headers],[#Data]]').
+            if (IsEndOfInnerReference(input, i))
+            {
+                firstColumn = null;
+                lastColumn = null;
+                return;
+            }
+
             i = SkipComma(input, i);
         }
 
@@ -417,6 +434,17 @@ internal static class TokenParser
             GetStructuredName(input, i + 1, out lastColumn);
         else
             lastColumn = null;
+    }
+
+    /// <summary>
+    /// Has the inner reference ended at <paramref name="i"/>, i.e. is only the SPACED_RBRACKET
+    /// left? That is the `INNER_REFERENCE : KEYWORD_LIST` alternative, a keyword list with no
+    /// column range after it.
+    /// </summary>
+    private static bool IsEndOfInnerReference(ReadOnlySpan<char> input, int i)
+    {
+        i = SkipWhitespaces(input, i);
+        return i >= input.Length || input[i] == ']';
     }
 
     private static int SkipComma(ReadOnlySpan<char> input, int i)
