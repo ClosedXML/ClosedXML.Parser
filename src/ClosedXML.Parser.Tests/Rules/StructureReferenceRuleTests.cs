@@ -38,11 +38,30 @@ public class StructureReferenceRuleTests
                 new StructureReferenceNode(null, StructuredReferenceArea.Data, "First Column", "Last Column")
             };
 
+            // A keyword list is a whole inner reference on its own, with no column range after it.
+            yield return new object[]
+            {
+                "[[#All]]",
+                new StructureReferenceNode(null, StructuredReferenceArea.All, null, null)
+            };
+
+            yield return new object[]
+            {
+                "[[#Headers],[#Data]]",
+                new StructureReferenceNode(null, StructuredReferenceArea.Headers | StructuredReferenceArea.Data, null, null)
+            };
+
             // structure_reference : NAME INTRA_TABLE_REFERENCE
             yield return new object[]
             {
                 "SomeTable[Column]",
                 new StructureReferenceNode("SomeTable", StructuredReferenceArea.None, "Column", "Column")
+            };
+
+            yield return new object[]
+            {
+                "SomeTable[[#Data],[#Totals]]",
+                new StructureReferenceNode("SomeTable", StructuredReferenceArea.Data | StructuredReferenceArea.Totals, null, null)
             };
 
             // structure_reference: BOOK_PREFIX NAME INTRA_TABLE_REFERENCE
