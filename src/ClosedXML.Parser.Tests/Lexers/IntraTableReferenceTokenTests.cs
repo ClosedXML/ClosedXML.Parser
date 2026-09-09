@@ -68,8 +68,23 @@ public class IntraTableReferenceTokenTests
             yield return new object?[] { "[[#Headers],[#Data],[First]:Last]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First", "Last" };
             yield return new object?[] { "[[#Headers],[#Data],First:[Last]]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First", "Last" };
 
+            // fragment INNER_REFERENCE : KEYWORD_LIST
+            // where the keyword list is the whole inner reference, with no column range after it
+            yield return new object?[] { "[[#All]]", StructuredReferenceArea.All, null, null };
+            yield return new object?[] { "[[#Data]]", StructuredReferenceArea.Data, null, null };
+            yield return new object?[] { "[[#Headers]]", StructuredReferenceArea.Headers, null, null };
+            yield return new object?[] { "[[#Totals]]", StructuredReferenceArea.Totals, null, null };
+            yield return new object?[] { "[[#This Row]]", StructuredReferenceArea.ThisRow, null, null };
+
+            // fragment INNER_REFERENCE : KEYWORD_LIST
+            // where KEYWORD_LIST | '[#Headers]' SPACED_COMMA '[#Data]' | '[#Data]' SPACED_COMMA '[#Totals]'
+            yield return new object?[] { "[[#Headers],[#Data]]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, null, null };
+            yield return new object?[] { "[[#Data],[#Totals]]", StructuredReferenceArea.Data | StructuredReferenceArea.Totals, null, null };
+
             // spaces are ignored
             yield return new object?[] { "[  [#Headers]  ,  [#Data]  ,  [First col]:[Last col]  ]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First col", "Last col" };
+            yield return new object?[] { "[  [#All]  ]", StructuredReferenceArea.All, null, null };
+            yield return new object?[] { "[  [#Headers]  ,  [#Data]  ]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, null, null };
         }
     }
 }
