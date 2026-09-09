@@ -18,4 +18,14 @@
   <ItemGroup>
     <ProjectReference Include="..\ClosedXML.Parser\ClosedXML.Parser.csproj" />
   </ItemGroup>
+
+  <!--
+    The ANTLR-generated lexer and parser are marked [CLSCompliant(false)]. Without a matching
+    assembly-level attribute the compiler reports CS3021 for every such type.
+  -->
+  <ItemGroup>
+    <AssemblyAttribute Include="CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
