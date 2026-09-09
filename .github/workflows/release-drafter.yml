@@ -1,0 +1,22 @@
+name: Release Drafter
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [develop]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-release-draft:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      # Labelling happens in pr-autolabel.yml while the PR is open — in v7 the
+      # autolabeler is a separate sub-action, so this only drafts the release.
+      - uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

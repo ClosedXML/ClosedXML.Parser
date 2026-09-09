@@ -1,0 +1,63 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore src/ClosedXML.Parser.sln
+
+      - name: Check formatting
+        run: |
+          if ! dotnet format src/ClosedXML.Parser.sln --verify-no-changes --verbosity diagnostic; then
+            echo "::warning::Code formatting issues detected. Run 'dotnet format src/ClosedXML.Parser.sln' locally to fix."
+          fi
+
+      - name: Check vulnerable packages
+        run: |
+          OUTPUT=$(dotnet list src/ClosedXML.Parser.sln package --vulnerable --include-transitive --format json)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | jq -e '.projects[] | select(.frameworks)' > /dev/null 2>&1; then
+            echo "::error::Vulnerable packages detected"
+            exit 1
+          fi
+
+      - name: Build
+        run: dotnet build src/ClosedXML.Parser.sln --configuration Release --no-restore
+
+      # The test project multi-targets net8.0 and net10.0; without --framework, both run.
+      - name: Test
+        run: >
+          dotnet test src/ClosedXML.Parser.Tests/ClosedXML.Parser.Tests.csproj
+          --configuration Release
+          --no-build
+          --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results
+          path: '**/TestResults/*.trx'

@@ -6,3 +6,5 @@ obj
 packages
 .antlr
 .vs
+TestResults
+artifacts

@@ -1,95 +1,150 @@
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-# Created from https://www.meziantou.net/publishing-a-nuget-package-following-best-practices-using-github.htm
-# The setup job iInstalls the .NET SDK indicated in the global.json file
+name: Release
 
-name: publish
-
+# Publishes XLibur.ClosedXML.Parser from a `v*` tag: pack, verify the package
+# version matches the tag, push to NuGet, publish the drafted GitHub Release.
+#
+# The glob requires a digit after the `v` so the bare upstream tags (`2.0.0`)
+# and anything else without the prefix never trigger a release.
 on:
-  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
-  release:
-    types:
-      - published    # Run the workflow when a new GitHub release is published
+  push:
+    tags: ['v[0-9]*']
+  # Called by release-publish.yml, which creates the tag and then invokes this
+  # workflow directly. A tag pushed with GITHUB_TOKEN does not trigger the
+  # `push: tags` trigger above, so the call has to be explicit.
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
 
-env:
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-  DOTNET_NOLOGO: true
-  NuGetDirectory: ${{ github.workspace }}/nuget
-
-defaults:
-  run:
-    shell: pwsh
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
-  run_test:
+  release:
     runs-on: ubuntu-latest
+
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      # Captured before publishing, because once this release is published it
+      # becomes "latest" and can no longer serve as the previous tag.
+      - name: Resolve previous release tag
+        id: previous
+        run: |
+          prev=$(gh release list --repo "$GITHUB_REPOSITORY" --exclude-drafts --exclude-pre-releases \
+                   --limit 20 --json tagName --jq '[.[] | select(.tagName | test("^v[0-9]"))] | .[0].tagName // ""')
+          echo "tag=$prev" >> "$GITHUB_OUTPUT"
+          echo "Previous release tag: ${prev:-<none>}"
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Restore dependencies
         run: dotnet restore src/ClosedXML.Parser.sln
 
-      - name: Build ClosedXML.Parser
-        run: dotnet build ./src/ClosedXML.Parser.sln --configuration Release --no-restore
+      - name: Build
+        run: dotnet build src/ClosedXML.Parser.sln --configuration Release --no-restore
 
-      - name: Run tests
-        run: dotnet test ./src/ClosedXML.Parser.sln --configuration Release --no-restore --no-build 
+      - name: Test
+        run: >
+          dotnet test src/ClosedXML.Parser.Tests/ClosedXML.Parser.Tests.csproj
+          --configuration Release
+          --no-build
 
-  create_nuget:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-
-      - name: Restore dependencies
-        run: dotnet restore ./src/ClosedXML.Parser/ClosedXML.Parser.csproj
-
-      - name: Build ClosedXML.Parser
-        run: dotnet build ./src/ClosedXML.Parser/ClosedXML.Parser.csproj --configuration Release --no-restore
-
-      # Create the NuGet package in the folder from the environment variable NuGetDirectory
-      - run: dotnet pack ./src/ClosedXML.Parser/ClosedXML.Parser.csproj --configuration Release --no-restore --no-build --output ${{ env.NuGetDirectory }}
-    
-      # Publish the NuGet package as an artifact, so they can be used in the following jobs
-      - uses: actions/upload-artifact@v4
-        with:
-          name: nuget
-          if-no-files-found: error
-          retention-days: 7
-          path: |
-            ${{ env.NuGetDirectory }}/*.nupkg
-            ${{ env.NuGetDirectory }}/*.snupkg
-
-  deploy:
-    # Publish only when creating a GitHub Release
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    needs: [ run_test, create_nuget ]
-    steps:
-      # Download the NuGet package created in the previous job
-      - uses: actions/download-artifact@v4
-        with:
-          name: nuget
-          path: ${{ env.NuGetDirectory }}
-
-      - name: Verify NuGet package exists
-        run: ls -l ${{ env.NuGetDirectory }}
-        shell: bash
-
-      # Install the .NET SDK indicated in the global.json file
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v4
-
-      # Publish all NuGet packages to NuGet.org
-      # Use --skip-duplicate to prevent errors if a package with the same version already exists.
-      # If you retry a failed workflow, already published packages will be skipped without error.
-      - name: Publish NuGet package
+      - name: Pack
         run: |
-          for file in ${{ env.NuGetDirectory }}/*.{nupkg,snupkg}; do
-            dotnet nuget push "$file" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet pack src/ClosedXML.Parser/ClosedXML.Parser.csproj --configuration Release --no-build --output ./artifacts
+          ls -la ./artifacts/
+
+      # The package must carry the tag's version. A mismatch means MinVer did
+      # not see the tag, which would publish a prerelease-versioned package.
+      - name: Verify package version matches the tag
+        run: |
+          expected=${TAG#v}
+          status=0
+          for package in ./artifacts/*.nupkg; do
+            name=$(basename "$package" .nupkg)
+            if [ "${name%.$expected}" = "$name" ]; then
+              echo "::error::$name is not version $expected"
+              status=1
+            fi
           done
-        shell: bash
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Package version does not match tag $TAG — refusing to publish"
+            exit 1
+          fi
+          echo "Package is version $expected"
+
+      - name: NuGet login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        id: nuget-login
+        with:
+          user: jafin
+
+      - name: Push to NuGet
+        run: dotnet nuget push ./artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
+
+      - name: Push symbols to NuGet
+        run: dotnet nuget push ./artifacts/*.snupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
+
+      # Publishes the rolling draft that Release Drafter has been accumulating
+      # from merged PRs, so any manual edits made to it are kept.
+      - name: Publish GitHub Release
+        uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
+        with:
+          publish: true
+          tag: ${{ env.TAG }}
+          name: ${{ env.TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Release Drafter has no first-time-contributor detection, so borrow
+      # GitHub's own and append its "New Contributors" section to the notes.
+      - name: Append new contributors
+        env:
+          PREV: ${{ steps.previous.outputs.tag }}
+        run: |
+          if [ -n "$PREV" ]; then
+            generated=$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$TAG" -f previous_tag_name="$PREV" --jq .body)
+          else
+            generated=$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$TAG" --jq .body)
+          fi
+
+          printf '%s\n' "$generated" | awk '/^## New Contributors/ { found = 1 } found { print }' > new-contributors.md
+
+          if [ ! -s new-contributors.md ]; then
+            echo "No new contributors in this release."
+            exit 0
+          fi
+
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq .body > notes.md
+          printf '\n' >> notes.md
+          cat new-contributors.md >> notes.md
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file notes.md
+          echo "Appended:"
+          cat new-contributors.md
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            ./artifacts/*.nupkg
+            ./artifacts/*.snupkg

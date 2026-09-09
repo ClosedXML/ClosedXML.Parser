@@ -1,0 +1,86 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+# Categories double as version resolvers: `semver-increment` on a category bumps
+# that part of the version when any PR lands in it. The highest matching
+# increment wins, and the trailing `type: version-resolver` entry with no `when`
+# is the fallback for anything uncategorised.
+#
+# The package is past 1.0, so a breaking change is a major bump.
+categories:
+  - title: 'Breaking Changes'
+    semver-increment: 'major'
+    when:
+      labels:
+        - 'breaking'
+  - title: 'New Features'
+    semver-increment: 'minor'
+    when:
+      labels:
+        - 'enhancement'
+  - title: 'Bug Fixes'
+    when:
+      labels:
+        - 'bug'
+  - title: 'Performance'
+    when:
+      labels:
+        - 'performance'
+  - title: 'Documentation'
+    when:
+      labels:
+        - 'documentation'
+  - title: 'Dependencies'
+    when:
+      labels:
+        - 'dependencies'
+  - title: 'Other Changes'
+    when:
+      labels:
+        - 'chore'
+  - type: 'version-resolver'
+    semver-increment: 'patch'
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\<*_&'
+no-changes-template: 'No changes.'
+
+# Bots don't get a thank-you line.
+exclude-contributors:
+  - 'dependabot'
+  - 'dependabot[bot]'
+  - 'github-actions'
+  - 'github-actions[bot]'
+no-contributors-template: ''
+
+# PR titles follow Conventional Commits, so the label — and therefore the release
+# note category and the version bump — is derived from the title automatically.
+# Applied by the PR Autolabel workflow, which runs the autolabeler sub-action.
+# Labels referenced here must already exist in the repository; the autolabeler
+# cannot create them.
+autolabeler:
+  - label: 'breaking'
+    title:
+      - '/^[a-z]+(\(.+\))?!:/'
+  - label: 'enhancement'
+    title:
+      - '/^feat(\(.+\))?!?:/'
+  - label: 'bug'
+    title:
+      - '/^fix(\(.+\))?!?:/'
+  - label: 'performance'
+    title:
+      - '/^perf(\(.+\))?!?:/'
+  - label: 'documentation'
+    title:
+      - '/^docs(\(.+\))?!?:/'
+  - label: 'chore'
+    title:
+      - '/^(chore|build|ci|style|refactor|test)(\(.+\))?!?:/'
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  Thanks to $CONTRIBUTORS for contributing to this release.
