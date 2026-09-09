@@ -17,4 +17,8 @@ under Unreleased with each change.
 
 ### Fixed
 
+- Write formula numbers with the invariant culture. `ToR1C1` used the current culture's
+  negative sign, so under sv-SE, fi-FI or nb-NO (negative sign U+2212) it emitted
+  `RC[−1]`, which the R1C1 reader could not parse back. Upstream issue
+  [ClosedXML/ClosedXML.Parser#30](https://github.com/ClosedXML/ClosedXML.Parser/issues/30).
 - Parse a keyword list that is a whole inner reference.
