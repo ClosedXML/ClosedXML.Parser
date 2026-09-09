@@ -1,5 +1,11 @@
 # ClosedParser
 
+> **Fork notice**
+>
+> This repository is a fork of [ClosedXML.Parser](https://github.com/ClosedXML/ClosedXML.Parser), Copyright (c) 2023, Jan Havlíček.
+>
+> The sole purpose of this fork is to bundle some fixes needed by the upstream XLibur library, published as the `XLibur.ClosedXML.Parser` NuGet package. We aim to push pull requests with these fixes back to upstream ClosedXML.Parser.
+
 ClosedParser is a project to parse OOXML grammar to create an abstract syntax tree that can be later evaluated.
 
 Official source for the grammar is [MS-XML](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/2c5dee00-eff2-4b22-92b6-0738acd4475e), chapter 2.2.2 Formulas. The provided grammar is not usable for parser generators, it's full of ambiguities and the rules don't take into account operator precedence.
@@ -14,7 +20,7 @@ Official source for the grammar is [MS-XML](https://learn.microsoft.com/en-us/op
 ## Visualizer
 There is a visualizer to display AST in a browser at **[https://parser.closedxml.io](https://parser.closedxml.io)**
 
-![image](https://github.com/ClosedXML/ClosedXML.Parser/assets/7634052/4beaab23-4599-44d4-be7b-705178b69f99)
+![image](https://github.com/XLibur/ClosedXML.Parser/assets/7634052/4beaab23-4599-44d4-be7b-705178b69f99)
 
 # Goals
 
