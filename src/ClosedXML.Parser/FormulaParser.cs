@@ -573,7 +573,7 @@ public class FormulaParser<TScalarValue, TNode, TContext>
                     Consume();
                     return _factory.BangReference(_context, new SymbolRange(start, _tokenSource.StartIndex), reference);
                 }
-        
+
             // external_cell_reference: SHEET_RANGE_PREFIX (A1_CELL | A1_CELL COLON A1_CELL | A1_SPAN_REFERENCE)
             case Token.SHEET_RANGE_PREFIX:
                 {

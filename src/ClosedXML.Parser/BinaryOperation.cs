@@ -6,7 +6,7 @@
 public enum BinaryOperation
 {
     #region Text operators
-    
+
     /// <summary><c>&amp;</c></summary>
     Concat,
 

@@ -74,7 +74,7 @@ public class RefModVisitorTests
     [Fact]
     public void Log10_is_not_interpreted_as_cell_function()
     {
-        var factory = new ShiftReferenceVisitor { ReferenceMap = { { "LOG10", "A1"} } };
+        var factory = new ShiftReferenceVisitor { ReferenceMap = { { "LOG10", "A1" } } };
         AssertChangesA1("LOG10(LOG10)", factory, "LOG10(A1)");
     }
 

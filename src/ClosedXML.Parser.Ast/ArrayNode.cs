@@ -22,7 +22,7 @@ public record ArrayNode(int Rows, int Columns, IReadOnlyList<ScalarValue> Elemen
                 sb.Append(',').Append(Elements[idx++].GetDisplayString());
         }
         sb.Append('}');
-        
+
         return sb.ToString();
     }
 

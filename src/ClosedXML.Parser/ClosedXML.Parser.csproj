@@ -3,21 +3,42 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>10</LangVersion>
+    <!--
+      The SDK leaves this off for netstandard targets. Without a reference assembly the
+      MSBuild workspace that dotnet format loads cannot match this project's ProjectReference
+      to its metadata reference, and every consuming project logs a workspace warning.
+    -->
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <Nullable Condition="'$(TargetFramework)' == 'netstandard2.1'">enable</Nullable>
     <Nullable Condition="'$(TargetFramework)' == 'netstandard2.0'">annotations</Nullable>
-    <Authors>Jan Havlíček</Authors>
-    <PackageId>ClosedXML.Parser</PackageId>
-    <PackageTags>ClosedXML;parser;formula;xlsx</PackageTags>
+    <Authors>Jan Havlíček, XLibur Contributors</Authors>
+    <!--
+      The namespace stays ClosedXML.Parser; only the package id carries the XLibur prefix,
+      so the fork is distinguishable from the upstream ClosedXML.Parser package on nuget.org.
+    -->
+    <PackageId>XLibur.ClosedXML.Parser</PackageId>
+    <PackageTags>ClosedXML;XLibur;parser;formula;xlsx</PackageTags>
     <Description>
       A lexer and parser of Excel formulas with focus on performance. Its goal is to create
       an abstract syntax tree from a formula text to enable formula evaluation.
     </Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/ClosedXML/ClosedXML.Parser</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ClosedXML/ClosedXML.Parser</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/XLibur/ClosedXML.Parser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/XLibur/ClosedXML.Parser</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageVersion>2.0.0</PackageVersion>
+  </PropertyGroup>
+
+  <!--
+    MinVer derives the version from git tags. The tag prefix is `v`, so the upstream fork
+    tags (`2.0.0`, `1.3.0`, ...) are ignored and this package has its own version stream
+    starting at 2.1.0. A commit that is not exactly on a release tag gets a pre-release
+    version (2.1.0-alpha.0.N); the Pre-release workflow sets the label via
+    MinVerDefaultPreReleaseIdentifiers.
+  -->
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>2.1</MinVerMinimumMajorMinor>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -35,6 +56,7 @@
 
   <!-- Include symbols for .snupkg package -->
   <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -49,6 +71,17 @@
     <AssemblyOriginatorKeyFile>../ClosedXML.Parser.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <!--
+    MinVer computes the version inside a target, so the release-notes link has to be built
+    after that target runs. Setting these as ordinary properties would interpolate an empty
+    version and ship a broken "releases/tag/" link.
+  -->
+  <Target Name="SetPackageReleaseNotesFromVersion" DependsOnTargets="MinVer" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <PackageReleaseNotes>See $(RepositoryUrl)/releases/tag/$(MinVerTagPrefix)$(MinVerVersion)</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
+
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
@@ -56,7 +89,7 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="All" />
     <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Lexer isn't CLS compliant thus neither should be the assembly.  -->

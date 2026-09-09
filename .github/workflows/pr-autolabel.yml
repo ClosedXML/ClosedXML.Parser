@@ -1,0 +1,30 @@
+name: PR Autolabel
+
+# Labels pull requests from their Conventional Commits title. The label drives both
+# the release-note category and the version bump, so this has to run on every PR —
+# including PRs from forks, which is why the trigger is pull_request_target. A
+# plain pull_request trigger gets a read-only token on fork PRs and cannot label.
+#
+# Safety: this workflow never checks out or executes pull request code. It only reads
+# the PR title and applies labels.
+#
+# Note this uses the autolabeler sub-action, not the top-level action. In v7 the
+# autolabeler is a separate entry point; the main action has no disable-releaser
+# input, and running it here would try to draft a release with a read-only token.
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  autolabel:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: release-drafter/release-drafter/autolabeler@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,147 @@
+name: Publish Release
+
+# One-click stable release:
+#
+#   1. resolves the version from the release draft (or the version input)
+#   2. rolls CHANGELOG.md's Unreleased section into a dated version heading
+#   3. commits that to develop and tags it
+#   4. calls release.yml, which packs, publishes to NuGet, and publishes the
+#      draft release notes with contributor attribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, e.g. 2.1.0. Leave empty to use the drafted version.'
+        required: false
+        type: string
+      dry-run:
+        description: 'Dry run — resolve the version and show the changelog roll without tagging or publishing'
+        required: false
+        default: true
+        type: boolean
+
+permissions: {}
+
+jobs:
+  prepare:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    # Needs write to push the changelog commit and the release tag.
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      version: ${{ steps.resolve.outputs.version }}
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Check branch
+        run: |
+          if [ "$GITHUB_REF_NAME" != "develop" ]; then
+            echo "::error::Releases must be published from develop (got $GITHUB_REF_NAME)"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Resolve version
+        id: resolve
+        # The input is passed through the environment, never interpolated into
+        # the script — a workflow_dispatch input is attacker-controlled text.
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="$INPUT_VERSION"
+
+          if [ -z "$version" ]; then
+            version=$(gh api "repos/$GITHUB_REPOSITORY/releases" \
+              --jq '[.[] | select(.draft)] | .[0].tag_name // ""')
+            if [ -z "$version" ]; then
+              echo "::error::No release draft found — pass an explicit version input"
+              exit 1
+            fi
+            echo "Resolved from release draft: $version"
+          fi
+
+          version=${version#v}
+
+          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::'$version' is not a stable MAJOR.MINOR.PATCH version. Pre-releases go through the Pre-release workflow."
+            exit 1
+          fi
+
+          tag="v$version"
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "::error::Tag $tag already exists"
+            exit 1
+          fi
+
+          # Release Drafter resolves the previous version from published GitHub
+          # Releases, not from git tags. Until the first release is published it
+          # sees none and drafts v0.0.1, which would publish a NuGet package below
+          # the versions already out there — and NuGet versions cannot be reused.
+          # Refuse anything that is not an increase over the highest existing tag.
+          # Only `v`-prefixed tags count: the bare upstream tags (`2.0.0`) belong to
+          # the original ClosedXML.Parser package, not this one.
+          latest=$(git tag --list 'v[0-9]*' --sort=-v:refname | head -n1)
+          if [ -n "$latest" ] && \
+             [ "$(printf '%s\n%s\n' "$version" "${latest#v}" | sort -V | head -n1)" = "$version" ]; then
+            echo "::error::$tag is not an increase over the latest tag $latest. If the release draft is wrong (it reads v0.0.1 until the first release is published), pass an explicit version input."
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Releasing $tag"
+
+      - name: Roll changelog
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: bash .github/scripts/roll-changelog.sh "$VERSION"
+
+      - name: Show changelog diff
+        run: git --no-pager diff -- CHANGELOG.md
+
+      - name: Dry run summary
+        if: ${{ inputs.dry-run }}
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          {
+            echo "### Dry run — nothing was published"
+            echo
+            echo "Would release **$TAG** with the changelog roll shown in the job log."
+            echo
+            echo "Re-run with **dry-run** unchecked to tag and publish."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit and tag
+        if: ${{ !inputs.dry-run }}
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add CHANGELOG.md
+          git commit -m "chore: roll changelog for $TAG"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin HEAD:develop
+          git push origin "$TAG"
+
+  release:
+    name: Release
+    needs: prepare
+    if: ${{ !inputs.dry-run }}
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+    permissions:
+      contents: write
+      id-token: write
+    secrets: inherit
