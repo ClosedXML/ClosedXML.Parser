@@ -52,10 +52,10 @@ public class PrattParserPrecedenceTests
         return node switch
         {
             ValueNode value => value.GetDisplayString(A1),
-            BinaryNode binaryOp => "(" + 
-                                   GetNormalizedForm(binaryOp.Children[0]) + 
+            BinaryNode binaryOp => "(" +
+                                   GetNormalizedForm(binaryOp.Children[0]) +
                                    binaryOp.GetDisplayString(A1) +
-                                   GetNormalizedForm(binaryOp.Children[1]) + 
+                                   GetNormalizedForm(binaryOp.Children[1]) +
                                    ")",
             _ => throw new UnreachableException()
         };

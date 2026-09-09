@@ -53,7 +53,7 @@ internal class IdentParselet<TScalar, T, TContext> : IPrefixParselet<T, TContext
 
             // No need to check for token type, if EoF, nothing will be matched to such token
             var sheetRefToken = _parser.Consume();
-            
+
             // Check for area `sheet!A1:B2` or just cell `sheet!A1`
             // Check for colspan `sheet!A:B`
             // Check for rowspan `sheet!1:2` with absolute or relative start row

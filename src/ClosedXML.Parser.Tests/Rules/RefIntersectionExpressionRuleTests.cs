@@ -17,7 +17,7 @@ public class RefIntersectionExpressionRuleTests
                 UnaryOperation.ImplicitIntersection,
                 new BinaryNode(
                     BinaryOperation.Intersection,
-                    new ReferenceNode(new ReferenceArea(new RowCol(1,1, A1), new RowCol(10,1, A1))),
+                    new ReferenceNode(new ReferenceArea(new RowCol(1, 1, A1), new RowCol(10, 1, A1))),
                     new ReferenceNode(new ReferenceArea(5, 1, A1))));
         AssertFormula.SingleNodeParsed("@A1:A10 A5", expectedNode);
     }

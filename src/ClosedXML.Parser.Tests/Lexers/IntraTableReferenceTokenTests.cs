@@ -63,7 +63,7 @@ public class IntraTableReferenceTokenTests
             // fragment INNER_REFERENCE : KEYWORD_LIST SPACED_COMMA COLUMN_RANGE
             // where KEYWORD_LIST | '[#Headers]' SPACED_COMMA '[#Data]' | '[#Data]' SPACED_COMMA '[#Totals]'
             yield return new object?[] { "[[#Headers],[#Data],[Col]]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "Col", null };
-            yield return new object?[] { "[[#Headers],[#Data],[First col]:[Last col]]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First col", "Last col"};
+            yield return new object?[] { "[[#Headers],[#Data],[First col]:[Last col]]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First col", "Last col" };
             yield return new object?[] { "[[#Headers],[#Data],First:Last]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First", "Last" };
             yield return new object?[] { "[[#Headers],[#Data],[First]:Last]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First", "Last" };
             yield return new object?[] { "[[#Headers],[#Data],First:[Last]]", StructuredReferenceArea.Headers | StructuredReferenceArea.Data, "First", "Last" };
