@@ -39,8 +39,19 @@ jobs:
         run: |
           OUTPUT=$(dotnet list src/ClosedXML.Parser.sln package --vulnerable --include-transitive --format json)
           echo "$OUTPUT"
-          if echo "$OUTPUT" | jq -e '.projects[] | select(.frameworks)' > /dev/null 2>&1; then
-            echo "::error::Vulnerable packages detected"
+          # A project is only vulnerable if some package carries a non-empty
+          # vulnerabilities array. Testing for .frameworks alone matches clean
+          # projects too, because jq treats an empty array as truthy.
+          VULNERABLE=$(echo "$OUTPUT" | jq -r '
+            .projects[]?.frameworks[]?
+            | ((.topLevelPackages // []) + (.transitivePackages // []))[]
+            | select((.vulnerabilities // []) | length > 0)
+            | "\(.id) \(.resolvedVersion) [\([.vulnerabilities[].severity] | join(", "))]"
+          ' | sort -u)
+          if [ -n "$VULNERABLE" ]; then
+            while IFS= read -r package; do
+              echo "::error::Vulnerable package: $package"
+            done <<< "$VULNERABLE"
             exit 1
           fi
 
