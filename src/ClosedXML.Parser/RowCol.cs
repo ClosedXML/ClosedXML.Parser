@@ -323,11 +323,11 @@ public readonly struct RowCol : IEquatable<RowCol>
         switch (RowType)
         {
             case Absolute:
-                sb.Append('$').Append(RowValue);
+                sb.Append('$').AppendInvariant(RowValue);
                 break;
 
             case Relative:
-                sb.Append(RowValue);
+                sb.AppendInvariant(RowValue);
                 break;
 
             case None:
@@ -356,11 +356,11 @@ public readonly struct RowCol : IEquatable<RowCol>
             switch (type)
             {
                 case Absolute:
-                    sb.Append(axis).Append(position);
+                    sb.Append(axis).AppendInvariant(position);
                     break;
 
                 case Relative when position != 0:
-                    sb.Append(axis).Append('[').Append(position).Append(']');
+                    sb.Append(axis).Append('[').AppendInvariant(position).Append(']');
                     break;
 
                 case Relative:

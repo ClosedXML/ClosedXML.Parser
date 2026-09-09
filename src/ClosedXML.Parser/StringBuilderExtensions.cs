@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace ClosedXML.Parser;
@@ -9,6 +10,31 @@ namespace ClosedXML.Parser;
 /// </summary>
 internal static class StringBuilderExtensions
 {
+    /// <summary>Length of <c>int.MinValue</c> (<c>-2147483648</c>), the longest <see cref="int"/> text.</summary>
+    private const int MaxInt32Length = 11;
+
+    /// <summary>
+    /// Append an <see cref="int"/> formatted with the invariant culture.
+    /// </summary>
+    /// <remarks>
+    /// A formula is a machine format, not a display one. <see cref="StringBuilder.Append(int)"/>
+    /// formats with <see cref="CultureInfo.CurrentCulture"/>, so under a culture whose
+    /// <see cref="NumberFormatInfo.NegativeSign"/> is the Unicode MINUS SIGN U+2212 (sv-SE,
+    /// fi-FI, nb-NO, ...) a negative R1C1 offset would be written as <c>RC[−1]</c>. The
+    /// readers only accept the ASCII hyphen-minus, so such output can't be parsed back.
+    /// </remarks>
+    public static StringBuilder AppendInvariant(this StringBuilder sb, int value)
+    {
+#if NETSTANDARD2_0
+        return sb.Append(value.ToString(CultureInfo.InvariantCulture));
+#else
+        Span<char> buffer = stackalloc char[MaxInt32Length];
+        return value.TryFormat(buffer, out var length, default, CultureInfo.InvariantCulture)
+            ? sb.Append(buffer.Slice(0, length))
+            : sb.Append(value.ToString(CultureInfo.InvariantCulture));
+#endif
+    }
+
     public static StringBuilder AppendSheetReference(this StringBuilder sb, string? sheetName)
     {
         if (sheetName is null)
@@ -46,7 +72,7 @@ internal static class StringBuilderExtensions
 
     public static StringBuilder AppendBookIndex(this StringBuilder sb, int bookIndex)
     {
-        return sb.Append('[').Append(bookIndex).Append(']');
+        return sb.Append('[').AppendInvariant(bookIndex).Append(']');
     }
 
     public static StringBuilder AppendFunction(this StringBuilder sb, ModContext ctx, SymbolRange range, ReadOnlySpan<char> functionName, IReadOnlyList<TransformedSymbol> arguments)
